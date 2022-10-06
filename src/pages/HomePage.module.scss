@@ -1,0 +1,6 @@
+@use '../styles/_themes.scss' as *;
+@use '../styles/_variables.scss' as *;
+
+div {
+  color: $timetable-lab-clr;
+}

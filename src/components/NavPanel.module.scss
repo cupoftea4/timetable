@@ -1,0 +1,16 @@
+
+
+nav {
+  max-width: 90rem;
+  margin: 0 auto;
+  padding: 2.5rem 4rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 2rem;
+  .navButtons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+}

@@ -1,0 +1,29 @@
+@use '../styles/_mixins.scss' as *;
+
+.heart {
+  @include nav-button;
+  min-width: 3.5rem;
+}
+
+.heart > path {
+  fill: transparent;
+
+}
+
+.liked > path {
+  fill: rgb(204, 84, 84);
+  stroke: rgb(204, 84, 84);
+  animation: beat .2s ease-in 2 alternate;
+}
+
+@keyframes beat {
+  0% {
+    transform: scale(1.1);
+  }
+  65% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
