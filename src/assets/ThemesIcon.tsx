@@ -2,7 +2,7 @@ import styles from './ThemesIcon.module.scss';
 
 const ThemesIcon = () => {
   return (
-    <svg className={styles.themes} viewBox="0 0 57 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg className={styles.themes} tabIndex={0} viewBox="0 0 57 56" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M17.8125 24.5C19.78 24.5 21.375 22.933 21.375 21C21.375 19.067 19.78 17.5 17.8125 17.5C15.845 17.5 14.25 19.067 14.25 21C14.25 22.933 15.845 24.5 17.8125 24.5Z" fill="white"/>
       <path d="M28.5 19.25C30.4675 19.25 32.0625 17.683 32.0625 15.75C32.0625 13.817 30.4675 12.25 28.5 12.25C26.5325 12.25 24.9375 13.817 24.9375 15.75C24.9375 17.683 26.5325 19.25 28.5 19.25Z" fill="white"/>
       <path d="M39.1875 24.5C41.155 24.5 42.75 22.933 42.75 21C42.75 19.067 41.155 17.5 39.1875 17.5C37.22 17.5 35.625 19.067 35.625 21C35.625 22.933 37.22 24.5 39.1875 24.5Z" fill="white"/>

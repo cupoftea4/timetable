@@ -1,4 +1,4 @@
-@use '../styles/_variables.scss' as *;
+@use '../styles/_variables' as *;
 
 $border-clr: hsla(0, 0%, 100%, 0.67);
 $placeholder-clr: hsla(0, 0%, 100%, 0.8);
@@ -62,7 +62,7 @@ $icon-size: 1em;
       transition: all .5s ease;
       width: 2rem;
       height: 2rem;
-      &:hover {
+      &:hover, &:focus {
         transform: scale(1.1);
         cursor: pointer;
         
@@ -76,7 +76,7 @@ $icon-size: 1em;
       svg {
         width: 3rem;
         height: 3rem;
-        &:hover {
+        &:hover, &:focus {
           transform: scale(1);
         }
       }
