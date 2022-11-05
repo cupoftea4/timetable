@@ -1,6 +1,7 @@
 .heart {
   min-width: 3.5rem;
   padding-top: 0.25rem;
+  transition: all .2s ease-in-out;
 }
 
 .heart > path {

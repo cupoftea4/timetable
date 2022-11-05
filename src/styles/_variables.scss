@@ -17,3 +17,14 @@ $bg-theme-light-2: linear-gradient(45deg, hsl(292, 58%, 60%), hsl(212, 76%, 66%)
 $regular-font: 400;
 $medium-font: 500;
 $semi-bold-font: 600; 
+
+$spin-animation: spin 2s ease-in-out infinite reverse;
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,24 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.container {
+  @include flex-center;
+  height: 100vh;
+  width: 100vw;
+  background-image: linear-gradient(hsla(0, 0%, 0%, 0.6), hsla(0, 0%, 0%, 0.2));
+  div {
+    @include flex-center;
+    gap: 1rem;
+    svg {
+      width: 4rem;
+      height: 4rem;
+      animation: $spin-animation;
+    }
+    span {
+      font-size: 1.5rem;
+      font-weight: $semi-bold-font;
+    }
+  }
+}
+
+

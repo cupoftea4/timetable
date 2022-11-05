@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import SearchIcon from './SearchIcon';
 import styles from './SearchBar.module.scss';
-import useWindowDimensions from '../hooks/useWindowDimentions';
+import useWindowDimensions from '../hooks/useWindowDimensions';
 
 const SearchBar = ( {toggleSearchBar}: {toggleSearchBar: Function} ) => {
   const { width } = useWindowDimensions();

@@ -2,10 +2,10 @@ import SavedMenu from './SavedMenu'
 import React, { useMemo } from 'react'
 import SearchBar from '../assets/SearchBar';
 import ThemesIcon from '../assets/ThemesIcon';
-import useWindowDimensions from '../hooks/useWindowDimentions';
+import useWindowDimensions from '../hooks/useWindowDimensions';
 import styles from './HeaderPanel.module.scss';
 
-const likedGroups = [ 'ПЗ-22', 'КН-21', 'ПЗ-46'];
+// const likedGroups = [ 'ПЗ-22', 'КН-21', 'ПЗ-46'];
 
 const HeaderPanel = () => {
   const { width } = useWindowDimensions();
@@ -27,7 +27,7 @@ const HeaderPanel = () => {
         null 
         :
         <nav className={styles['nav-buttons']}>
-          <SavedMenu savedGroups={likedGroups} />
+          <SavedMenu />
           <ThemesIcon />
         </nav> 
       }
