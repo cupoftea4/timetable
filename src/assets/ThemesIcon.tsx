@@ -1,8 +1,6 @@
-import styles from './ThemesIcon.module.scss';
-
 const ThemesIcon = () => {
   return (
-    <svg className={styles.themes} tabIndex={0} viewBox="0 0 57 56" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg tabIndex={0} viewBox="0 0 57 56" fill="none" xmlns="http://www.w3.org/2000/svg">
 
     <path d="M15.8125 22.5C17.78 22.5 19.375 20.933 19.375 19C19.375 17.067 17.78 15.5 15.8125 15.5C13.845 15.5 12.25 17.067 12.25 19C12.25 20.933 13.845 22.5 15.8125 22.5Z" fill="white"/>
     <path d="M26.5 17.25C28.4675 17.25 30.0625 15.683 30.0625 13.75C30.0625 11.817 28.4675 10.25 26.5 10.25C24.5325 10.25 22.9375 11.817 22.9375 13.75C22.9375 15.683 24.5325 17.25 26.5 17.25Z" fill="white"/>

@@ -6,30 +6,20 @@ header {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 2rem;
-  .navButtons {
+  .nav-buttons {
     display: flex;
     gap: 1rem;
     align-items: center;
+    svg {
+      width: 3rem;
+      height: 3rem; 
+      transition: all .2s ease-in-out;
+      transform-origin: center;
+      cursor: pointer;
+      &:hover, &:focus {
+        outline: none;
+        transform: scale(1.1);
+      }
+    }
   }
- /*  .liked {
-    position: relative;
-    .likedMenu {
-      padding: 10px;
-      width: 200px;
-      height: 100px;
-      background-color: black;
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translate(-50%, 0);
-      z-index: 100;
-      border-radius: 10px;
-    }    
-    &:hover > .likedMenu, svg:focus + .likedMenu {
-      display: block;
-    } 
-  }*/
-
-
 }

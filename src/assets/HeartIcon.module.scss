@@ -1,7 +1,4 @@
-@use '../styles/_mixins.scss' as *;
-
 .heart {
-  @include nav-button;
   min-width: 3.5rem;
   padding-top: 0.25rem;
 }

@@ -26,7 +26,7 @@ const HeaderPanel = () => {
       {!shrinkSearchBar && shouldShrinkSearchBar ?
         null 
         :
-        <nav className={styles.navButtons}>
+        <nav className={styles['nav-buttons']}>
           <SavedMenu savedGroups={likedGroups} />
           <ThemesIcon />
         </nav> 
