@@ -1,13 +1,10 @@
-// import { MouseEvent } from 'react';
 import styles from './HeartIcon.module.scss';
 
-const HeartIcon = ({liked/* , openMenu */}: {liked: boolean/*, openMenu: (event: MouseEvent<SVGSVGElement>) => void */}) => {
+const HeartIcon = ({liked}: {liked?: boolean}) => {
   return (
-      <svg className={`${styles.heart} ${liked && styles.liked} `} 
-        tabIndex={0}
-        fill="white" xmlns="http://www.w3.org/2000/svg">
-        <path d="M24.3996 9.32811L22.392 7.36278C17.6797 2.74946 9.03888 4.34146 5.91969 10.1414C4.4553 12.8694 4.1249 16.8081 6.79889 21.8347C9.37488 26.6747 14.7341 32.472 24.3996 38.7867C34.0652 32.472 39.4216 26.6747 42.0004 21.8347C44.6744 16.8054 44.3468 12.8694 42.8796 10.1414C39.7604 4.34146 31.1196 2.74679 26.4072 7.36011L24.3996 9.32811Z"  stroke="white" strokeWidth="5"/>
-      </svg>      
+      <svg className={`${styles.heart} ${liked && styles.liked} ` } tabIndex={0} viewBox="0 0 42 38" xmlns="http://www.w3.org/2000/svg">
+        <path d="M21.0003 8.21602L19.2974 6.54894C15.3002 2.63572 7.97068 3.98612 5.32485 8.90592C4.08269 11.2199 3.80243 14.5609 6.07062 18.8247C8.25569 22.9302 12.8016 27.8477 21.0003 33.204C29.1991 27.8477 33.7426 22.9302 35.93 18.8247C38.1982 14.5586 37.9203 11.2199 36.6758 8.90592C34.03 3.98612 26.7005 2.63346 22.7033 6.54668L21.0003 8.21602Z" fill="white" stroke="white" strokeWidth="5"/>
+      </svg>
   )
 };
 

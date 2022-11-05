@@ -1,0 +1,60 @@
+@use '../styles/_variables' as *;
+
+.likedMenu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 16rem;
+  background-color: hsla(0, 0%, 64%, 0.27);
+  border-radius: 1rem;
+  box-shadow: 2px 2px 11px 5px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(40px);
+  z-index: 1;
+  transform: translateX(-50%);
+  padding: 1.5rem 0;
+  /* Tittle */
+  & > span {
+    font-weight: $semi-bold-font;
+    font-size: 0.875rem;
+    margin: 0 1.625rem;
+  }
+  ul {
+    list-style: none;
+    li {
+      font-size: 1.125rem;
+      padding: 0.375rem 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      /* Remove Item Icon */
+      & > svg {
+        display: none;
+      }
+      /* Item name and checkmark*/
+      span {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        & > svg {
+          width: 1rem;
+          height: 1rem;
+        }
+      }
+      &:hover {
+        background-color: hsla(0, 0%, 100%, 0.15);
+        cursor: pointer;
+        & > svg {
+          display: block;
+          width: 0.875rem;
+          height: 0.875rem;
+          transition: all 0.2s ease-in-out;
+          &:hover, &:focus {
+            transform: scale(1.15);
+            cursor: pointer;
+          }
+        }
+      }
+    }
+  }
+
+}

@@ -4,11 +4,16 @@
   @media screen and (max-width: 768px) {
     font-size: 14px;
   }
+  @media screen and (max-width: 268px) {
+    font-size: 12px;
+  }
 }
 
 body {
   background: $bg-theme-light-1;
   font-family: 'Roboto Flex', sans-serif;
+  color: white;
+  font-weight: $regular-font;
   @media screen and (prefers-color-scheme: dark) {
     background: $bg-theme-dark-1;
   }

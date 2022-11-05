@@ -29,6 +29,7 @@ $icon-size: 1em;
     gap: 1em;
 
     input {
+      font-weight: $regular-font;
       flex: 1;
       width: 100%;
       max-width: 15rem;
@@ -68,7 +69,7 @@ $icon-size: 1em;
         
       }
     }
-    &.hiddenSearch {
+    &.hidden-search {
       width: fit-content;
       .search {
         display: none;

@@ -1,18 +1,16 @@
-import { SavedMenu } from './SavedMenu'
+import SavedMenu from './SavedMenu'
 import React, { useMemo } from 'react'
-import HeartIcon from '../assets/HeartIcon';
 import SearchBar from '../assets/SearchBar';
 import ThemesIcon from '../assets/ThemesIcon';
 import useWindowDimensions from '../hooks/useWindowDimentions';
-import styles from './NavPanel.module.scss';
+import styles from './HeaderPanel.module.scss';
 
 const likedGroups = [ 'ПЗ-22', 'КН-21', 'ПЗ-46'];
 
-const NavPanel = () => {
+const HeaderPanel = () => {
   const { width } = useWindowDimensions();
   const shouldShrinkSearchBar = useMemo(() => width < 600, [width]);
   const [shrinkSearchBar, setShrinkSearchBar] = React.useState(shouldShrinkSearchBar);
-
 
 
   const toggleSearchBar = () => {
@@ -23,18 +21,18 @@ const NavPanel = () => {
 
 
   return (
-    <nav>
+    <header>
       <SearchBar toggleSearchBar={toggleSearchBar} /> 
       {!shrinkSearchBar && shouldShrinkSearchBar ?
         null 
         :
-        <span className={styles.navButtons}>
+        <nav className={styles.navButtons}>
           <SavedMenu savedGroups={likedGroups} />
           <ThemesIcon />
-        </span> 
+        </nav> 
       }
-    </nav>
+    </header>
   )
 }
 
-export default NavPanel;
+export default HeaderPanel;

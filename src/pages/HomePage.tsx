@@ -1,4 +1,4 @@
-import NavPanel from '../components/NavPanel';
+import HeaderPanel from '../components/HeaderPanel';
 import '../styles/main.scss';
 import './HomePage.module.scss';
 
@@ -6,7 +6,7 @@ const HomePage = () => {
   
   return (
     <>
-      <NavPanel />
+      <HeaderPanel />
     </>
   )
 }

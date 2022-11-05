@@ -5,6 +5,7 @@
   transform-origin: center;
   cursor: pointer;
   &:hover, &:focus {
+    outline: none;
     transform: scale(1.1);
   }
 }
