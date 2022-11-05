@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import SearchIcon from './SearchIcon';
+import SearchIcon from '../assets/SearchIcon';
 import styles from './SearchBar.module.scss';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 

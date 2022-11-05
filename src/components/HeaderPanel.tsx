@@ -1,6 +1,6 @@
 import SavedMenu from './SavedMenu'
 import React, { useMemo } from 'react'
-import SearchBar from '../assets/SearchBar';
+import SearchBar from './SearchBar';
 import ThemesIcon from '../assets/ThemesIcon';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import styles from './HeaderPanel.module.scss';
