@@ -3,3 +3,9 @@
   align-items: center;
   justify-content: center;
 }
+
+@mixin small-italic-text {
+  font-size: 0.75rem;
+  font-style: italic;
+  font-weight: 300;
+}
