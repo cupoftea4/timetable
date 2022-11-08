@@ -1,8 +1,15 @@
 @use '../styles/mixins' as *;
+@use '../styles/variables' as *;
+
+header {
+  .params {
+    @include flex-center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}
 
 main {
   @include flex-center;
-  // height: 100vh;
   padding: 1rem;
-  // width: 100vw;
 }

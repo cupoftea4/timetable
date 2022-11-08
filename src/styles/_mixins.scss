@@ -1,3 +1,5 @@
+@use './variables' as vars;
+
 @mixin flex-center {
   display: flex;
   align-items: center;
@@ -8,4 +10,11 @@
   font-size: 0.75rem;
   font-style: italic;
   font-weight: 300;
+}
+
+@mixin light-pillow-button {
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  background-color: vars.$light-accent-clr;
+  cursor: pointer;
 }

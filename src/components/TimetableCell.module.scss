@@ -9,7 +9,6 @@ td {
     top: 0;
     height: 100%;
     min-width: $spacer-width;
-    min-height: 6rem;
   }
 }
 
@@ -27,14 +26,15 @@ td {
     margin-left: $spacer-width;
 
     a {
+      font-size: $small-font-size;
       position: absolute;
       bottom: 0.4375rem;
       right: 1rem;
       color: white;
       cursor: pointer;
-      padding: 0 0.3125rem;
+      padding: 0.125em 0.375em; 
       width: fit-content;
-      border-radius: 0.5rem;
+      border-radius: 1rem;
       &.lecture:hover {
         background-color: $timetable-lect-hover-clr;
       }

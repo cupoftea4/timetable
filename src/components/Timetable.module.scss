@@ -6,9 +6,11 @@
   td, th {
     border: 1px solid hsla(0, 0%, 100%, 0.2);
   }
+  // first row
   thead tr:first-child th {
     border-top: none;
   }
+  // last row
   tr:last-child td, th {
     border-bottom: none;
   }
@@ -39,6 +41,7 @@
     }
     border-left: none;
   }
+  // last column
   tr td:last-child, th:last-child {
     border-right: none;
   }

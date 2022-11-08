@@ -4,11 +4,10 @@ import './HomePage.module.scss';
 
 const HomePage = () => {
 
-  
-  
   return (
     <>
       <HeaderPanel />
+      
     </>
   )
 }
