@@ -1,9 +1,10 @@
 @use '../styles/variables' as *;
 
+// TODO: make this a className
 header {
   max-width: 90rem;
   margin: 0 auto;
-  padding: 2.5rem 4rem;
+  padding: 2rem 4rem .75rem 4rem;
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;

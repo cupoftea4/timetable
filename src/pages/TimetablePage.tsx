@@ -17,11 +17,11 @@ const TimetablePage = () => {
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(false); 
   const [isSecondWeek, setIsSecondWeek] = useState(false);
 
-  useEffect(() => {
-    if (timetableGroup) {
-      console.log(TimetableManager.getCachedTimetables());
-    }
-  }, [timetableGroup]);
+  // useEffect(() => {
+  //   if (timetableGroup) {
+  //     console.log(TimetableManager.getCachedTimetables());
+  //   }
+  // }, [timetableGroup]);
 
   useEffect(
     () => {
@@ -29,7 +29,6 @@ const TimetablePage = () => {
         setTimetableGroup(group.toUpperCase().trim());
         TimetableManager.getTimetable(group).then(
           (data) => {
-            // console.log(sortByTime(sortByDay(data)));
             setTimetable(data);
           }
         ).catch((err) =>  {
@@ -40,7 +39,6 @@ const TimetablePage = () => {
         setTimetableGroup(null);
       }
     }, [group]);
-
 
   return (
     <>
@@ -55,11 +53,11 @@ const TimetablePage = () => {
               </nav>
               <span className={styles.params}>
                 <Toggle 
-                  toggleState={[isSecondWeek, setIsSecondWeek]} 
-                  states={['По чисельнику', 'По знаменнику']} />
-                <Toggle 
                   toggleState={[isSecondSubgroup, setIsSecondSubgroup]} 
                   states={["I підгрупа", "II підгрупа"]} />
+                <Toggle 
+                  toggleState={[isSecondWeek, setIsSecondWeek]} 
+                  states={['По чисельнику', 'По знаменнику']} />
               </span>
             </header>
             <main>
@@ -74,6 +72,6 @@ const TimetablePage = () => {
       : <Navigate to="/"/>}
     </>
   )
-}
+};
 
 export default TimetablePage;

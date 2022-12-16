@@ -1,5 +1,5 @@
-import { timeout } from "./func";
-import { TimetableItem, TimetableType } from "./types";
+import { timeout } from "./requestHandling";
+import { ObjectType, TimetableItem, TimetableType } from "./types";
 
 const NULP = "https://student.lpnu.ua/";
 const TIMETABLE_SUFFIX = "students_schedule";
@@ -8,8 +8,6 @@ const PROXY = "https://api.codetabs.com/v1/proxy?quest=";
 const FALLBACK_URL = "https://raw.githubusercontent.com/zubiden/nulp-timetable-data/data/";
 
 const TIMEOUT = 3000; // 3s
-
-type ObjectType = {[key: string]: string};
 
 
 export async function fetchHtml(params: ObjectType = {}) {

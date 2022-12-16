@@ -1,17 +1,36 @@
+import { memo } from 'react';
+import { useDelayedProp } from '../hooks/useDelayedProp';
 import { TimetableItem } from '../utils/types';
 import styles from './TimetableCell.module.scss';
 
-const TimetableCell = ({lesson}: {lesson:  null | TimetableItem}) => {
-  return (
+type TimetableCellProps = {
+  lesson: null | TimetableItem;
+  active: boolean;
+};
+
+const ANIMATION_DURATION = 300;
+
+const TimetableCell = ({lesson, active}: TimetableCellProps) => {
+  const [innerLesson, shouldAppear] = useDelayedProp(lesson, ANIMATION_DURATION);
+
+  return ( 
     <>
-      {lesson !== null ? (
-          <td >
-            <div className={`${styles.spacer} ${styles[lesson.type]}`}/>
-            <div className={styles.cell}>
+      {innerLesson !== null ? (
+          <td className={`${!shouldAppear ? styles.hide : styles.show}`}>
+            <div className={`${styles.spacer} ${styles[innerLesson.type]}`}/>
+            <div className={`${styles.cell} ${active && styles.active}`} >
               <div className={styles.info}>
-                <h4>{lesson.subject}</h4>  
-                {lesson.location.trim()} 
-                <a href={lesson.urls[0]} className={styles[lesson.type]}>Приєднатись</a>   
+                <span>
+                  <h4>{innerLesson.subject.replace('`', '’')}</h4> 
+                  {innerLesson.lecturer}
+                </span> 
+                <span>  
+                  {innerLesson.location.replaceAll(/,./g, '').trim()} 
+                  {innerLesson.urls[0] && 
+                    <a href={innerLesson.urls[0]} target="_blank" rel="noreferrer"
+                    className={styles[innerLesson.type]}>Приєднатись</a>
+                  }
+                </span>
               </div>      
             </div>
           </td>
@@ -20,6 +39,6 @@ const TimetableCell = ({lesson}: {lesson:  null | TimetableItem}) => {
     </>
 
   )
-}
+};
 
-export default TimetableCell;
+export default memo(TimetableCell);

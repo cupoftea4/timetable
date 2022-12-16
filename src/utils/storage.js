@@ -1,15 +1,22 @@
 import { openDB } from "idb";
 
-const defaultDbName = "nulp-timetable";
-const defaultStoreName = "cache";
-const cachedKevals = {};
+const DEFAULT_DB_NAME = "nulp-timetable";
+const DEFAULT_STORE_NAME = "cache";
 
-function keval(dbPromise, storeName) {
-    if (cachedKevals[storeName]) {
-        return cachedKevals[storeName];
+const DEFAULT_DB_PROMISE = openDB(DEFAULT_DB_NAME, 2, {
+    upgrade(db) {
+            db.createObjectStore(DEFAULT_STORE_NAME);
+    },
+});
+
+const cachedStorage = {};
+
+function getStorage(dbPromise, storeName) {
+    if (cachedStorage[storeName]) {
+        return cachedStorage[storeName];
     }
 
-    return cachedKevals[storeName] = {
+    return cachedStorage[storeName] = {
         keys: () => dbPromise.then(db => db.getAllKeys(storeName)),
         clear: () => dbPromise.then(db => db.clear(storeName)),
         deleteItem: (key) => dbPromise.then(db => db.delete(storeName, key)),
@@ -18,12 +25,8 @@ function keval(dbPromise, storeName) {
     };
 }
 
-const DEFAULT_DB_PROMISE = openDB(defaultDbName, 2, {
-    upgrade(db, oldVersion, newVersion, transaction) {
-            db.createObjectStore(defaultStoreName);
-    },
-});
 
-const storage = keval(DEFAULT_DB_PROMISE, defaultStoreName);
+
+const storage = getStorage(DEFAULT_DB_PROMISE, DEFAULT_STORE_NAME);
 
 export default storage;

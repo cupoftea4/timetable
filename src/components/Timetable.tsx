@@ -1,7 +1,8 @@
-import { memo, useMemo } from 'react';
+import { useMemo } from 'react';
 import { TimetableItem } from '../utils/types';
 import TimetableCell from './TimetableCell';
 import styles from './Timetable.module.scss';
+import { getCurrentUADate, stringToDate } from '../utils/date';
 
 type TimetableProps = {
   timetable: TimetableItem[];
@@ -9,8 +10,8 @@ type TimetableProps = {
   isSecondWeek: boolean;
 };
 
-
 const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) => {
+  console.log(timetable);
   const maxLessonNumber = useMemo(() => 
     timetable?.reduce((max, item) => item.number > max ? item.number : max, 0) || 0, 
   [timetable]);
@@ -34,13 +35,28 @@ const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) 
     [null, "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].slice(0, maxDayNumber + 1), 
   [maxDayNumber]);
 
+  const getCurrentLessonNumber = () => {
+    const curDate = stringToDate("15:23");
+    return lessonsTimes.findIndex(time => stringToDate(time.start) <= curDate && curDate <= stringToDate(time.end));
+  } 
+
+  const currentDay =  getCurrentUADate().getDay();
+  const currentLessonNumber = getCurrentLessonNumber();
+  
 
   const getLessonByDayAndTime = (number: number, day: number) => {
     if (timetable) {
-      return timetable.find((item) => item.day === day && item.number === number) ?? null;
+      return timetable.find(item => 
+        item.day === day &&
+        item.number === number &&
+        ((item.isSecondSubgroup === isSecondSubgroup && item.isFirstSubgroup === !isSecondSubgroup) ||
+          (item.isFirstSubgroup && item.isSecondSubgroup)) &&
+        ((item.isSecondWeek === isSecondWeek && item.isFirstWeek === !isSecondWeek) ||
+          (item.isFirstWeek && item.isSecondWeek))
+      ) ?? null;
     }
     return null;
-  }
+  };
 
   return (
       <table className={styles.timetable}>
@@ -61,7 +77,10 @@ const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) 
                       <span>{time.end}</span>
                     </th> 
                     :
-                    <TimetableCell lesson={getLessonByDayAndTime(i + 1, j)} key={time.start + day}/>
+                      <TimetableCell 
+                        lesson={getLessonByDayAndTime(i + 1, j)} 
+                        active={currentLessonNumber === i && currentDay === j} 
+                        key={time.start + day}/>
                 )
               }</tr>  
             )
@@ -69,6 +88,6 @@ const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) 
         </tbody>
      </table>
   )
-}
+};
 
-export default memo(Timetable);
+export default Timetable;

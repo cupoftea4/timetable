@@ -3,6 +3,8 @@ import SearchIcon from '../assets/SearchIcon';
 import styles from './SearchBar.module.scss';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 
+
+// TODO: refactor generic html elements (div, span, etc.)
 const SearchBar = ( {toggleSearchBar}: {toggleSearchBar: Function} ) => {
   const { width } = useWindowDimensions();
   const [showSearchBar, setShowSearchBar] = useState(width > 600);
@@ -20,6 +22,6 @@ const SearchBar = ( {toggleSearchBar}: {toggleSearchBar: Function} ) => {
       </span>
     </span>
   )
-}
+};
 
 export default SearchBar;

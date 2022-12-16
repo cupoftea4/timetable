@@ -5,6 +5,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import TimetablePage from "./pages/TimetablePage";
 import LoadingPage from "./pages/LoadingPage";
 
+/*
+TODO:
+  - add data-attributes and aria-labels to elements
+  - make custom hooks from useEffects
+  - add webkit css
+*/
+
 const App = () => {
   const [isLoaded, setIsLoaded] = useState(false);
 

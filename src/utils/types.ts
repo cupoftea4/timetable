@@ -19,3 +19,4 @@ export type TimetableType = 'lecture' | 'practical' | 'lab' | 'consultation';
 export type CachedTimetable = {group: string, time: number};
 export type CachedGroup = string;
 export type CachedInstitute = string;
+export type ObjectType = {[key: string]: string};

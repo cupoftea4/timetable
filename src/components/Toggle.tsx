@@ -1,4 +1,3 @@
-// import useToggleRef from '../hooks/useToggle';
 import styles from './Toggle.module.scss';
 
 type ToggleProps = {
@@ -9,7 +8,8 @@ type ToggleProps = {
 const Toggle = ({toggleState, states}: ToggleProps) => {
   const [active, setActive] = toggleState;
   
-  const toggle = () => setActive(prev => !prev);
+  const toggle = () => setActive(!active);
+  
   const handleKeyToggle = (e: React.KeyboardEvent<HTMLSpanElement>) => {
     if (e.key === 'Enter') toggle();
   };

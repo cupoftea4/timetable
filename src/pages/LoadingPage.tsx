@@ -10,6 +10,6 @@ const LoadingPage = () => {
       </div>
     </main>
   )
-}
+};
 
-export default LoadingPage
+export default LoadingPage;

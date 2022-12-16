@@ -6,34 +6,34 @@
   td, th {
     border: 1px solid hsla(0, 0%, 100%, 0.2);
   }
-  // first row
+  /* First row */
   thead tr:first-child th {
     border-top: none;
   }
-  // last row
+  /* Last row */
   tr:last-child td, th {
     border-bottom: none;
   }
 
-  // first column
+  /* First column */
   tr td:first-child, th:first-child {
     width: 5rem;
     position: relative;
     span {
       position: absolute;
     }
-    // start time
+    /* Start time */
     span:first-child {
       @include small-italic-text;
       top: 0%;
       right: .5rem;
     }
-    // lesson number
+    /* Lesson number */
     :nth-child(2) {
       top: 0%;
       right: 3.5rem;
     }
-    // end time
+    /* End time */
     span:last-child {
       @include small-italic-text;
       bottom: 0%;
@@ -41,7 +41,7 @@
     }
     border-left: none;
   }
-  // last column
+  /* Last column */
   tr td:last-child, th:last-child {
     border-right: none;
   }
