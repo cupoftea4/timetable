@@ -11,7 +11,6 @@ type TimetableProps = {
 };
 
 const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) => {
-  console.log(timetable);
   const maxLessonNumber = useMemo(() => 
     timetable?.reduce((max, item) => item.number > max ? item.number : max, 0) || 0, 
   [timetable]);
@@ -71,7 +70,7 @@ const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) 
               <tr key={time.start}>{
                 days.map((day, j) =>
                   day === null ?
-                    <th key={time.start + day}>
+                    <th key={time.start + day} style={{height: "5rem"}}>
                       <span>{time.start}</span>
                       <span>{i + 1}</span> 
                       <span>{time.end}</span>

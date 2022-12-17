@@ -2,12 +2,17 @@ import { useState } from 'react';
 import SearchIcon from '../assets/SearchIcon';
 import styles from './SearchBar.module.scss';
 import useWindowDimensions from '../hooks/useWindowDimensions';
-
+import DatalistInput from 'react-datalist-input';
+import 'react-datalist-input/dist/styles.scss';
+import TimetableManager from '../utils/TimetableManager';
+import { useNavigate } from 'react-router-dom';
 
 // TODO: refactor generic html elements (div, span, etc.)
 const SearchBar = ( {toggleSearchBar}: {toggleSearchBar: Function} ) => {
   const { width } = useWindowDimensions();
   const [showSearchBar, setShowSearchBar] = useState(width > 600);
+  const options = TimetableManager.getSyncGroups().map(group => ({id: group, value: group}));
+  const navigate = useNavigate();
 
   return (
     <span className={`${styles.bar} ${!showSearchBar && styles['hidden-search']}`}>
@@ -15,10 +20,15 @@ const SearchBar = ( {toggleSearchBar}: {toggleSearchBar: Function} ) => {
           if (width < 600) {
             setShowSearchBar(!showSearchBar);
             toggleSearchBar();
-          }
+          } 
         }}/>
       <span className={styles.search}>
-        <input type="text" placeholder="Search" />
+        <DatalistInput
+          placeholder="Група"
+          label=""
+          onSelect={item => navigate(`/${item.value}`)}
+          items={options}
+        />
       </span>
     </span>
   )

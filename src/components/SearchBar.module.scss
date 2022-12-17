@@ -14,7 +14,7 @@ $icon-size: 1em;
       margin: 0 0.575em;
       width: $icon-size;
       height: $icon-size;
-      position: fixed;
+      position: absolute;
     }
 
   .search {
@@ -27,6 +27,14 @@ $icon-size: 1em;
     padding: 0.125em 1em;
     border-radius: 10rem;
     gap: 1em;
+    ul {
+      max-height: 300px;
+      overflow-y: auto;
+      color: black;
+      mark {
+        background-color: $dark-accent-clr;
+      }
+    }
 
     input {
       font-weight: $regular-font;
@@ -39,6 +47,7 @@ $icon-size: 1em;
       outline: none;
       padding: 0;
       margin-left: $icon-size;
+      font-size: 1em;
 
       &::placeholder {
         color: $placeholder-clr;

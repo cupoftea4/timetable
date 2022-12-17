@@ -10,6 +10,7 @@ TODO:
   - add data-attributes and aria-labels to elements
   - make custom hooks from useEffects
   - add webkit css
+  - add error handling
 */
 
 const App = () => {
@@ -17,13 +18,9 @@ const App = () => {
 
   useEffect(
     () => {
-      initData().then(() => setIsLoaded(true));
+      TimetableManager.init().then(() => setIsLoaded(true));
     }, []
   );
-
-  const initData = async () => {
-    await TimetableManager.init();
-  }
 
   return (
     <BrowserRouter>

@@ -57,7 +57,7 @@ export async function getGroups(departmentparent_abbrname_selective = "All") {
 		const response = await fetch(fallback);
 		if (!response.ok)
 			throw Error(err);
-		return await response.json();
+		return await response.json() as string[];
 	})
 }
 
@@ -165,7 +165,7 @@ function parseLessonData(element: Element) {
 		if(node.nodeName === "BR") {
 			if(br) texts.push(""); //sometimes text is skipped with sequenced <br/> 
 			br = true;
-		} else if(node.nodeName==="SPAN") {
+		} else if(node.nodeName === "SPAN") {
 			lessonUrls.push((node as Element).querySelector("a")?.href ?? "");
 			br = false;
 		} else {
@@ -190,8 +190,8 @@ function parseLessonId(id: string) {
 	}
 	week = split[split.length-1];
 	return {
-		isFirstWeek: week === "full" || week==="chys",
-		isSecondWeek: week === "full" || week==="znam",
+		isFirstWeek: week === "full" || week === "chys",
+		isSecondWeek: week === "full" || week === "znam",
 		isFirstSubgroup: subgroup === "all" || subgroup === 1,
 		isSecondSubgroup: subgroup === "all" || subgroup === 2,
 	}

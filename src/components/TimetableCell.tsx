@@ -34,7 +34,7 @@ const TimetableCell = ({lesson, active}: TimetableCellProps) => {
               </div>      
             </div>
           </td>
-        ) : <td></td>
+        ) : <td style={{minWidth: "12rem"}}></td>
       }    
     </>
 
