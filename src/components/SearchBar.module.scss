@@ -28,11 +28,41 @@ $icon-size: 1em;
     border-radius: 10rem;
     gap: 1em;
     ul {
+      z-index: 1;
       max-height: 300px;
       overflow-y: auto;
-      color: black;
+      border: none;
+      font-size: 1.25rem;
+      background-color: hsla(0, 0%, 64%, 0.27);
+      border-radius: 1rem;
+      
+      box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
+      backdrop-filter: blur(40px);
+      &::-webkit-scrollbar {
+        width: 12px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: $light-accent-clr;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background-color: $light-accent-clr;
+        border-radius: .5rem;
+      }
       mark {
-        background-color: $dark-accent-clr;
+        color: white;
+        background-color: $light-accent-clr;
+      }
+      li {
+        padding: 0.25em 1em;
+        &:hover {
+          background-color: hsla(0, 0%, 100%, 0.15);
+          cursor: pointer;
+        }
+        &:focus {
+          background-color: hsla(0, 0%, 100%, 0.371);
+        }
       }
     }
 
