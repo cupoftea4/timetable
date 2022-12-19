@@ -1,2 +1,35 @@
 @use '../styles/_themes.scss' as *;
 @use '../styles/_variables.scss' as *;
+@use '../styles/_mixins.scss' as *;
+
+.selection {
+  max-width: $max-content-width;
+  display: flex;
+  gap: 5rem;
+  padding: .5rem 10rem;
+  @include tablet {
+    padding: .5rem 3rem;
+  }
+  width: 100%;
+  li {
+    font-size: $medium-font-size;
+    margin: .125em;
+
+    button {
+      padding: .125em .5em;  
+      width: 7em;
+      text-align: left;
+      border-radius: 5px;
+      color: white;
+      background-color: transparent;
+      border: none;
+      cursor: pointer;
+      &[data-state=selected] {
+        background-color: $light-accent-clr;
+      }
+      &:hover {
+        background-color: $light-accent-clr;
+      }
+    }
+  }
+}

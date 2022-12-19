@@ -7,8 +7,8 @@ $icon-size: 1em;
 .bar {
   display: flex;
   align-items: center;
-  font-size: 24px;
-  width: 25rem;
+  font-size: 22px;
+  width: 22rem;
 
   svg {
       margin: 0 0.575em;
@@ -34,8 +34,7 @@ $icon-size: 1em;
       border: none;
       font-size: 1.25rem;
       background-color: hsla(0, 0%, 64%, 0.27);
-      border-radius: 1rem;
-      
+      border-radius: 2% 2% 2% 6%;
       box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
       backdrop-filter: blur(40px);
       &::-webkit-scrollbar {
@@ -44,6 +43,7 @@ $icon-size: 1em;
       
       &::-webkit-scrollbar-track {
         background: $light-accent-clr;
+        border-radius: 1rem;
       }
       
       &::-webkit-scrollbar-thumb {
@@ -103,6 +103,7 @@ $icon-size: 1em;
       width: 2rem;
       height: 2rem;
       &:hover, &:focus {
+
         transform: scale(1.1);
         cursor: pointer;
         
@@ -114,8 +115,8 @@ $icon-size: 1em;
         display: none;
       }
       svg {
-        width: 3rem;
-        height: 3rem;
+        width: 2.5rem;
+        height: 2.5rem;
         &:hover, &:focus {
           transform: scale(1);
         }

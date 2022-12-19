@@ -70,7 +70,8 @@ class TimetableManager {
 		return groups;
 	}
 
-	getSyncGroups(): string[] {
+	// TODO: remove
+	getSyncGroups(): CachedGroup[] {
 		return this.groups;
 	}
 
@@ -100,7 +101,8 @@ class TimetableManager {
 
 		const data = this.timetables.find(el => el.group === group.toUpperCase());
 		if (!data) {
-				throw Error(`Failed to update timetable subgroup! Group: ${group}`);
+			console.error(`Failed to update timetable subgroup! Group: ${group}`);
+			return;
 		}
 		if (data.subgroup === subgroup) return;
 
@@ -116,10 +118,7 @@ class TimetableManager {
 	getSubgroup(group: string | undefined) {
 		if (!group) return;
 		const data = this.timetables.find(el => el.group === group.toUpperCase());
-		if (!data) {
-			return;
-				// throw Error(`Failed to get timetable subgroup! Group: ${group}`);
-		}
+		if (!data) return;
 		return data.subgroup;
 	}
 

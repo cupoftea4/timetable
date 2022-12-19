@@ -40,11 +40,11 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
       onMouseEnter={openMenu}  onMouseLeave={closeMenu} 
       onFocusCapture={openMenu} onBlur={closeMenu} 
     >
-      <button style={{background: "transparent", border: 0}} onClick={likeItem}>
-        <HeartIcon liked={likable && isLiked}/>
-      </button>
+      {/* <button style={{background: "transparent", border: 0, outline: "none"}} onClick={likeItem} > */}
+        <HeartIcon onClick={likeItem} liked={likable && isLiked}/>
+      {/* </button> */}
       {isMenuOpen &&
-        <div className={styles['saved-menu']}>
+        <div className={styles['saved-menu']} >
           <span>{savedGroups.length !== 0 ? "Saved" : "No saved items. Open any timetable to automatically save it."}</span>
           <ul>
             {savedGroups.map((group, index) => (

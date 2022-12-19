@@ -51,7 +51,7 @@ const TimetablePage = () => {
       {timetableGroup !== null ? 
         timetable !== undefined ?
           <>
-            <header>
+            <header className={headerStyles.header}>
               <nav className={headerStyles['nav-buttons']}> 
                 <Link to="/"><HomeIcon className={headerStyles.home}/></Link>
                 <SavedMenu likable={true}/>
@@ -66,12 +66,14 @@ const TimetablePage = () => {
                   states={['По чисельнику', 'По знаменнику']} />
               </span>
             </header>
-            <main>
-              <Timetable 
-                timetable={timetable} 
-                isSecondWeek={isSecondWeek} 
-                isSecondSubgroup={isSecondSubgroup} 
-              />
+            <main className={styles.container}>
+              <section className={styles.timetable}>
+                <Timetable 
+                  timetable={timetable} 
+                  isSecondWeek={isSecondWeek} 
+                  isSecondSubgroup={isSecondSubgroup} 
+                />
+              </section>
             </main> 
           </>       
         : <LoadingPage/>

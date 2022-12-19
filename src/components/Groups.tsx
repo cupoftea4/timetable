@@ -1,6 +1,8 @@
 import { memo, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom';
+import useWindowDimensions from '../hooks/useWindowDimensions';
 import TimetableManager from '../utils/TimetableManager';
+import styles from './Groups.module.scss';
 
 enum Year {
   First = 1,
@@ -10,15 +12,19 @@ enum Year {
 }
 
 const Groups = ({institute}: {institute: string}) => {
-  const [groupsByYear, setGroupsByYear] = useState<string[][]>([]);
+  const [groupsByYear, setGroupsByYear] = useState<string[][]>([]); // groupsByYear[year][groupIndex]
   const [majors, setMajors] = useState<string[]>([]);
   const [selectedMajor, setSelectedMajor] = useState<string | null>(null);
+  const { width } = useWindowDimensions();
+  console.log(width);
+  
 
   useEffect(() => {
     TimetableManager.getGroups(institute).then((data) =>  {
       const tempGroups = new Set<string>(data.map(group => group.split('-')[0]));
       setMajors(Array.from(tempGroups));
       setGroupsByYear(sortGroupsByYear(data));
+      setSelectedMajor(null);
     });
   }, [institute]);
 
@@ -36,6 +42,14 @@ const Groups = ({institute}: {institute: string}) => {
       return acc;
     }, [] as string[][]);
   }
+
+  const groupElement = (group: string) => {
+    return (<li key={group}>
+              <Link to={group}>
+                {group}
+              </Link>
+            </li>)
+  }
   
   return (
     <>
@@ -43,36 +57,33 @@ const Groups = ({institute}: {institute: string}) => {
           {
             majors.map((group) =>
                 <li key={group}>
-                  <button onClick={() => setSelectedMajor(group)}>
-                    {group} {selectedMajor === group && "selected"}
-                  </button>
-                </li>
-            )
-          }        
-        </ul>
-        <ul>
-          {
-            getSelectedGroups(Year.Second).map((group) =>
-                <li key={group}>
-                  <Link to={group}>
+                  <button data-state={selectedMajor === group ? "selected" : ""} 
+                      onClick={() => setSelectedMajor(group)} 
+                      >
                     {group}
-                  </Link>
+                  </button>
                 </li>
             )
           }
       </ul>
-      <ul>
-          {
-            getSelectedGroups(Year.Third).map((group) =>
-                <li key={group}>
-                  <Link to={group}>
-                    {group}
-                  </Link>
-                </li>
-            )
-          }
-      </ul>      
-    </> 
+      {
+        !selectedMajor ? <p>Виберіть спеціальність</p> :
+        <div className={styles.groups}>
+          { 
+            [Year.First, Year.Second, Year.Third, Year.Fourth].map((year) => 
+              getSelectedGroups(year).length !== 0 ?
+                  <ul key={year} className={styles.year} 
+                      data-value={`${year} Курс`}
+                    >
+                      { getSelectedGroups(year).map(groupElement) }
+                  </ul> 
+              : null
+            )}
+        </div>
+      }
+      
+       
+    </>
   )
 };
 

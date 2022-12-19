@@ -18,3 +18,71 @@
   background-color: vars.$light-accent-clr;
   cursor: pointer;
 }
+
+@mixin animated-underline {
+      position: relative;
+      &::after{
+        // transition: all .1s ease-in-out;
+          content: '';
+          position: absolute;
+          width: 60%;
+          height: .2rem;
+          bottom: 0;
+          left: 50%;
+          transform: translateX(-50%) scaleX(0);
+          background-color: white;
+          border-radius: .7rem;
+          visibility: hidden;
+          transition: .25s linear;
+      }
+      &:hover:after,
+      &:focus:after {
+          visibility: visible;
+          transform: translateX(-50%) scaleX(1);
+      }
+}
+
+// @mixin visually-hidden {
+//   clip: rect(0 0 0 0);
+//   clip-path: inset(50%);
+//   // height: 1px;
+//   // overflow: hidden;
+//   position: absolute;
+//   // white-space: nowrap;
+//   // width: 1px;
+// }
+
+// @mixin visually-visible {
+//   clip: auto;
+//   clip-path: none;
+//   // height: auto;
+//   // overflow: visible;
+//   position: block;
+//   // white-space: normal;
+//   // width: auto;
+// }
+
+
+@mixin timetable-mobile {
+  @media only screen and (max-width: 1000px) {
+      @content;
+  }
+}
+
+@mixin mobile {
+  @media only screen and (max-width: 480px) {
+      @content;
+  }
+}
+
+@mixin tablet {
+  @media only screen and (max-width: 768px) {
+      @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 768px) {
+      @content;
+  }
+}

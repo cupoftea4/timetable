@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Literata:opsz@7..72&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600;8..144,700&family=Roboto+Mono:ital,wght@0,400;0,600;0,700;1,300;1,600&display=swap');
 
 :root {
-  @media screen and (max-width: 768px) {
+  @include tablet {
     font-size: 14px;
   }
-  @media screen and (max-width: 268px) {
+  @include mobile {
     font-size: 12px;
   }
 }
@@ -14,8 +14,14 @@ body {
   font-family: 'Roboto Flex', sans-serif;
   color: white;
   font-weight: $regular-font;
+  
   @media screen and (prefers-color-scheme: dark) {
     background: $bg-theme-dark-1;
+  }
+
+  main {
+    @include flex-center;
+    padding: 1rem;
   }
 }
 

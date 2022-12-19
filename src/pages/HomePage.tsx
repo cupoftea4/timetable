@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import Groups from '../components/Groups';
 import HeaderPanel from '../components/HeaderPanel';
-import '../styles/main.scss';
 import TimetableManager from '../utils/TimetableManager';
 import { CachedInstitute } from '../utils/types';
-import './HomePage.module.scss';
+import styles from './HomePage.module.scss';
 
 const HomePage = () => {
   const [institutes, setInstitutes] = useState<CachedInstitute[]>([]);
@@ -13,7 +12,7 @@ const HomePage = () => {
   useEffect(() => {
     TimetableManager.getInstitutes().then((data) => {
       setInstitutes(data);
-      showInstituteGroups(data[0]);
+      // showInstituteGroups(data[0]);
     });
   }, []);
 
@@ -24,20 +23,27 @@ const HomePage = () => {
   return (
     <>
       <HeaderPanel />
-      <ul>
-      {
-        institutes.map((institute) => {
-          return (
-            <li key={institute}>
-              <button onClick={() => showInstituteGroups(institute)}>
-                {institute} {selectedInstitute === institute && "selected"}
-              </button>
-              </li>
-          )
-        })
-      }        
-      </ul>
-      {selectedInstitute && <Groups institute={selectedInstitute} />}
+      <main>
+        <section className={styles.selection}>
+          <ul>
+          {
+            institutes.map((institute) => {
+              return (
+                <li key={institute}>
+                  <button onClick={() => showInstituteGroups(institute)} 
+                    data-state={selectedInstitute === institute ? "selected" : ""} 
+                   >
+                    {institute}
+                  </button>
+                </li>
+              )
+            })
+          }        
+          </ul>
+          {selectedInstitute && <Groups institute={selectedInstitute} />}
+        </section>
+        
+      </main>
     </>
   )
 };

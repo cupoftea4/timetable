@@ -1,15 +1,27 @@
 @use '../styles/mixins' as *;
 @use '../styles/variables' as *;
 
-header {
-  .params {
-    @include flex-center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
+
+.params {
+  @include flex-center;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
-main {
-  @include flex-center;
-  padding: 1rem;
+
+/* Timetable on mobile */
+.container {
+  margin: auto 0;
+  .timetable {
+    @include timetable-mobile {
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      max-width: 90vw;
+      td, th {
+        min-width: 90vw;
+        scroll-snap-align: center;
+      }
+    }
+  }
+ 
 }

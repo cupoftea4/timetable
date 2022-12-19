@@ -19,7 +19,7 @@ const HeaderPanel = () => {
 
 
   return (
-    <header>
+    <header className={styles.header}>
       <SearchBar toggleSearchBar={toggleSearchBar} /> 
       {!shrinkSearchBar && shouldShrinkSearchBar ?
         null 
