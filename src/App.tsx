@@ -23,7 +23,7 @@ const App = () => {
   );
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/timetable">
       <Routes>
         <Route path="/" element={isLoaded ? <HomePage/> : <LoadingPage/>} />
         <Route path="/:group" element={isLoaded ? <TimetablePage/> : <LoadingPage/>} />

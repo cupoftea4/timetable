@@ -12,21 +12,26 @@ class TimetableManager {
 	private groupsRequest: Promise<CachedGroup[]> | null  = null;
 
 	async init() {
-		this.institutes = (await storage.getItem("institutes")) || [];
-		this.groups = (await storage.getItem("groups")) || [];
-		this.timetables = (await storage.getItem("cached_timetables")) || [];
+		try {
+			this.institutes = (await storage.getItem("institutes")) || [];
+			this.groups = (await storage.getItem("groups")) || [];
+			this.timetables = (await storage.getItem("cached_timetables")) || [];
+		
+			const institutesUpdated = await storage.getItem("institutes_updated");
+			if (this.institutes.length === 0 || needsUpdate(institutesUpdated)) {
+				console.log("Downloading institute list...");
+				this.requestInstitutes(true);
+			}
 
-		const institutesUpdated = await storage.getItem("institutes_updated");
-		if (this.institutes.length === 0 || needsUpdate(institutesUpdated)) {
-			console.log("Downloading institute list...");
-			this.requestInstitutes(true);
+			const groupsUpdated = await storage.getItem("groups_updated");
+			if (this.groups.length === 0 || needsUpdate(groupsUpdated)) {
+				console.log("Downloading group list...");
+				this.requestGroups(true);
+			}
+		} catch (e) {
+			console.error("Error while loading cached data", e);
 		}
-
-		const groupsUpdated = await storage.getItem("groups_updated");
-		if (this.groups.length === 0 || needsUpdate(groupsUpdated)) {
-			console.log("Downloading group list...");
-			this.requestGroups(true);
-		}
+		
 	}
 
 	async requestInstitutes(force: boolean = false) {

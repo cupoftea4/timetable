@@ -11,7 +11,7 @@ const Toggle = ({toggleState, states}: ToggleProps) => {
   const toggle = () => setActive(!active);
   
   const handleKeyToggle = (e: React.KeyboardEvent<HTMLSpanElement>) => {
-    if (e.key === 'Enter') toggle();
+    if (e.key === 'Enter' || e.key === " ") toggle();
   };
 
   return (

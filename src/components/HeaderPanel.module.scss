@@ -19,10 +19,10 @@
       transition: all .2s ease-in-out;
       transform-origin: center;
       cursor: pointer;
-      &:hover, &:focus {
+/*       &:hover, &:focus {
         outline: none;
         transform: scale(1.1);
-      }
+      } */
     }
     h1 {
       align-self: flex-end;
