@@ -6,6 +6,10 @@
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   padding: 1rem;
+  @include timetable-mobile {
+    padding: 0;
+    grid-template-columns: 1fr;
+  }
   flex-basis: 100%;
   height: fit-content;
   .year {
@@ -24,7 +28,7 @@
     }
 
     &:hover {
-      max-height: 40rem; // it could go wrong any time...
+      max-height: 60rem; // it could go wrong any time...
       cursor: pointer;
       li {
         opacity: 1;

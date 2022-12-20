@@ -7,11 +7,10 @@ import 'react-datalist-input/dist/styles.scss';
 import TimetableManager from '../utils/TimetableManager';
 import { useNavigate } from 'react-router-dom';
 
-// TODO: refactor generic html elements (div, span, etc.)
 const SearchBar = ( {toggleSearchBar}: {toggleSearchBar: Function} ) => {
   const { width } = useWindowDimensions();
   const [showSearchBar, setShowSearchBar] = useState(width > 600);
-  const options = TimetableManager.getSyncGroups().map(group => ({id: group, value: group}));
+  const options = TimetableManager.getCachedGroups().map(group => ({id: group, value: group}));
   const navigate = useNavigate();
 
   return (

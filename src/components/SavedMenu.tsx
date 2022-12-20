@@ -5,6 +5,7 @@ import HeartIcon from '../assets/HeartIcon';
 import RemoveIcon from '../assets/RemoveIcon';
 import TimetableManager from '../utils/TimetableManager'; 
 import styles from './SavedMenu.module.scss';
+import * as errors from '../utils/errorConstants';
 
 const MAX_SAVED_ITEMS = 5;
 
@@ -16,22 +17,19 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
   const navigate = useNavigate();
     
   function getCachedGroups(): string[] {
-    console.log(TimetableManager.getCachedTimetables());
     const cachedGroups = TimetableManager.getCachedTimetables()
     return cachedGroups.slice(Math.max(cachedGroups.length - MAX_SAVED_ITEMS, 0))
                        .map(item => item.group);
   }
 
-  const openMenu = () => {
-    setIsMenuOpen(true);
-  }
+  const openMenu = () => setIsMenuOpen(true);
 
   const closeMenu = () => setIsMenuOpen(false);
 
   const deleteItem = (index: number) => {
     TimetableManager.deleteTimetable(savedGroups[index]).then(
       () => setSavedGroups(getCachedGroups())
-    );
+    ).catch((e) => errors.handleError(e, errors.DELETE_TIMETABLE_ERROR));
   };
 
   const likeItem = () => {

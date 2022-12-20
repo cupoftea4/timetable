@@ -1,4 +1,3 @@
-import React from 'react'
 
 const LoadingIcon = () => {
   return (
@@ -8,6 +7,6 @@ const LoadingIcon = () => {
     </svg>
 
   )
-}
+};
 
-export default LoadingIcon
+export default LoadingIcon;

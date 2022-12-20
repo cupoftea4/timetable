@@ -16,6 +16,10 @@ class TimetableManager {
 			this.institutes = (await storage.getItem("institutes")) || [];
 			this.groups = (await storage.getItem("groups")) || [];
 			this.timetables = (await storage.getItem("cached_timetables")) || [];
+		} catch (e) { 
+			// sometimes chrome throws an error while trying to access idb
+			throw new Error("[TimetableManager.init] Error while loading cached data: " + e);
+		}
 		
 			const institutesUpdated = await storage.getItem("institutes_updated");
 			if (this.institutes.length === 0 || needsUpdate(institutesUpdated)) {
@@ -28,9 +32,7 @@ class TimetableManager {
 				console.log("Downloading group list...");
 				this.requestGroups(true);
 			}
-		} catch (e) {
-			console.error("Error while loading cached data", e);
-		}
+
 		
 	}
 
@@ -53,7 +55,7 @@ class TimetableManager {
 		return this.groupsRequest = this.getGroups(undefined, force);
 	}
 
-	async getGroups(institute: string | undefined = undefined, force: boolean = false): Promise<string[]> {
+	async getGroups(institute?: string, force: boolean = false): Promise<string[]> {
 		let suffix = institute ? ("_" + institute) : "";
 		if (!institute && this.groups.length > 0 && !force) return this.groups;
 		if (institute) {
@@ -63,8 +65,7 @@ class TimetableManager {
 				if (!needsUpdate(updated)) return cached;
 			}
 		}
-
-		const groups = await parser.getGroups(institute);
+		const	groups = await parser.getGroups(institute);
 
 		if (!institute) {
 			this.groups = groups;
@@ -73,11 +74,6 @@ class TimetableManager {
 		storage.setItem("groups" + suffix, groups);
 		storage.setItem("groups" + suffix + "_updated", Date.now());
 		return groups;
-	}
-
-	// TODO: remove
-	getSyncGroups(): CachedGroup[] {
-		return this.groups;
 	}
 
 	async getTimetable(group: string, checkCache = true) {
@@ -101,7 +97,7 @@ class TimetableManager {
 		return timetable;
 	}
 
-	updateSubgroup(group: string | undefined, subgroup: 1 | 2) {
+	updateSubgroup(group?: string, subgroup: 1 | 2 = 1) {
 		if (!group) return;
 
 		const data = this.timetables.find(el => el.group === group.toUpperCase());
@@ -117,10 +113,10 @@ class TimetableManager {
 			time: Date.now(),
 			subgroup: subgroup
 		})
-		storage.setItem("cached_timetables", this.timetables);
+		return storage.setItem("cached_timetables", this.timetables);
 	}
 
-	getSubgroup(group: string | undefined) {
+	getSubgroup(group?: string) {
 		if (!group) return;
 		const data = this.timetables.find(el => el.group === group.toUpperCase());
 		if (!data) return;
@@ -135,7 +131,7 @@ class TimetableManager {
 	}
 
 	ifGroupExists(group: string) {
-		return this.groups.find(el => el === group.toUpperCase().trim()) ? true : false;
+		return this.groups.find(el => el === group.trim()) ? true : false;
 	}
 
 	getCachedTimetables() {

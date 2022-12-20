@@ -10,9 +10,10 @@ import { TimetableItem } from '../utils/types';
 import HomeIcon from '../assets/HomeIcon';
 import styles from './TimetablePage.module.scss';
 import { getNULPWeek } from '../utils/date';
+import * as errors from '../utils/errorConstants';
 
 const TimetablePage = () => {
-  const group = useParams().group?.toUpperCase().trim();
+  const group = useParams().group?.trim();
 
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
   const isSecondNULPWeek = () => getNULPWeek() % 2 === 0;
@@ -24,32 +25,34 @@ const TimetablePage = () => {
 
   useEffect(
     () => {
-      if (group && TimetableManager.ifGroupExists(group)) {        
-        setTimetableGroup(group.toUpperCase().trim());
-        TimetableManager.getTimetable(group).then(
+      if (!group || !TimetableManager.ifGroupExists(group)) {
+        errors.handleError(`Group ${group} doesn't exist`, errors.NONEXISTING_GROUP);
+        setTimetableGroup(null);
+        return;
+      }  
+      setTimetableGroup(group.toUpperCase().trim());
+      TimetableManager.getTimetable(group).then(
           (data) => {
             setTimetable(data);
             setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
-          }
-        ).catch((err) =>  {
+          })
+        .catch((e) => {
+          errors.handleError(e);
           setTimetableGroup(null);
-          console.error(err);
         });
-      } else {
-        setTimetableGroup(null);
-      }
     }, [group]);
 
   const changeIsSecondSubgroup = (isSecond: boolean | ((isSecond: boolean) => boolean)) => {
     if (typeof isSecond === 'function') isSecond = isSecond(isSecondSubgroup);
     setIsSecondSubgroup(isSecond);
-    TimetableManager.updateSubgroup(group, isSecond ? 2 : 1);
+    TimetableManager.updateSubgroup(group, isSecond ? 2 : 1)
+      ?.catch((e) => errors.handleError(e, errors.UPDATE_SUBGROUP_ERROR));
   }
 
   return (
     <>
       {timetableGroup !== null ? 
-        timetable !== undefined ?
+        timetable !== undefined  ?
           <>
             <header className={headerStyles.header}>
               <nav className={headerStyles['nav-buttons']}> 
@@ -78,6 +81,7 @@ const TimetablePage = () => {
           </>       
         : <LoadingPage/>
       : <Navigate to="/"/>}
+      
     </>
   )
 };

@@ -42,27 +42,6 @@
       }
 }
 
-// @mixin visually-hidden {
-//   clip: rect(0 0 0 0);
-//   clip-path: inset(50%);
-//   // height: 1px;
-//   // overflow: hidden;
-//   position: absolute;
-//   // white-space: nowrap;
-//   // width: 1px;
-// }
-
-// @mixin visually-visible {
-//   clip: auto;
-//   clip-path: none;
-//   // height: auto;
-//   // overflow: visible;
-//   position: block;
-//   // white-space: normal;
-//   // width: auto;
-// }
-
-
 @mixin timetable-mobile {
   @media only screen and (max-width: 1000px) {
       @content;
@@ -83,6 +62,12 @@
 
 @mixin desktop {
   @media (min-width: 768px) {
+      @content;
+  }
+}
+
+@mixin large-screen {
+  @media (min-width: 1600px) {
       @content;
   }
 }
