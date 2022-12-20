@@ -10,7 +10,7 @@ import { TimetableItem } from '../utils/types';
 import HomeIcon from '../assets/HomeIcon';
 import styles from './TimetablePage.module.scss';
 import { getNULPWeek } from '../utils/date';
-import * as errors from '../utils/errorConstants';
+import * as errors from '../utils/errorHandling';
 
 const TimetablePage = () => {
   const group = useParams().group?.trim();
@@ -25,7 +25,12 @@ const TimetablePage = () => {
 
   useEffect(
     () => {
-      if (!group || !TimetableManager.ifGroupExists(group)) {
+      if (!group) {
+        setTimetableGroup(null);
+        return;
+      }
+      
+      if (!TimetableManager.ifGroupExists(group)) {
         errors.handleError(`Group ${group} doesn't exist`, errors.NONEXISTING_GROUP);
         setTimetableGroup(null);
         return;

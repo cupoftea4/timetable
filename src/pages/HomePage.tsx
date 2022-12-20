@@ -7,7 +7,8 @@ import styles from "./HomePage.module.scss";
 import cat from "../assets/cat.png";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import List from "../components/List";
-import * as errors from '../utils/errorConstants'
+import * as errors from '../utils/errorHandling'
+import { SCREEN_BREAKPOINT } from "../utils/constants";
 
 const HomePage = () => {
   const [institutes, setInstitutes] = useState<CachedInstitute[]>([]);
@@ -16,7 +17,7 @@ const HomePage = () => {
   const [selectedInstitute, setSelectedInstitute] = useState<CachedInstitute | null>(null);
   const [selectedMajor, setSelectedMajor] = useState<string | null>(null);
   const { width } = useWindowDimensions();
-  const isMobile = width < 768;
+  const isMobile = width < SCREEN_BREAKPOINT;
 
   useEffect(() => {
     TimetableManager.getInstitutes()

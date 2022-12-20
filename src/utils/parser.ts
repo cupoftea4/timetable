@@ -1,5 +1,5 @@
 import { timeout } from "./requestHandling";
-import { ObjectType, TimetableItem, TimetableType } from "./types";
+import { TimetableItem, TimetableType } from "./types";
 
 const NULP = "https://student.lpnu.ua/";
 const TIMETABLE_SUFFIX = "students_schedule";
@@ -10,7 +10,7 @@ const FALLBACK_URL = "https://raw.githubusercontent.com/zubiden/nulp-timetable-d
 const TIMEOUT = 3000; // 3s
 
 
-export async function fetchHtml(params: ObjectType = {}) {
+export async function fetchHtml(params: {[key: string]: string} = {}) {
 	let baseUrl = NULP + TIMETABLE_SUFFIX;
 	const originalUrl = new URL(baseUrl);
 	for(let key in params) {
@@ -61,7 +61,7 @@ export async function getGroups(departmentparent_abbrname_selective = "All") {
 	})
 }
 
-export async function getTimetable(studygroup_abbrname_selective="All", departmentparent_abbrname_selective = "All" ) { // group, institute
+export async function getTimetable(studygroup_abbrname_selective = "All", departmentparent_abbrname_selective = "All" ) { // group, institute
 	return fetchHtml({
 		departmentparent_abbrname_selective,
 	 	studygroup_abbrname_selective,

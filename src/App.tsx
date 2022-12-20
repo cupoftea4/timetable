@@ -4,7 +4,7 @@ import TimetableManager from "./utils/TimetableManager";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import TimetablePage from "./pages/TimetablePage";
 import LoadingPage from "./pages/LoadingPage";
-import * as errors from './utils/errorConstants';
+import * as errors from './utils/errorHandling';
 
 
 enum Status {

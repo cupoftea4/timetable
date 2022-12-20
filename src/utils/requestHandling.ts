@@ -16,29 +16,27 @@ export function timeout<T>(ms: number, promise: Promise<T>): Promise<T> {
   })
 }
 
-// export const throttle = (callable: Function, period: number, context = null) => {
-//     let timeoutId: NodeJS.Timeout;
-//     let time: number;
+export const throttle = (callable: Function, period: number, context?: Function) => {
+    let timeoutId: NodeJS.Timeout;
+    let time: number;
 
-//     return function () {
-//         if (!context) {
-//             // context = this
-//         }
+    return function () {
+        // if (!context) {
+        //     context = this
+        // }
 
-//         if (time) {
-//             clearTimeout(timeoutId);
+        if (time) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                if ((Date.now() - time) >= period) {
+                    callable.apply(context, arguments);
+                    time = Date.now();
+                }
+            }, period - (Date.now() - time));
+        } else {
+            callable.apply(context, arguments);
 
-//             timeoutId = setTimeout(() => {
-//                 if ((Date.now() - time) >= period) {
-//                     callable.apply(context, arguments);
-
-//                     time = Date.now();
-//                 }
-//             }, period - (Date.now() - time));
-//         } else {
-//             callable.apply(context, arguments);
-
-//             time = Date.now();
-//         }
-//     }
-// }
+            time = Date.now();
+        }
+    }
+}

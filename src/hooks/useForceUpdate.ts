@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 
-export function useForceUpdate() {
+export default function useForceUpdate() {
   const [, dispatch] = useState(Object.create(null));
 
   // Turn dispatch(required_parameter) into dispatch().

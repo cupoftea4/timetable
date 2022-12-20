@@ -45,6 +45,10 @@
     }
   }
   .no-selection {
+    @include mobile {
+      display: none;
+    }
+
     width: 100%;
     @include flex-center;
     flex-direction: column;
@@ -52,9 +56,11 @@
       width: 20rem;
       height: auto;
       filter: invert(75%);
+
     }
     p {
       font-size: $medium-font-size;
+      text-align: center;
       color: rgba(255, 255, 255, 0.666);
     }
 

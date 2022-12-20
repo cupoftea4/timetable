@@ -5,7 +5,7 @@ import HeartIcon from '../assets/HeartIcon';
 import RemoveIcon from '../assets/RemoveIcon';
 import TimetableManager from '../utils/TimetableManager'; 
 import styles from './SavedMenu.module.scss';
-import * as errors from '../utils/errorConstants';
+import * as errors from '../utils/errorHandling';
 
 const MAX_SAVED_ITEMS = 5;
 

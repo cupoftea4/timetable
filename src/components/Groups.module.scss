@@ -12,6 +12,11 @@
   }
   flex-basis: 100%;
   height: fit-content;
+
+  button.back {
+    justify-self: start;
+  }
+
   .year {
     animation: slideUp .2s ease forwards;
     transition: all .8s ease-in-out;

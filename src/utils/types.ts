@@ -20,9 +20,6 @@ export type CachedTimetable = {group: string, time: number, subgroup: 1 | 2};
 export type CachedGroup = string;
 export type CachedInstitute = string;
 
-// костиль?
-export type ObjectType = {[key: string]: string};
-
 export enum Year {
   First = 1,
   Second,
