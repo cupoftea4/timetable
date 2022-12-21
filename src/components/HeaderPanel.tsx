@@ -4,10 +4,11 @@ import SearchBar from './SearchBar';
 import ThemesIcon from '../assets/ThemesIcon';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import styles from './HeaderPanel.module.scss';
+import { SCREEN_BREAKPOINT } from '../utils/constants';
 
 const HeaderPanel = () => {
   const { width } = useWindowDimensions();
-  const shouldShrinkSearchBar = useMemo(() => width < 600, [width]);
+  const shouldShrinkSearchBar = useMemo(() => width < SCREEN_BREAKPOINT, [width]);
   const [shrinkSearchBar, setShrinkSearchBar] = React.useState(shouldShrinkSearchBar);
 
 

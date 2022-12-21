@@ -35,7 +35,7 @@ const TimetablePage = () => {
         setTimetableGroup(null);
         return;
       }  
-      setTimetableGroup(group.toUpperCase().trim());
+      setTimetableGroup(group.trim());
       TimetableManager.getTimetable(group).then(
           (data) => {
             setTimetable(data);

@@ -5,13 +5,8 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import TimetablePage from "./pages/TimetablePage";
 import LoadingPage from "./pages/LoadingPage";
 import * as errors from './utils/errorHandling';
+import { Status } from "./utils/types";
 
-
-enum Status {
-  Loading,
-  Idle,
-  Failed
-}
 
 const App = () => {
   const [status, setStatus] = useState<Status>(Status.Loading);

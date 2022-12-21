@@ -77,39 +77,40 @@ class TimetableManager {
 	}
 
 	async getTimetable(group: string, checkCache = true) {
-		const data = this.timetables.find(el => el.group === group.toUpperCase());
+		group = group.trim();
+		const data = this.timetables.find(el => el.group.toUpperCase()  === group.toUpperCase() );
 		if (checkCache && data && !needsUpdate(data.time)) {
-			return storage.getItem("timetable_" + group.toUpperCase());
+			return storage.getItem("timetable_" + group);
 		}
 
 		const timetable = await parser.getTimetable(group);
 		if (!timetable) {
 			throw Error(`Failed to get timetable! Group: ${group}, checkCache: ${checkCache}`);
 		}
-		this.timetables = this.timetables.filter(el => el.group !== group.toUpperCase()) // remove previous timetable
+		this.timetables = this.timetables.filter(el => el.group.toUpperCase()  !== group.toUpperCase() ) // remove previous timetable
 		this.timetables.push({
-			group: group.toUpperCase(),
+			group: group,
 			time: Date.now(),
 			subgroup: 1
 		})
 		storage.setItem("cached_timetables", this.timetables);
-		storage.setItem("timetable_" + group.toUpperCase(), timetable);
+		storage.setItem("timetable_" + group, timetable);
 		return timetable;
 	}
 
 	updateSubgroup(group?: string, subgroup: 1 | 2 = 1) {
 		if (!group) return;
-
-		const data = this.timetables.find(el => el.group === group.toUpperCase());
+		group = group.trim();
+		const data = this.timetables.find(el => el.group === group);
 		if (!data) {
 			console.error(`Failed to update timetable subgroup! Group: ${group}`);
 			return;
 		}
 		if (data.subgroup === subgroup) return;
 
-		this.timetables = this.timetables.filter(el => el.group !== group.toUpperCase()) // remove previous timetable
+		this.timetables = this.timetables.filter(el => el.group !== group) // remove previous timetable
 		this.timetables.push({
-			group: group.toUpperCase(),
+			group: group,
 			time: Date.now(),
 			subgroup: subgroup
 		})
@@ -118,20 +119,23 @@ class TimetableManager {
 
 	getSubgroup(group?: string) {
 		if (!group) return;
-		const data = this.timetables.find(el => el.group === group.toUpperCase());
+		group = group.trim();
+		const data = this.timetables.find(el => el.group === group);
 		if (!data) return;
 		return data.subgroup;
 	}
 
 
 	async deleteTimetable(group: string) {
-		this.timetables = this.timetables.filter(el => el.group !== group.toUpperCase());
-		storage.deleteItem("timetable_" + group.toUpperCase());
+		group = group.trim();
+		this.timetables = this.timetables.filter(el => el.group !== group);
+		storage.deleteItem("timetable_" + group);
 		return storage.setItem("cached_timetables", this.timetables);
 	}
 
 	ifGroupExists(group: string) {
-		return this.groups.find(el => el === group.trim()) ? true : false;
+		group = group.trim();
+		return this.groups.find(el => el.toUpperCase() === group.toUpperCase() ) ? true : false;
 	}
 
 	getCachedTimetables() {

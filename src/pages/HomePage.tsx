@@ -9,6 +9,7 @@ import useWindowDimensions from "../hooks/useWindowDimensions";
 import List from "../components/List";
 import * as errors from '../utils/errorHandling'
 import { SCREEN_BREAKPOINT } from "../utils/constants";
+import { toast } from "react-toastify";
 
 const HomePage = () => {
   const [institutes, setInstitutes] = useState<CachedInstitute[]>([]);
@@ -26,11 +27,13 @@ const HomePage = () => {
   }, []);
 
   const showInstituteGroups = (institute: CachedInstitute = "ІКНІ") => {
-    TimetableManager.getGroups(institute).then((data) => {
+    toast.promise(TimetableManager.getGroups(institute), {
+      pending: 'Fetching groups...'
+    }).then((data) => {
       const tempGroups = new Set<string>(data.map((group) => group.split("-")[0]));
       setMajors(Array.from(tempGroups));
       setGroupsByYear(sortGroupsByYear(data));
-      setSelectedMajor(null);
+      setSelectedMajor(null);;
     }).catch(errors.handleError);
   };
 

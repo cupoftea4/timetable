@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import CheckMarkIcon from '../assets/CheckMarkIcon';
 import HeartIcon from '../assets/HeartIcon';
 import RemoveIcon from '../assets/RemoveIcon';
@@ -14,6 +14,7 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
   const [isLiked, setIsLiked] = useState(false);
   const [savedGroups, setSavedGroups] = useState<string[]>(getCachedGroups);
   const [selectedItem, setSelectedItem] = useState(0);
+  const groupParam = useParams().group?.trim();
   const navigate = useNavigate();
     
   function getCachedGroups(): string[] {
@@ -72,7 +73,7 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
             {savedGroups.map((group, index) => (
               <li key={index} className={selectedItem === index ? styles.selected : ""}>
                 <Link to={`/${group}`} onFocus={() => setSelectedItem(index)}> 
-                  <span>{group} {index === 0 ? <CheckMarkIcon className={styles['check-mark']}/> : null}</span> 
+                  <span>{group} {groupParam === group ? <CheckMarkIcon className={styles['check-mark']}/> : null}</span> 
                 </Link>
                 <RemoveIcon onClick={() => deleteItem(index)} className={styles.remove} />
               </li>

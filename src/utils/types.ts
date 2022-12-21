@@ -26,3 +26,9 @@ export enum Year {
   Third,
   Fourth,
 }
+
+export enum Status {
+  Loading,
+  Idle,
+  Failed
+}
