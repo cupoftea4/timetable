@@ -1,4 +1,4 @@
-import { timeout } from "./requestHandling";
+import { timeout } from "./promiseHandling";
 import { TimetableItem, TimetableType } from "./types";
 
 const NULP = "https://student.lpnu.ua/";

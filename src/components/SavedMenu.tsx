@@ -5,7 +5,7 @@ import HeartIcon from '../assets/HeartIcon';
 import RemoveIcon from '../assets/RemoveIcon';
 import TimetableManager from '../utils/TimetableManager'; 
 import styles from './SavedMenu.module.scss';
-import * as errors from '../utils/errorHandling';
+import * as handler from '../utils/requestHandler';
 
 const MAX_SAVED_ITEMS = 5;
 
@@ -30,7 +30,7 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
   const deleteItem = (index: number) => {
     TimetableManager.deleteTimetable(savedGroups[index]).then(
       () => setSavedGroups(getCachedGroups())
-    ).catch((e) => errors.handleError(e, errors.DELETE_TIMETABLE_ERROR));
+    ).catch((e) => handler.handleError(e, handler.DELETE_TIMETABLE_ERROR));
   };
 
   const likeItem = () => {
@@ -73,7 +73,10 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
             {savedGroups.map((group, index) => (
               <li key={index} className={selectedItem === index ? styles.selected : ""}>
                 <Link to={`/${group}`} onFocus={() => setSelectedItem(index)}> 
-                  <span>{group} {groupParam === group ? <CheckMarkIcon className={styles['check-mark']}/> : null}</span> 
+                  <span>
+                    {group} 
+                    {groupParam === group ? <CheckMarkIcon className={styles['check-mark']}/> : null}
+                  </span> 
                 </Link>
                 <RemoveIcon onClick={() => deleteItem(index)} className={styles.remove} />
               </li>

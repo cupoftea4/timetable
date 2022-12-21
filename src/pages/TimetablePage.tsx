@@ -10,10 +10,10 @@ import { TimetableItem } from '../utils/types';
 import HomeIcon from '../assets/HomeIcon';
 import styles from './TimetablePage.module.scss';
 import { getNULPWeek } from '../utils/date';
-import * as errors from '../utils/errorHandling';
+import * as handler from '../utils/requestHandler';
 
 const TimetablePage = () => {
-  const group = useParams().group?.trim();
+  const group = useParams().group?.trim() ?? "";
 
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
   const isSecondNULPWeek = () => getNULPWeek() % 2 === 0;
@@ -23,6 +23,8 @@ const TimetablePage = () => {
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup); 
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
 
+  const time = TimetableManager.getCachedTime(group);
+
   useEffect(
     () => {
       if (!group) {
@@ -31,7 +33,7 @@ const TimetablePage = () => {
       }
       
       if (!TimetableManager.ifGroupExists(group)) {
-        errors.handleError(`Group ${group} doesn't exist`, errors.NONEXISTING_GROUP);
+        handler.handleError(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
         setTimetableGroup(null);
         return;
       }  
@@ -41,8 +43,8 @@ const TimetablePage = () => {
             setTimetable(data);
             setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
           })
-        .catch((e) => {
-          errors.handleError(e);
+        .catch(e => {
+          handler.handleError(e);
           setTimetableGroup(null);
         });
     }, [group]);
@@ -51,8 +53,13 @@ const TimetablePage = () => {
     if (typeof isSecond === 'function') isSecond = isSecond(isSecondSubgroup);
     setIsSecondSubgroup(isSecond);
     TimetableManager.updateSubgroup(group, isSecond ? 2 : 1)
-      ?.catch((e) => errors.handleError(e, errors.UPDATE_SUBGROUP_ERROR));
+      ?.catch(e => handler.handleError(e, handler.UPDATE_SUBGROUP_ERROR));
   }
+
+  const updateTimetable = (checkCache = false) => {
+    handler.handlePromise(TimetableManager.getTimetable(group, checkCache))
+      .then(setTimetable).catch(handler.handleError)
+  };
 
   return (
     <>
@@ -83,6 +90,10 @@ const TimetablePage = () => {
                 />
               </section>
             </main> 
+            <footer className={styles.update}>
+              <button onClick={() => updateTimetable()}>Оновити</button>
+              {time && <p>Востаннє {new Date(time).toLocaleString()}</p>}
+            </footer>
           </>       
         : <LoadingPage/>
       : <Navigate to="/"/>}

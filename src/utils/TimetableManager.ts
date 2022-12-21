@@ -1,6 +1,6 @@
 import storage from "./storage"
 import parser from "./parser"
-import { CachedGroup, CachedInstitute, CachedTimetable } from "./types";
+import { CachedGroup, CachedInstitute, CachedTimetable, TimetableItem } from "./types";
 
 const UPDATE_PERIOD = 3 * 24 * 60 * 60 * 1000; // 3 days
 
@@ -76,7 +76,7 @@ class TimetableManager {
 		return groups;
 	}
 
-	async getTimetable(group: string, checkCache = true) {
+	async getTimetable(group: string, checkCache = true) : Promise<TimetableItem[]> {
 		group = group.trim();
 		const data = this.timetables.find(el => el.group.toUpperCase()  === group.toUpperCase() );
 		if (checkCache && data && !needsUpdate(data.time)) {

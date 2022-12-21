@@ -19,21 +19,27 @@ const nonexistingGroupErrors = [
   "Please, stop trying to break the app, your group does not exist",
   "Cat not found, group not found, what else is not found?",
   "Meow, your group does not exist",
+  "Meow, your group does not exist",
   "Let me guess, you are a wizard, cause your group does not exist",
 ]
 
 export const FETCH_ERROR = "Due to failed fetch u have no lectures tomorrow, go to sleep 😴";
+export const FETCH_PENDING = "Fetching data";
 export const DELETE_TIMETABLE_ERROR = "Couldn't delete timetable, try again later";
 export const UPDATE_SUBGROUP_ERROR = "Couldn't update subgroup, try again later";
 export const UNKNOWN_ERROR = "Unknown error, try again later";
 export const INIT_ERROR = getRandomValue(initErrors);
 export const NONEXISTING_GROUP = getRandomValue(nonexistingGroupErrors);
 
-export const handleError = (error: string, userError: string = FETCH_ERROR) => {
+export function handleError(error: string, userError: string = FETCH_ERROR) {
   console.error(error);
   toast.error(userError);
 }
 
+export function handlePromise<T>(promise: Promise<T>, pending: string = FETCH_PENDING, error?: string) {
+  return toast.promise(promise, error ? {pending, error} : {pending});
+}
+
 function getRandomValue<T>(array: T[]) {
-  return array[Math.floor(Math.random() * array.length)];
+  return array[Math.floor(Math.random() * array.length)]; 
 }

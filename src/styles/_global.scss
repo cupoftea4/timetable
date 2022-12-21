@@ -15,7 +15,7 @@
 body {
   background: hsl(216, 28%, 7%);
   font-family: 'Roboto Flex', sans-serif;
-  color: white;
+  color: $text-clr;
   font-weight: $regular-font;
   
   @media screen and (prefers-color-scheme: dark) {

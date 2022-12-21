@@ -30,7 +30,7 @@
           bottom: 0;
           left: 50%;
           transform: translateX(-50%) scaleX(0);
-          background-color: white;
+          background-color: vars.$text-clr;
           border-radius: .7rem;
           visibility: hidden;
           transition: .25s linear;

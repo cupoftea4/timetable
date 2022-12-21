@@ -54,11 +54,11 @@ td {
 
       a {
         font-size: $small-font-size;
-        color: white;
         cursor: pointer;
         padding: 0.1875em 0.375em; 
         width: fit-content;
         border-radius: 1rem;
+        color: $text-clr;
         &.lection:hover, .lecture:hover {
           background-color: $timetable-lect-hover-clr;
         }

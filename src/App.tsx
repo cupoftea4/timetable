@@ -4,7 +4,7 @@ import TimetableManager from "./utils/TimetableManager";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import TimetablePage from "./pages/TimetablePage";
 import LoadingPage from "./pages/LoadingPage";
-import * as errors from './utils/errorHandling';
+import * as handler from './utils/requestHandler';
 import { Status } from "./utils/types";
 
 
@@ -17,7 +17,7 @@ const App = () => {
         .then(() => setStatus(Status.Idle))
         .catch((e) => {
           setStatus(Status.Failed);
-          errors.handleError(e, errors.INIT_ERROR + ". Try again or use another browser.");
+          handler.handleError(e, handler.INIT_ERROR + ". Try again or use another browser.");
         });
     }, []
   );
