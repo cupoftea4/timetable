@@ -3,6 +3,7 @@ import parser from "./parser"
 import { CachedGroup, CachedInstitute, CachedTimetable, TimetableItem } from "./types";
 
 const UPDATE_PERIOD = 3 * 24 * 60 * 60 * 1000; // 3 days
+const LAST_OPENED_INSTITUTE = "last_opened_institute";
 
 class TimetableManager {
 	private institutes: CachedInstitute[] = [];
@@ -10,6 +11,7 @@ class TimetableManager {
 	private timetables: CachedTimetable[] = [];
 	private institutesRequest: Promise<CachedInstitute[]> | null  = null;
 	private groupsRequest: Promise<CachedGroup[]> | null  = null;
+	private lastOpenedInstitute: string | null = null;
 
 	async init() {
 		try {
@@ -39,6 +41,16 @@ class TimetableManager {
 	async requestInstitutes(force: boolean = false) {
 		if (this.institutesRequest) return this.institutesRequest;
 		return this.institutesRequest = this.getInstitutes(force);
+	}
+
+	async getLastOpenedInstitute() {
+		if (this.lastOpenedInstitute) return this.lastOpenedInstitute;
+		return storage.getItem(LAST_OPENED_INSTITUTE);
+	}
+
+	async updateLastOpenedInstitute(institute: string) {
+		this.lastOpenedInstitute = institute;
+		return storage.setItem(LAST_OPENED_INSTITUTE, institute);
 	}
 
 	async getInstitutes(force: boolean = false) {

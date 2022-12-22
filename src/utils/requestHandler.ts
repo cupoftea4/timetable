@@ -32,7 +32,7 @@ export const INIT_ERROR = getRandomValue(initErrors);
 export const NONEXISTING_GROUP = getRandomValue(nonexistingGroupErrors);
 
 export function handleError(error: string, userError: string = FETCH_ERROR) {
-  console.error(error);
+  console.error("[Handler]" + error);
   toast.error(userError);
 }
 

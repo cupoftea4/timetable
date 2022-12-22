@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Groups from "../components/Groups";
 import HeaderPanel from "../components/HeaderPanel";
 import TimetableManager from "../utils/TimetableManager";
@@ -18,14 +18,17 @@ const HomePage = () => {
   const [selectedMajor, setSelectedMajor] = useState<string | null>(null);
   const { width } = useWindowDimensions();
   const isMobile = width < SCREEN_BREAKPOINT;
+  const showMajorSelection = !isMobile || !selectedMajor;
 
   useEffect(() => {
+    TimetableManager.getLastOpenedInstitute().then(setSelectedInstitute);
     handler.handlePromise(TimetableManager.getInstitutes())
       .then(setInstitutes)
       .catch(handler.handleError);
   }, []);
 
-  const showInstituteGroups = (institute: CachedInstitute = "ІКНІ") => {
+  const handleInstituteUpdate = useCallback((institute: CachedInstitute = "ІКНІ") => {
+    TimetableManager.updateLastOpenedInstitute(institute);
     handler.handlePromise(TimetableManager.getGroups(institute), 'Fetching groups...')
       .then((data) => {
         const tempGroups = new Set<string>(data.map((group) => group.split("-")[0]));
@@ -34,7 +37,11 @@ const HomePage = () => {
         setSelectedMajor(null);;
       })
       .catch(handler.handleError);
-  };
+  }, []);
+
+  useEffect(() => {
+    if (selectedInstitute) handleInstituteUpdate(selectedInstitute);
+  }, [selectedInstitute, handleInstituteUpdate]);
 
   const getSelectedGroups = () => {
     return [Year.First, Year.Second, Year.Third, Year.Fourth].map(
@@ -59,29 +66,22 @@ const HomePage = () => {
       <HeaderPanel />
       <main>
         <section className={styles.selection}>
-          {
-            (!isMobile || !selectedMajor) &&
-              <List items={institutes} 
-                    selectedState={[selectedInstitute, setSelectedInstitute]} 
-                    onClick={showInstituteGroups} 
-                  />
+          {showMajorSelection &&
+              <List items={institutes} selectedState={[selectedInstitute, setSelectedInstitute]} />
           } 
           {selectedInstitute && 
-              (!isMobile || !selectedMajor) &&
+              showMajorSelection &&
               <List items={majors} selectedState={[selectedMajor, setSelectedMajor]} />
           }
 
-          {
-            (selectedMajor) ?
+          {selectedMajor ?
               <Groups groups={getSelectedGroups()} />
             : 
-            (
-              !isMobile && 
-              <div className={styles["no-selection"]}>
+              <div className={styles['no-selection']}>
                 <img src={cat} alt="cat" />
-                <p>Оберіть інститут, щоб продовжити</p>
+                <p>Оберіть інститут та спецільність, щоб продовжити</p>
               </div>
-            )}
+          }
         </section>
       </main>
     </>
