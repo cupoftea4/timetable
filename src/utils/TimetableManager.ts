@@ -1,6 +1,6 @@
 import storage from "./storage"
 import parser from "./parser"
-import { CachedGroup, CachedInstitute, CachedTimetable, TimetableItem } from "./types";
+import { CachedGroup, CachedInstitute, CachedTimetable, ExamsTimetableItem, TimetableItem } from "./types";
 
 const UPDATE_PERIOD = 3 * 24 * 60 * 60 * 1000; // 3 days
 const LAST_OPENED_INSTITUTE = "last_opened_institute";
@@ -9,6 +9,7 @@ class TimetableManager {
 	private institutes: CachedInstitute[] = [];
 	private groups: CachedGroup[] = [];
 	private timetables: CachedTimetable[] = [];
+	private examsTimetables: CachedTimetable[] = [];
 	private institutesRequest: Promise<CachedInstitute[]> | null  = null;
 	private groupsRequest: Promise<CachedGroup[]> | null  = null;
 	private lastOpenedInstitute: string | null = null;
@@ -90,25 +91,48 @@ class TimetableManager {
 
 	async getTimetable(group: string, checkCache = true) : Promise<TimetableItem[]> {
 		group = group.trim();
-		const data = this.timetables.find(el => el.group.toUpperCase()  === group.toUpperCase() );
+		const data = this.timetables.find(el => el.group.toUpperCase() === group.toUpperCase());
 		if (checkCache && data && !needsUpdate(data.time)) {
 			return storage.getItem("timetable_" + group);
-		}
-
+		}			
+		
 		const timetable = await parser.getTimetable(group);
+
 		if (!timetable) {
 			throw Error(`Failed to get timetable! Group: ${group}, checkCache: ${checkCache}`);
 		}
-		this.timetables = this.timetables.filter(el => el.group.toUpperCase()  !== group.toUpperCase() ) // remove previous timetable
+		this.timetables = this.timetables.filter(el => el.group.toUpperCase() !== group.toUpperCase()); // remove previous timetable
 		this.timetables.push({
 			group: group,
 			time: Date.now(),
 			subgroup: 1
-		})
+		});
 		storage.setItem("cached_timetables", this.timetables);
 		storage.setItem("timetable_" + group, timetable);
 		return timetable;
 	}
+
+	async getExamsTimetable(group: string, checkCache = true) : Promise<ExamsTimetableItem[]> {
+		group = group.trim();
+		const data = this.examsTimetables.find(el => el.group.toUpperCase() === group.toUpperCase());
+		if (checkCache && data && !needsUpdate(data.time)) {
+			return storage.getItem("exams_timetable_" + group);
+		}
+
+		const examsTimetable = await parser.getExamsTimetable(group);
+		if (!examsTimetable) {
+			throw Error(`Failed to get exams timetable! Group: ${group}, checkCache: ${checkCache}`);
+		}
+		this.examsTimetables = this.examsTimetables.filter(el => el.group.toUpperCase() !== group.toUpperCase()); // remove previous timetable
+		this.examsTimetables.push({
+			group: group,
+			time: Date.now()
+		});
+		storage.setItem("cached_exams_timetables", this.examsTimetables);
+		storage.setItem("exams_timetable_" + group, examsTimetable);
+		return examsTimetable;
+	}
+
 
 	updateSubgroup(group?: string, subgroup: 1 | 2 = 1) {
 		if (!group) return;
@@ -123,7 +147,7 @@ class TimetableManager {
 		this.timetables = this.timetables.filter(el => el.group !== group) // remove previous timetable
 		this.timetables.push({
 			group: group,
-			time: Date.now(),
+			time: data.time,
 			subgroup: subgroup
 		})
 		return storage.setItem("cached_timetables", this.timetables);

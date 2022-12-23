@@ -14,9 +14,16 @@ export type TimetableItem = {
   urls: string[]
 }
 
+export type ExamsTimetableItem = {
+  date: Date,
+  lecturer: string,
+  subject: string,
+  urls: string[]
+}
+
 export type TimetableType = 'lecture' | 'practical' | 'lab' | 'consultation';
 
-export type CachedTimetable = {group: string, time: number, subgroup: 1 | 2};
+export type CachedTimetable = {group: string, time: number, subgroup?: 1 | 2};
 export type CachedGroup = string;
 export type CachedInstitute = string;
 

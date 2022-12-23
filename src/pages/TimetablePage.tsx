@@ -6,11 +6,15 @@ import Timetable from '../components/Timetable';
 import SavedMenu from '../components/SavedMenu';
 import Toggle from '../components/Toggle';
 import TimetableManager from '../utils/TimetableManager';
-import { TimetableItem } from '../utils/types';
+import { ExamsTimetableItem, TimetableItem } from '../utils/types';
 import HomeIcon from '../assets/HomeIcon';
 import styles from './TimetablePage.module.scss';
 import { getNULPWeek } from '../utils/date';
 import * as handler from '../utils/requestHandler';
+import ExamsIcon from '../assets/ExamsIcon';
+import FilledExamsIcon from '../assets/FilledExamsIcon';
+import ExamsTimetable from '../components/ExamsTimetable';
+
 
 const TimetablePage = () => {
   const group = useParams().group?.trim() ?? "";
@@ -20,34 +24,42 @@ const TimetablePage = () => {
 
   const [timetableGroup, setTimetableGroup] = useState<string | null>();
   const [timetable, setTimetable] = useState<TimetableItem[]>();
+  const [examsTimetable, setExamsTimetable] = useState<ExamsTimetableItem[]>([]);
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup); 
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
 
+  const [isExamsTimetable, setIsExamsTimetable] = useState(false);
+
   const time = TimetableManager.getCachedTime(group);
+
+  const getTimetable = (group: string, exams: boolean = false, checkCache: boolean = true) => {
+    const onCatch = (e: string) => {
+      handler.handleError(e);
+      setTimetableGroup(null);
+    };
+    if (exams) {
+      TimetableManager.getExamsTimetable(group, checkCache)
+        .then(setExamsTimetable)
+        .catch(onCatch);
+    } else {
+      TimetableManager.getTimetable(group, checkCache)
+        .then(data => {
+          setTimetable(data);
+          setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
+        }).catch(onCatch);
+    }
+  };
 
   useEffect(
     () => {
-      if (!group) {
-        setTimetableGroup(null);
-        return;
-      }
-      
       if (!TimetableManager.ifGroupExists(group)) {
         handler.handleError(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
         setTimetableGroup(null);
         return;
       }  
       setTimetableGroup(group.trim());
-      TimetableManager.getTimetable(group).then(
-          (data) => {
-            setTimetable(data);
-            setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
-          })
-        .catch(e => {
-          handler.handleError(e);
-          setTimetableGroup(null);
-        });
-    }, [group]);
+      getTimetable(group, isExamsTimetable);
+    }, [group, isExamsTimetable]);
 
   const changeIsSecondSubgroup = (isSecond: boolean | ((isSecond: boolean) => boolean)) => {
     if (typeof isSecond === 'function') isSecond = isSecond(isSecondSubgroup);
@@ -57,8 +69,13 @@ const TimetablePage = () => {
   }
 
   const updateTimetable = (checkCache = false) => {
-    handler.handlePromise(TimetableManager.getTimetable(group, checkCache))
-      .then(setTimetable).catch(handler.handleError)
+    if (isExamsTimetable) {
+      handler.handlePromise(TimetableManager.getExamsTimetable(group, checkCache))
+        .then(setExamsTimetable).catch(handler.handleError)
+    } else {
+      handler.handlePromise(TimetableManager.getTimetable(group, checkCache))
+        .then(setTimetable).catch(handler.handleError)
+    }
   };
 
   return (
@@ -73,21 +90,31 @@ const TimetablePage = () => {
                 <h1>{timetableGroup}</h1>
               </nav>
               <span className={styles.params}>
-                <Toggle 
-                  toggleState={[isSecondSubgroup, changeIsSecondSubgroup]} 
-                  states={["I підгрупа", "II підгрупа"]} />
-                <Toggle 
-                  toggleState={[isSecondWeek, setIsSecondWeek]} 
-                  states={['По чисельнику', 'По знаменнику']} />
+                {!isExamsTimetable &&
+                    <>
+                      <Toggle 
+                        toggleState={[isSecondSubgroup, changeIsSecondSubgroup]} 
+                        states={["I підгрупа", "II підгрупа"]} />
+                      <Toggle 
+                        toggleState={[isSecondWeek, setIsSecondWeek]} 
+                        states={['По чисельнику', 'По знаменнику']} />
+                    </>
+                }
+                <button className={styles.cr69} onClick={() => setIsExamsTimetable(!isExamsTimetable)}>
+                  {isExamsTimetable ? <FilledExamsIcon /> : <ExamsIcon />}
+                </button>
               </span>
             </header>
             <main className={styles.container}>
               <section className={styles.timetable}>
-                <Timetable 
-                  timetable={timetable} 
-                  isSecondWeek={isSecondWeek} 
-                  isSecondSubgroup={isSecondSubgroup} 
-                />
+                {!isExamsTimetable ?
+                    <Timetable 
+                      timetable={timetable} 
+                      isSecondWeek={isSecondWeek} 
+                      isSecondSubgroup={isSecondSubgroup} 
+                    /> :
+                    <ExamsTimetable exams={examsTimetable} /> 
+                }
               </section>
             </main> 
             <footer className={styles.update}>

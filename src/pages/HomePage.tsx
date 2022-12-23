@@ -4,7 +4,7 @@ import HeaderPanel from "../components/HeaderPanel";
 import TimetableManager from "../utils/TimetableManager";
 import { CachedInstitute, Year } from "../utils/types";
 import styles from "./HomePage.module.scss";
-import cat from "../assets/cat.png";
+import catImage from "../assets/cat.png";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import List from "../components/List";
 import * as handler from '../utils/requestHandler'
@@ -78,7 +78,7 @@ const HomePage = () => {
               <Groups groups={getSelectedGroups()} />
             : 
               <div className={styles['no-selection']}>
-                <img src={cat} alt="cat" />
+                <img src={catImage} alt="cat" />
                 <p>Оберіть інститут та спецільність, щоб продовжити</p>
               </div>
           }
