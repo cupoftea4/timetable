@@ -32,17 +32,17 @@ const TimetablePage = () => {
 
   const time = TimetableManager.getCachedTime(group);
 
-  const getTimetable = (group: string, exams: boolean = false, checkCache: boolean = true) => {
+  const getTimetable = (group: string, exams: boolean, checkCache: boolean = true) => {
     const onCatch = (e: string) => {
       handler.handleError(e);
       setTimetableGroup(null);
     };
     if (exams) {
-      TimetableManager.getExamsTimetable(group, checkCache)
+      return TimetableManager.getExamsTimetable(group, checkCache)
         .then(setExamsTimetable)
         .catch(onCatch);
     } else {
-      TimetableManager.getTimetable(group, checkCache)
+      return TimetableManager.getTimetable(group, checkCache)
         .then(data => {
           setTimetable(data);
           setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
@@ -58,7 +58,8 @@ const TimetablePage = () => {
         return;
       }  
       setTimetableGroup(group.trim());
-      getTimetable(group, isExamsTimetable);
+      
+      handler.handlePromise(getTimetable(group, isExamsTimetable));
     }, [group, isExamsTimetable]);
 
   const changeIsSecondSubgroup = (isSecond: boolean | ((isSecond: boolean) => boolean)) => {
@@ -69,13 +70,7 @@ const TimetablePage = () => {
   }
 
   const updateTimetable = (checkCache = false) => {
-    if (isExamsTimetable) {
-      handler.handlePromise(TimetableManager.getExamsTimetable(group, checkCache))
-        .then(setExamsTimetable).catch(handler.handleError)
-    } else {
-      handler.handlePromise(TimetableManager.getTimetable(group, checkCache))
-        .then(setTimetable).catch(handler.handleError)
-    }
+    handler.handlePromise(getTimetable(group, isExamsTimetable, checkCache));
   };
 
   return (
@@ -100,7 +95,11 @@ const TimetablePage = () => {
                         states={['По чисельнику', 'По знаменнику']} />
                     </>
                 }
-                <button className={styles.cr69} onClick={() => setIsExamsTimetable(!isExamsTimetable)}>
+                <button 
+                    className={styles.cr69} 
+                    title={isExamsTimetable ? "Розклад пар" : "Розклад екзаменів"} 
+                    onClick={() => setIsExamsTimetable(!isExamsTimetable)}
+                >
                   {isExamsTimetable ? <FilledExamsIcon /> : <ExamsIcon />}
                 </button>
               </span>

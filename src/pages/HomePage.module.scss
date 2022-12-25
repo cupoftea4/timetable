@@ -2,7 +2,16 @@
 @use '../styles/_variables.scss' as *;
 @use '../styles/_mixins.scss' as *;
 
+
+
 .selection {
+  &[data-attr=selective-groups] {
+    // second child
+    > ul:nth-child(2) {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);      
+    }
+  }
   max-width: $max-content-width;
   display: flex;
   gap: 5rem;
@@ -11,11 +20,14 @@
     padding: .5rem 3rem;
     gap: 3rem;
   }
-
+  
   width: 100%;
+
   li {
     font-size: $medium-font-size;
     margin: .125em;
+    font-family: 'Ubuntu', sans-serif;
+ 
 
     button {
       padding: .125em .5em;  

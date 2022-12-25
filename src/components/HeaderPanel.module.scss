@@ -13,6 +13,15 @@
     display: flex;
     gap: 1rem;
     align-items: center;
+    select {
+      -webkit-appearance: none;
+      option {
+        -webkit-appearance: none;
+        background: rgba(0, 0, 0, .6); 
+      }
+      border: none;
+      background: transparent;
+    }
     svg {
       width: 2.75rem;
       height: 2.75rem; 

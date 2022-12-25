@@ -18,6 +18,7 @@ export type ExamsTimetableItem = {
   date: Date,
   lecturer: string,
   subject: string,
+  number: number,
   urls: string[]
 }
 

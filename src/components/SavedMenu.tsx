@@ -65,7 +65,7 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
     >
       <HeartIcon onClick={likeItem} liked={likable && isLiked}  />
       {isMenuOpen &&
-        <div className={styles['saved-menu']} >
+        <div className={`${styles['saved-menu']} ${groupParam && styles.home}`} >
           <span>
             {savedGroups.length !== 0 ? "Saved" : "No saved items. Open any timetable to automatically save it."}
           </span>

@@ -7,6 +7,15 @@ import LoadingPage from "./pages/LoadingPage";
 import * as handler from './utils/requestHandler';
 import { Status } from "./utils/types";
 
+/* TODO:
+  - Fix jumping of the timetable when switching between subgroups
+  - Add components for different timetable types (e.g. for teachers)
+  - Jump to the current week day on mobile
+  - Not all groups fetch exams timetable successfully
+  - Exams timetable item styles
+  - Exams timetable icon or any other way to switch between timetables
+  - Themes
+ */
 
 const App = () => {
   const [status, setStatus] = useState<Status>(Status.Loading);
@@ -23,7 +32,7 @@ const App = () => {
   );
 
   return (
-    <BrowserRouter basename="/timetable">
+    <BrowserRouter basename="/timetable-alpha">
       <Routes>
         <Route path="/" element={status ? <HomePage/> : <LoadingPage/>} />
         <Route path="/:group" element={status ? <TimetablePage/> : <LoadingPage/>} />

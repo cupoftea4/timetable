@@ -39,6 +39,23 @@ class TimetableManager {
 		
 	}
 
+	changeTimetableType(type: "timetable" | "postgraduates" | "selective" | "lecturer") {
+		switch (type) {
+			case "timetable":
+				parser.setTimetableSuffix("students_schedule");
+				break;
+			case "postgraduates":
+				parser.setTimetableSuffix("postgraduate_schedule");
+				break;
+			case "selective":
+				parser.setTimetableSuffix("schedule_selective");
+				break;
+			case "lecturer":
+				parser.setTimetableSuffix("lecturer_schedule");
+				break;
+		}
+	}
+
 	async requestInstitutes(force: boolean = false) {
 		if (this.institutesRequest) return this.institutesRequest;
 		return this.institutesRequest = this.getInstitutes(force);
@@ -86,6 +103,26 @@ class TimetableManager {
 
 		storage.setItem("groups" + suffix, groups);
 		storage.setItem("groups" + suffix + "_updated", Date.now());
+		return groups;
+	}
+
+	async getSelectiveGroups(force: boolean = false): Promise<string[]> {
+		// if (this.groups.length > 0 && !force) return this.groups;
+		// if (institute) {
+		// 	const cached = await storage.getItem("groups" + suffix);
+		// 	if (cached && !force) {
+		// 		const updated = await storage.getItem("groups" + suffix + "_updated");
+		// 		if (!needsUpdate(updated)) return cached;
+		// 	}
+		// }
+		const	groups = await parser.getSelectiveGroups();
+
+		// if (!institute) {
+		// 	this.groups = groups;
+		// }
+
+		// storage.setItem("groups" + suffix, groups);
+		// storage.setItem("groups" + suffix + "_updated", Date.now());
 		return groups;
 	}
 

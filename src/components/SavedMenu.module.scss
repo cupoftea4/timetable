@@ -14,7 +14,10 @@
 .saved-menu {
   position: absolute;
   top: 100%;
-  left: 50%;
+  left: -30%;
+  &.home {
+    left: 50%;
+  }
   width: 16rem;
   background-color: hsla(0, 0%, 64%, 0.27);
   border-radius: 1rem;

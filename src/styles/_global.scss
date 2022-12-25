@@ -1,4 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Literata:opsz@7..72&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600;8..144,700&family=Roboto+Mono:ital,wght@0,400;0,600;0,700;1,300;1,600&display=swap');
+// @import url('https://fonts.googleapis.com/css2?family=Oswald&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
 
 :root {
   @include tablet {
@@ -14,7 +16,8 @@
 
 body {
   background: hsl(216, 28%, 7%);
-  font-family: 'Roboto Flex', sans-serif;
+  // font-family: 'Roboto Flex', sans-serif;
+  font-family: 'Ubuntu', sans-serif;
   color: $text-clr;
   font-weight: $regular-font;
   
