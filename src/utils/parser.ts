@@ -1,13 +1,12 @@
 import { timeout } from "./promiseHandling";
-import { ExamsTimetableItem, TimetableItem, TimetableType } from "./types";
+import { ExamsTimetableItem, TimetableItem, TimetableItemType, TimetableType } from "./types";
 
-type RequestSuffix = "students_schedule" 
-		| "schedule_selective" 
-		| "postgraduate_schedule" 
-		| "lecturer_schedule";
+const NULP_STUDENTS = "https://student.lpnu.ua/";
+const NULP_STAFF = "https://staff.lpnu.ua/";
 
-const NULP = "https://student.lpnu.ua/";
 const TIMETABLE_SUFFIX = "students_schedule";
+const SELECTIVE_SUFFIX = "schedule_selective";
+const LECTURER_SUFFIX = "lecturer_schedule";
 const TIMETABLE_EXAMS_SUFFIX = "students_exam";
 
 const PROXY = "https://api.codetabs.com/v1/proxy?quest=";
@@ -16,11 +15,23 @@ const FALLBACK_URL = "https://raw.githubusercontent.com/zubiden/nulp-timetable-d
 
 const TIMEOUT = 3000; // 3s
 
+type RequestSuffix = 
+		  typeof TIMETABLE_SUFFIX
+		| typeof SELECTIVE_SUFFIX
+		| typeof LECTURER_SUFFIX
+		| typeof TIMETABLE_EXAMS_SUFFIX;
+
+const timetableTypes: {[key in TimetableType]: RequestSuffix} = {
+	timetable:  "students_schedule" ,
+	selective: "schedule_selective",
+	lecturer: "lecturer_schedule"
+}
+
 class TimetableParser {
 	private currentSuffix: RequestSuffix = TIMETABLE_SUFFIX;
 
-	private async fetchHtml(params: {[key: string]: string} = {}, exams = false) {
-		let baseUrl = NULP + (!exams ? this.currentSuffix : TIMETABLE_EXAMS_SUFFIX);
+	private async fetchHtml(params: {[key: string]: string} = {}, suffix = this.currentSuffix) {
+		let baseUrl = (suffix === LECTURER_SUFFIX) ? NULP_STAFF : NULP_STUDENTS + suffix;
 		const originalUrl = new URL(baseUrl);
 		for(let key in params) {
 			originalUrl.searchParams.set(key, params[key]);
@@ -33,12 +44,17 @@ class TimetableParser {
 		})
 	}
 
-	setTimetableSuffix(suffix: RequestSuffix) {
-		this.currentSuffix = suffix;
+	getTimetableType() {
+		return (Object.keys(timetableTypes) as TimetableType[])
+						.find(key => timetableTypes[key] === this.currentSuffix);
+	}
+
+	setTimetableType(type: TimetableType) {
+		this.currentSuffix = timetableTypes[type] ?? TIMETABLE_SUFFIX;
 	}
 
 	async getSelectiveGroups() {
-		return this.fetchHtml().then(html => {
+		return this.fetchHtml({}, SELECTIVE_SUFFIX).then(html => {
 			const select = this.parseAndGetFirstElByClassName(html, "#edit-studygroup-abbrname-selective");
 			const groups = Array.from(select?.children ?? [])
 								.map(child => (child as HTMLInputElement).value)
@@ -46,13 +62,24 @@ class TimetableParser {
 								.sort((a, b) => a.localeCompare(b));
 			return groups;
 		}).catch(async err => {
-			// const response = await fetch(FALLBACK_URL + "groups.json");
-			// if (!response.ok)
-				throw Error(err);
-			// return await response.json() as string[];
+			console.warn("Error in getSelectiveGroups: ", err);
+			throw Error(err);
 		})
 	}
-	
+
+	private async getSelectiveTimetable(group: string) {
+		return this.fetchHtml({studygroup_abbrname_selective: group}).then(html => {
+			const table = this.parseAndGetFirstElByClassName(html, ".view-content");
+			if (!table)
+				throw Error("No table found");
+			const days = Array.from(table.children);
+			return days.map((day) => this.parseDay(day)).flat(1);
+		}).catch(async err => {
+			console.warn("Error in getSelectiveTimetable: ", err);
+			throw Error(err);
+		});
+	}
+
 	async getInstitutes() {
 		return this.fetchHtml().then(html => {
 	
@@ -91,6 +118,10 @@ class TimetableParser {
 	}
 	
 	async getTimetable(studygroup_abbrname_selective = "All", departmentparent_abbrname_selective = "All" ) { // group, institute
+		if (this.currentSuffix === SELECTIVE_SUFFIX) {
+			return this.getSelectiveTimetable(studygroup_abbrname_selective);
+		}
+
 		return this.fetchHtml({
 			departmentparent_abbrname_selective,
 			studygroup_abbrname_selective,
@@ -113,18 +144,14 @@ class TimetableParser {
 		return this.fetchHtml({
 			departmentparent_abbrname_selective,
 			 studygroup_abbrname_selective
-		}, true).then(html => {
-			// console.log(html);
+		}, TIMETABLE_EXAMS_SUFFIX).then(html => {
 			const content = this.parseAndGetFirstElByClassName(html, ".view-content");
 			const exams = Array.from(content?.children ?? [])
 								.map(this.parseExam)
 			return exams;
 		}).catch(async err => {
 			console.warn(err);
-			// const response = await fetch(FALLBACK_URL + `exams/${studygroup_abbrname_selective}.json`);
-			// if (!response.ok)
-				throw Error(err);
-			// return await response.json();
+			throw Error(err);
 		})
 	}
 	
@@ -187,12 +214,34 @@ class TimetableParser {
 			urls
 		} as ExamsTimetableItem;
 	}
+
+	private dayToNumber(day: string) {
+		switch(day?.toLowerCase()) {
+			case "пн":
+				return 1;
+			case "вт":
+				return 2;
+			case "ср":
+				return 3;
+			case "чт":
+				return 4;
+			case "пт":
+				return 5;
+			case "сб":
+				return 6;
+			case "нд":
+				return 7;
+			default:
+				return -1;		
+		}
+	}
 	
 	private parseDay(day: Element) {
 		const dayText = day.querySelector(".view-grouping-header");
 		if(!dayText) {
 			throw Error("Got wrong DOM structure for day!");
 		}
+		
 		const dayNumber = this.dayToNumber(dayText.textContent ?? "");
 		const contentChildren = day.querySelector(".view-grouping-content")?.children ?? [];
 	
@@ -281,7 +330,7 @@ class TimetableParser {
 		}
 	}
 	
-	private tryToGetType(location: string): TimetableType {
+	private tryToGetType(location: string): TimetableItemType {
 		location = location.toLowerCase();
 		if(location.includes("практична")) return "practical";
 		if(location.includes("лабораторна")) return "lab";
@@ -289,26 +338,7 @@ class TimetableParser {
 		return "lecture";
 	}
 	
-	private dayToNumber(day: string) {
-		switch(day?.toLowerCase()) {
-			case "пн":
-				return 1;
-			case "вт":
-				return 2;
-			case "ср":
-				return 3;
-			case "чт":
-				return 4;
-			case "пт":
-				return 5;
-			case "сб":
-				return 6;
-			case "нд":
-				return 7;
-			default:
-				return -1;		
-		}
-	}
+
 	
 	private parseAndGetFirstElByClassName(html: string, css: string): HTMLElement | null {
 		const parser = new DOMParser();

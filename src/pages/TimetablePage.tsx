@@ -50,16 +50,21 @@ const TimetablePage = () => {
     }
   };
 
+  const initGroup = async (group: string) => {
+    if (!TimetableManager.isInited()) await TimetableManager.init();
+    if (!TimetableManager.ifGroupExists(group)) {
+      handler.handleError(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
+      setTimetableGroup(null);
+      return;
+    }  
+    setTimetableGroup(group);
+  };
+
   useEffect(
     () => {
-      if (!TimetableManager.ifGroupExists(group)) {
-        handler.handleError(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
-        setTimetableGroup(null);
-        return;
-      }  
-      setTimetableGroup(group.trim());
-      
-      handler.handlePromise(getTimetable(group, isExamsTimetable));
+      initGroup(group).then(() => {
+        handler.handlePromise(getTimetable(group, isExamsTimetable));
+      }).catch(handler.handleError);
     }, [group, isExamsTimetable]);
 
   const changeIsSecondSubgroup = (isSecond: boolean | ((isSecond: boolean) => boolean)) => {

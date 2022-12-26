@@ -1,13 +1,24 @@
 import storage from "./storage"
 import parser from "./parser"
-import { CachedGroup, CachedInstitute, CachedTimetable, ExamsTimetableItem, TimetableItem } from "./types";
+import { CachedGroup, CachedInstitute, CachedTimetable, ExamsTimetableItem, TimetableItem, TimetableType } from "./types";
 
 const UPDATE_PERIOD = 3 * 24 * 60 * 60 * 1000; // 3 days
+
+// storage keys
 const LAST_OPENED_INSTITUTE = "last_opened_institute";
+const INSTITUTES = "institutes";
+const GROUPS = "groups";
+const SELECTIVE_GROUPS = "selective_groups";
+const TIMETABLES = "cached_timetables";
+const EXAMS_TIMETABLES = "cached_exams_timetables";
+const TIMETABLE = "timetable_";
+const EXAMS_TIMETABLE = "exams_timetable_";
+const UPDATED = "_updated";
 
 class TimetableManager {
 	private institutes: CachedInstitute[] = [];
 	private groups: CachedGroup[] = [];
+	private selectiveGroups: CachedGroup[] = [];
 	private timetables: CachedTimetable[] = [];
 	private examsTimetables: CachedTimetable[] = [];
 	private institutesRequest: Promise<CachedInstitute[]> | null  = null;
@@ -16,44 +27,40 @@ class TimetableManager {
 
 	async init() {
 		try {
-			this.institutes = (await storage.getItem("institutes")) || [];
-			this.groups = (await storage.getItem("groups")) || [];
-			this.timetables = (await storage.getItem("cached_timetables")) || [];
+			this.institutes = (await storage.getItem(INSTITUTES)) || [];
+			this.groups = (await storage.getItem(GROUPS)) || [];
+			this.timetables = (await storage.getItem(TIMETABLES)) || [];
+			this.selectiveGroups = (await storage.getItem(SELECTIVE_GROUPS)) || [];
 		} catch (e) { 
 			// sometimes chrome throws an error while trying to access idb
 			throw new Error("[TimetableManager.init] Error while loading cached data: " + e);
 		}
 		
-			const institutesUpdated = await storage.getItem("institutes_updated");
-			if (this.institutes.length === 0 || needsUpdate(institutesUpdated)) {
-				console.log("Downloading institute list...");
-				this.requestInstitutes(true);
-			}
+		const institutesUpdated = await storage.getItem(INSTITUTES + UPDATED);
+		if (this.institutes.length === 0 || needsUpdate(institutesUpdated)) {
+			console.log("Downloading institute list...");
+			this.requestInstitutes(true);
+		}
 
-			const groupsUpdated = await storage.getItem("groups_updated");
-			if (this.groups.length === 0 || needsUpdate(groupsUpdated)) {
-				console.log("Downloading group list...");
-				this.requestGroups(true);
-			}
+		const groupsUpdated = await storage.getItem(GROUPS + UPDATED);
+		if (this.groups.length === 0 || needsUpdate(groupsUpdated)) {
+			console.log("Downloading group list...");
+			this.requestGroups(true);
+		}
 
-		
+		const selectiveGroupsUpdated = await storage.getItem(SELECTIVE_GROUPS + UPDATED);
+		if (this.selectiveGroups.length === 0 || needsUpdate(selectiveGroupsUpdated)) {
+			console.log("Downloading selective group list...");
+			this.getSelectiveGroups(true);
+		}
 	}
 
-	changeTimetableType(type: "timetable" | "postgraduates" | "selective" | "lecturer") {
-		switch (type) {
-			case "timetable":
-				parser.setTimetableSuffix("students_schedule");
-				break;
-			case "postgraduates":
-				parser.setTimetableSuffix("postgraduate_schedule");
-				break;
-			case "selective":
-				parser.setTimetableSuffix("schedule_selective");
-				break;
-			case "lecturer":
-				parser.setTimetableSuffix("lecturer_schedule");
-				break;
-		}
+	isInited() {
+		return this.institutes.length > 0 && this.groups.length > 0 && this.selectiveGroups.length > 0;
+	}
+
+	changeTimetableType(type: TimetableType) {
+		parser.setTimetableType(type);
 	}
 
 	async requestInstitutes(force: boolean = false) {
@@ -74,8 +81,8 @@ class TimetableManager {
 	async getInstitutes(force: boolean = false) {
 		if (this.institutes.length > 0 && !force) return this.institutes;
 		const institutes = await parser.getInstitutes();
-		storage.setItem("institutes", institutes);
-		storage.setItem('institutes_updated', Date.now());
+		storage.setItem(INSTITUTES, institutes);
+		storage.setItem(INSTITUTES + UPDATED, Date.now());
 		this.institutes = institutes;
 		return institutes;
 	}
@@ -86,12 +93,19 @@ class TimetableManager {
 	}
 
 	async getGroups(institute?: string, force: boolean = false): Promise<string[]> {
+		console.log(parser.getTimetableType());
+		
+		if (parser.getTimetableType() === "selective") return this.getSelectiveGroups(force);
+		return this.getTimetableGroups(institute, force);
+	}
+
+	private async getTimetableGroups(institute?: string, force: boolean = false): Promise<string[]> {
 		let suffix = institute ? ("_" + institute) : "";
 		if (!institute && this.groups.length > 0 && !force) return this.groups;
 		if (institute) {
-			const cached = await storage.getItem("groups" + suffix);
+			const cached = await storage.getItem(GROUPS + suffix);
 			if (cached && !force) {
-				const updated = await storage.getItem("groups" + suffix + "_updated");
+				const updated = await storage.getItem(GROUPS + suffix + UPDATED);
 				if (!needsUpdate(updated)) return cached;
 			}
 		}
@@ -101,28 +115,27 @@ class TimetableManager {
 			this.groups = groups;
 		}
 
-		storage.setItem("groups" + suffix, groups);
-		storage.setItem("groups" + suffix + "_updated", Date.now());
+		storage.setItem(GROUPS + suffix, groups);
+		storage.setItem(GROUPS + suffix + UPDATED, Date.now());
 		return groups;
 	}
 
-	async getSelectiveGroups(force: boolean = false): Promise<string[]> {
-		// if (this.groups.length > 0 && !force) return this.groups;
-		// if (institute) {
-		// 	const cached = await storage.getItem("groups" + suffix);
-		// 	if (cached && !force) {
-		// 		const updated = await storage.getItem("groups" + suffix + "_updated");
-		// 		if (!needsUpdate(updated)) return cached;
-		// 	}
-		// }
+	private async getSelectiveGroups(force: boolean = false): Promise<string[]> {
+		console.log("getSelectiveGroups", this.selectiveGroups);
+		
+		if (this.selectiveGroups.length > 0 && !force) return this.selectiveGroups;
+		const cached = await storage.getItem(SELECTIVE_GROUPS);
+		if (cached && !force) {
+			const updated = await storage.getItem(SELECTIVE_GROUPS + UPDATED);
+			if (!needsUpdate(updated)) return cached;
+		}
 		const	groups = await parser.getSelectiveGroups();
+		console.log("getSelectiveGroups 2", groups);
+		
+		this.selectiveGroups = groups;
 
-		// if (!institute) {
-		// 	this.groups = groups;
-		// }
-
-		// storage.setItem("groups" + suffix, groups);
-		// storage.setItem("groups" + suffix + "_updated", Date.now());
+		storage.setItem(SELECTIVE_GROUPS, groups);
+		storage.setItem(SELECTIVE_GROUPS + UPDATED, Date.now());
 		return groups;
 	}
 
@@ -130,7 +143,7 @@ class TimetableManager {
 		group = group.trim();
 		const data = this.timetables.find(el => el.group.toUpperCase() === group.toUpperCase());
 		if (checkCache && data && !needsUpdate(data.time)) {
-			return storage.getItem("timetable_" + group);
+			return storage.getItem(TIMETABLE + group);
 		}			
 		
 		const timetable = await parser.getTimetable(group);
@@ -144,8 +157,8 @@ class TimetableManager {
 			time: Date.now(),
 			subgroup: 1
 		});
-		storage.setItem("cached_timetables", this.timetables);
-		storage.setItem("timetable_" + group, timetable);
+		storage.setItem(TIMETABLES, this.timetables);
+		storage.setItem(TIMETABLE + group, timetable);
 		return timetable;
 	}
 
@@ -153,7 +166,7 @@ class TimetableManager {
 		group = group.trim();
 		const data = this.examsTimetables.find(el => el.group.toUpperCase() === group.toUpperCase());
 		if (checkCache && data && !needsUpdate(data.time)) {
-			return storage.getItem("exams_timetable_" + group);
+			return storage.getItem(EXAMS_TIMETABLE + group);
 		}
 
 		const examsTimetable = await parser.getExamsTimetable(group);
@@ -165,8 +178,8 @@ class TimetableManager {
 			group: group,
 			time: Date.now()
 		});
-		storage.setItem("cached_exams_timetables", this.examsTimetables);
-		storage.setItem("exams_timetable_" + group, examsTimetable);
+		storage.setItem(EXAMS_TIMETABLES, this.examsTimetables);
+		storage.setItem(EXAMS_TIMETABLES + "_" + group, examsTimetable);
 		return examsTimetable;
 	}
 
@@ -187,7 +200,7 @@ class TimetableManager {
 			time: data.time,
 			subgroup: subgroup
 		})
-		return storage.setItem("cached_timetables", this.timetables);
+		return storage.setItem(TIMETABLES, this.timetables);
 	}
 
 	getSubgroup(group?: string) {
@@ -202,13 +215,14 @@ class TimetableManager {
 	async deleteTimetable(group: string) {
 		group = group.trim();
 		this.timetables = this.timetables.filter(el => el.group !== group);
-		storage.deleteItem("timetable_" + group);
-		return storage.setItem("cached_timetables", this.timetables);
+		storage.deleteItem(TIMETABLE + group);
+		return storage.setItem(TIMETABLES, this.timetables);
 	}
 
 	ifGroupExists(group: string) {
 		group = group.trim();
-		return this.groups.find(el => el.toUpperCase() === group.toUpperCase() ) ? true : false;
+		const compare = (el: string) => el.toUpperCase() === group.toUpperCase();
+		return (this.groups.find(compare) || this.selectiveGroups.find(compare));
 	}
 
 	getCachedTimetables() {

@@ -5,17 +5,17 @@ import SearchBar from './SearchBar';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import styles from './HeaderPanel.module.scss';
 import { SCREEN_BREAKPOINT } from '../utils/constants';
+import { TimetableType } from '../utils/types';
 
 type OwnProps = {
-  timetableTypeState: [string, React.Dispatch<React.SetStateAction<"timetable" | "postgraduates" | "selective" | "lecturer">>];
+  setTimetableType: React.Dispatch<React.SetStateAction<TimetableType>>;
 };
 
-const HeaderPanel : FC<OwnProps> = ({timetableTypeState}) => {
+const HeaderPanel : FC<OwnProps> = ({setTimetableType}) => {
   const { width } = useWindowDimensions();
   const shouldShrinkSearchBar = useMemo(() => width < SCREEN_BREAKPOINT, [width]);
   const [shrinkSearchBar, setShrinkSearchBar] = React.useState(shouldShrinkSearchBar);
-  const [timetableType, setTimetableType] = timetableTypeState;
-  console.log(timetableType);
+  // const [timetableType, setTimetableType] = timetableTypeState;
   
 
   const toggleSearchBar = () => {
@@ -32,10 +32,9 @@ const HeaderPanel : FC<OwnProps> = ({timetableTypeState}) => {
         null 
         :
         <nav className={styles['nav-buttons']}>
-          <select name="timetable-types" onChange={(e) => setTimetableType(e.target.value as "timetable" | "postgraduates" | "selective" | "lecturer")}>
-            <option value="timetable">Бакалавр</option>
-            <option value="postgraduates">Аспірант</option>
-            <option value="selective">Вибіркові</option>
+          <select name="timetable-types" onChange={(e) => setTimetableType(e.target.value as TimetableType)}>
+            <option value="timetable">Студент</option>
+            <option value="selective">Вибіркові</option> 
             <option value="lecturer">Викладач</option>
           </select>
           <SavedMenu />

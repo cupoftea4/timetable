@@ -19,7 +19,6 @@ const nonexistingGroupErrors = [
   "Please, stop trying to break the app, your group does not exist",
   "Cat not found, group not found, what else is not found?",
   "Meow, your group does not exist",
-  "Meow, your group does not exist",
   "Let me guess, you are a wizard, cause your group does not exist",
 ]
 
