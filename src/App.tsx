@@ -15,6 +15,7 @@ import { Status } from "./utils/types";
   - Exams timetable item styles
   - Exams timetable icon or any other way to switch between timetables
   - Themes
+  - horizontal scrolling on mobileS
  */
 
 const App = () => {

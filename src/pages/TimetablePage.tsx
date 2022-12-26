@@ -51,11 +51,11 @@ const TimetablePage = () => {
   };
 
   const initGroup = async (group: string) => {
-    if (!TimetableManager.isInited()) await TimetableManager.init();
+    if (!TimetableManager.isInited()) 
+      await TimetableManager.init().catch(e => handler.handleError(e, handler.INIT_ERROR));
     if (!TimetableManager.ifGroupExists(group)) {
-      handler.handleError(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
       setTimetableGroup(null);
-      return;
+      throw new Error(`Group ${group} doesn't exist`);
     }  
     setTimetableGroup(group);
   };
@@ -64,7 +64,7 @@ const TimetablePage = () => {
     () => {
       initGroup(group).then(() => {
         handler.handlePromise(getTimetable(group, isExamsTimetable));
-      }).catch(handler.handleError);
+      }).catch(e => handler.handleError(e, handler.NONEXISTING_GROUP));
     }, [group, isExamsTimetable]);
 
   const changeIsSecondSubgroup = (isSecond: boolean | ((isSecond: boolean) => boolean)) => {

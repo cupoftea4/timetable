@@ -93,8 +93,6 @@ class TimetableManager {
 	}
 
 	async getGroups(institute?: string, force: boolean = false): Promise<string[]> {
-		console.log(parser.getTimetableType());
-		
 		if (parser.getTimetableType() === "selective") return this.getSelectiveGroups(force);
 		return this.getTimetableGroups(institute, force);
 	}
@@ -121,8 +119,6 @@ class TimetableManager {
 	}
 
 	private async getSelectiveGroups(force: boolean = false): Promise<string[]> {
-		console.log("getSelectiveGroups", this.selectiveGroups);
-		
 		if (this.selectiveGroups.length > 0 && !force) return this.selectiveGroups;
 		const cached = await storage.getItem(SELECTIVE_GROUPS);
 		if (cached && !force) {

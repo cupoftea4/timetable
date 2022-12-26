@@ -43,17 +43,18 @@ const HomePage = () => {
     TimetableManager.getInstitutes()
       .then(setInstitutes)
       .catch(handler.handleError);
+    return () => handler.hideAllMessages();
   }, []);
 
   const updateGroups = useCallback((timetableType: TimetableType, institute?: CachedInstitute | null) => {
-    if (timetableType === "timetable" && institute) {
+    if (timetableType === "timetable") {
+      if (!institute) return;
       TimetableManager.updateLastOpenedInstitute(institute);
     }
+    
     handler.handlePromise(TimetableManager.getGroups(institute ?? undefined), 'Fetching groups...')
       .then((data) => {
-        const tempGroups = new Set<string>(data.map((group) => getGroupName(group, timetableType)));
-        console.log(tempGroups);
-        
+        const tempGroups = new Set<string>(data.map((group) => getGroupName(group, timetableType)));     
         setMajors(Array.from(tempGroups));
         setGroupsByYear(sortGroupsByYear(data));
         setSelectedMajor(null);
@@ -62,7 +63,7 @@ const HomePage = () => {
   }, []);
 
   useEffect(() => {
-    TimetableManager.changeTimetableType(timetableType);
+    TimetableManager.changeTimetableType(timetableType);  
     updateGroups(timetableType, selectedInstitute);
   }, [selectedInstitute, timetableType, updateGroups]);
 

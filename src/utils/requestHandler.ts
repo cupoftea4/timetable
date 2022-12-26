@@ -31,12 +31,16 @@ export const INIT_ERROR = getRandomValue(initErrors);
 export const NONEXISTING_GROUP = getRandomValue(nonexistingGroupErrors);
 
 export function handleError(error: string, userError: string = FETCH_ERROR) {
-  console.error("[Handler]" + error);
+  console.error("[Handler] " + error);
   toast.error(userError);
 }
 
 export function handlePromise<T>(promise: Promise<T>, pending: string = FETCH_PENDING, error?: string) {
   return toast.promise(promise, error ? {pending, error} : {pending});
+}
+
+export function hideAllMessages() {
+  toast.dismiss();
 }
 
 function getRandomValue<T>(array: T[]) {
