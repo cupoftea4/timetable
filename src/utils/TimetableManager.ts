@@ -31,12 +31,16 @@ class TimetableManager {
 	private groupsRequest: Promise<CachedGroup[]> | null  = null;
 	private lastOpenedInstitute: string | null = null;
 
+	private departments: string[] = [];
+	private lecturers: string[] = [];
+
 	async init() {
 		try {
 			this.institutes = (await storage.getItem(INSTITUTES)) || [];
 			this.groups = (await storage.getItem(GROUPS)) || [];
 			this.timetables = (await storage.getItem(TIMETABLES)) || [];
 			this.selectiveGroups = (await storage.getItem(SELECTIVE_GROUPS)) || [];
+			this.lecturers = (await storage.getItem("lecturers")) || [];
 		} catch (e) { 
 			// sometimes chrome throws an error while trying to access idb
 			throw new Error("[TimetableManager.init] Error while loading cached data: " + e);
@@ -59,6 +63,13 @@ class TimetableManager {
 			console.log("Downloading selective group list...");
 			await this.getSelectiveGroups(true);
 		}
+
+		const lecturersUpdated = await storage.getItem("lecturers" + UPDATED);
+		if (this.lecturers.length === 0 || Util.needsUpdate(lecturersUpdated)) {
+			console.log("Downloading lecturers list...");
+			await this.getLecturers(undefined, true);
+		}
+		
 	}
 
 	isInited() {
@@ -72,7 +83,7 @@ class TimetableManager {
 				const tempGroups = new Set<string>(data.map((group) => Util.getGroupName(group, type))); 
 				return Util.getFirstLetters([...tempGroups]);
 			case "lecturer":
-				return [];
+				return Util.getFirstLetters(await this.getLecturerDepartments());
 			default: 
 				return this.getInstitutes();
 		}
@@ -86,7 +97,8 @@ class TimetableManager {
 				return [...tempGroups].filter((group) => 
 					group.startsWith(query.at(0) ?? "") || group.startsWith(query.at(-1) ?? ""));
 			case "lecturer":
-				return [];
+				return (await this.getLecturerDepartments()).filter((group) => 
+					group.startsWith(query.at(0) ?? "") || group.startsWith(query.at(-1) ?? ""));
 			default:
 				const groups = await this.getTimetableGroups(query);
 				return [...new Set<string>(groups.map((group) => Util.getGroupName(group, type)))];
@@ -97,13 +109,33 @@ class TimetableManager {
 		switch (type) {
 			case "selective":
 				const data = await this.getSelectiveGroups();
-				return Util.sortGroupsByYear(data.filter(group => Util.getGroupName(group, type) === query));
+				return data.filter(group => Util.getGroupName(group, type) === query);
 			case "lecturer":
-				return [];
+				return await this.getLecturers(query);
 			default:
 				const groups = await this.getTimetableGroups();
-				return Util.sortGroupsByYear(groups.filter(group => Util.getGroupName(group, type) === query));
+				return groups.filter(group => Util.getGroupName(group, type) === query);
 		}
+	}
+
+	async getLecturers(department = "All", force = false): Promise<string[]> {
+		if (this.lecturers.length > 0 && !force && department === "All") return this.lecturers;
+		const lecturers = await parser.getLecturers(department);
+		if (department === "All") {
+			storage.setItem("lecturers", lecturers);
+			storage.setItem("lecturers" + UPDATED, Date.now());
+			this.lecturers = lecturers;
+		}
+		return lecturers;
+	}
+
+	async getLecturerDepartments(force = false): Promise<string[]> {
+		if (this.departments.length > 0 && !force) return this.departments;
+		const departments = await parser.getLecturerDepartments();
+		storage.setItem("departments_", departments);
+		storage.setItem("departments" + UPDATED, Date.now());
+		this.departments = departments;
+		return departments;
 	}
 
 	async getTimetable(group: string, type?: TimetableType, checkCache = true) : Promise<TimetableItem[]> {
@@ -219,6 +251,14 @@ class TimetableManager {
 		return this.groups;
 	}
 
+	getCachedSelectiveGroups() {
+		return this.selectiveGroups;
+	}
+
+	getCachedLecturers() {
+		return this.lecturers;
+	}
+
 	updateTimetable(type: TimetableType, group: string) {
 		return this.getTimetable(group, type, false);
 	}
@@ -289,12 +329,12 @@ class TimetableManager {
 		return groups;
 	}
 
-	private tryToGetType(timetable: string): TimetableType | undefined {
+	tryToGetType(timetable: string): TimetableType | undefined {
 		timetable = timetable.trim();
 		const compare = (el: string) => el.toUpperCase() === timetable.toUpperCase();
 		if (this.groups.find(compare)) return 'timetable';
 		if (this.selectiveGroups.find(compare)) return 'selective';
-		// if (this.lecturers.find(compare)) return 'lecturer';
+		if (this.lecturers.find(compare)) return 'lecturer';
 	}
 
 	searchGroups(query: string) {

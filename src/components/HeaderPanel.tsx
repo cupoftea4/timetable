@@ -32,7 +32,7 @@ const HeaderPanel : FC<OwnProps> = ({timetableType}) => {
 
   return (
     <header className={styles.header}>
-      <SearchBar toggleSearchBar={toggleSearchBar} /> 
+      <SearchBar toggleSearchBar={toggleSearchBar} timetableType={timetableType} /> 
       {!shrinkSearchBar && shouldShrinkSearchBar ?
         null 
         :

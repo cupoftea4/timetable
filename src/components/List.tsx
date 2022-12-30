@@ -8,15 +8,13 @@ type ListProps = {
 }
 
 const List = ({items, selectedState}: ListProps) => {
-  const [selected, setSelected] = selectedState;
+  const [selected, onSelect] = selectedState;
   return (
     <ul>
       {items.map((item) => (
         <li key={item}>
           <button
-            onClick={() => {
-              setSelected(item);
-            }}
+            onClick={() => onSelect(item)}
             data-state={selected === item ? "selected" : ""}
           >
             {item}

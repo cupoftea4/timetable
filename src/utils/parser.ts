@@ -30,7 +30,7 @@ const timetableSuffixes: {[key in TimetableType]: RequestSuffix} = {
 class TimetableParser {
 
 	private async fetchHtml(params: {[key: string]: string} = {}, suffix = TIMETABLE_SUFFIX) {
-		let baseUrl = (suffix === LECTURER_SUFFIX) ? NULP_STAFF : NULP_STUDENTS + suffix;
+		let baseUrl = ((suffix === LECTURER_SUFFIX) ? NULP_STAFF : NULP_STUDENTS) + suffix;
 		const originalUrl = new URL(baseUrl);
 		for(let key in params) {
 			originalUrl.searchParams.set(key, params[key]);
@@ -45,7 +45,7 @@ class TimetableParser {
 
 	async getSelectiveGroups() {
 		return this.fetchHtml({}, SELECTIVE_SUFFIX).then(html => {
-			const select = this.parseAndGetFirstElByClassName(html, "#edit-studygroup-abbrname-selective");
+			const select = this.parseAndGetFirstElBySelector(html, "#edit-studygroup-abbrname-selective");
 			const groups = Array.from(select?.children ?? [])
 								.map(child => (child as HTMLInputElement).value)
 								.filter(group => group !== "All")
@@ -60,7 +60,7 @@ class TimetableParser {
 	async getInstitutes() {
 		return this.fetchHtml().then(html => {
 	
-			const select = this.parseAndGetFirstElByClassName(html, "#edit-departmentparent-abbrname-selective");
+			const select = this.parseAndGetFirstElBySelector(html, "#edit-departmentparent-abbrname-selective");
 			const institutes = Array.from(select?.children ?? [])
 									.map(child => (child as HTMLInputElement).value)
 									.filter(inst => inst !== "All")
@@ -73,10 +73,37 @@ class TimetableParser {
 			return await response.json();
 		});
 	}
+
+	async getLecturers(department?: string) {
+		return this.fetchHtml(department ? 
+			{department_name_selective: department} : {}, LECTURER_SUFFIX).then(html => {
+			const select = this.parseAndGetFirstElBySelector(html, "#edit-teachername-selective");
+			const lecturers = Array.from(select?.children ?? [])
+									.map(child => (child as HTMLInputElement).value)
+									.filter(inst => inst !== "All")
+									.sort((a, b) => a.localeCompare(b));
+			return lecturers;
+		}).catch(err => {
+			throw Error("Couldn't parse lecturers: " + err);
+		});
+	}
+
+	async getLecturerDepartments() {
+		return this.fetchHtml({}, LECTURER_SUFFIX).then(html => {
+			const select = this.parseAndGetFirstElBySelector(html, "#edit-department-name-selective");
+			const departments = Array.from(select?.children ?? [])
+				.map(child => (child as HTMLInputElement).value)
+				.filter(depart => depart !== "All")
+				.sort((a, b) => a.localeCompare(b));
+			return departments;
+		}).catch(err => {
+			throw Error("Couldn't parse departments: " + err);
+		});
+	}
 	
 	async getGroups(departmentparent_abbrname_selective = "All") {
 		return this.fetchHtml({departmentparent_abbrname_selective}).then(html => {
-			const select = this.parseAndGetFirstElByClassName(html, "#edit-studygroup-abbrname-selective");
+			const select = this.parseAndGetFirstElBySelector(html, "#edit-studygroup-abbrname-selective");
 			const groups = Array.from(select?.children ?? [])
 								.map(child => (child as HTMLInputElement).value)
 								.filter(inst => inst !== "All")
@@ -93,44 +120,36 @@ class TimetableParser {
 			return await response.json() as string[];
 		})
 	}
-	
-	async getTimetable(type: TimetableType, group = "All", institute = "All") {
-		const suffix = timetableSuffixes[type];
-		if (suffix === SELECTIVE_SUFFIX) {
-			return this.getSelectiveTimetable(group);
-		}
-		return this.getStudentTimetable(group, institute)
-	}
 
-	private async getSelectiveTimetable(group: string) {
-		return this.fetchHtml({studygroup_abbrname_selective: group}, SELECTIVE_SUFFIX).then(html => {
-			const table = this.parseAndGetFirstElByClassName(html, ".view-content");
+	private async parseTimetable(params: { [key: string]: string; }, suffix?: string) {
+		try {
+			const html = await this.fetchHtml(params, suffix);
+			const table = this.parseAndGetFirstElBySelector(html, ".view-content");
 			if (!table)
 				throw Error("No table found");
 			const days = Array.from(table.children);
 			return days.map((day) => this.parseDay(day)).flat(1);
-		}).catch(async err => {
-			console.warn("Error in getSelectiveTimetable: ", err);
-			throw Error(err);
-		});
+		} catch (err) {
+			throw Error("Error while getting timetable: " + err);
+		}
 	}
-
-	private async getStudentTimetable(group = "All", institute = "All") {
-		return this.fetchHtml({
-			departmentparent_abbrname_selective: institute,
-			studygroup_abbrname_selective: group,
+	
+	async getTimetable(type: TimetableType, timetableName = "All", timetableCategory = "All") {
+		const suffix = timetableSuffixes[type];
+		if (suffix === SELECTIVE_SUFFIX) {
+			return this.parseTimetable({studygroup_abbrname_selective: timetableName}, suffix);
+		}
+		if (suffix === LECTURER_SUFFIX) {
+			return this.parseTimetable({
+				department_name_selective: timetableCategory,
+				teachername_selective: timetableName,
+				assetbuilding_name_selective: "весь семестр"
+			}, LECTURER_SUFFIX);
+		}
+		return this.parseTimetable({
+			departmentparent_abbrname_selective: timetableCategory,
+			studygroup_abbrname_selective: timetableName,
 			semestrduration: '1', // Why, NULP?
-		}).then(html => {
-			const content = this.parseAndGetFirstElByClassName(html, ".view-content");
-			const days = Array.from(content?.children ?? [])
-								.map(this.parseDay)
-								.flat(1);
-			return days;
-		}).catch(async err => {
-			const response = await fetch(FALLBACK_URL + `timetables/${group}.json`);
-			if (!response.ok)
-				throw Error(err);
-			return await response.json();
 		})
 	}
 	
@@ -139,7 +158,7 @@ class TimetableParser {
 			departmentparent_abbrname_selective: institute,
 			studygroup_abbrname_selective: group
 		}, TIMETABLE_EXAMS_SUFFIX).then(html => {
-			const content = this.parseAndGetFirstElByClassName(html, ".view-content");
+			const content = this.parseAndGetFirstElBySelector(html, ".view-content");
 			const exams = Array.from(content?.children ?? [])
 								.map(this.parseExam)
 			return exams;
@@ -148,7 +167,6 @@ class TimetableParser {
 			throw Error(err);
 		})
 	}
-	
 	
 	
 	/*
@@ -334,7 +352,7 @@ class TimetableParser {
 	
 
 	
-	private parseAndGetFirstElByClassName(html: string, css: string): HTMLElement | null {
+	private parseAndGetFirstElBySelector(html: string, css: string): HTMLElement | null {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(html, "text/html");
 		return doc.querySelector(css) ?? new HTMLElement();

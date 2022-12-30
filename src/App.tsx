@@ -36,12 +36,13 @@ const App = () => {
     <>
      {status ?
       <>
-        <BrowserRouter basename="/timetable">
+        <BrowserRouter basename="/timetable-alpha">
           <Routes>
             <Route path="/" element={<HomePage timetableType="timetable"/>} />
             <Route path="selective" element={<HomePage timetableType="selective"/>} />
             <Route path="lecturer" element={<HomePage timetableType="lecturer"/>} />
             <Route path="/:group" element={<TimetablePage/>} />
+            <Route path="/:group/exams" element={<TimetablePage isExamsTimetable/>} />
           </Routes>
         </BrowserRouter>
       </> 

@@ -2,8 +2,6 @@
 @use '../styles/_variables.scss' as *;
 @use '../styles/_mixins.scss' as *;
 
-
-
 .selection {
   max-width: $max-content-width;
   display: flex;
@@ -14,12 +12,10 @@
     gap: 3rem;
   }
   width: 100%;
-  
-  > ul {
-      li {
-        animation: $fade-in-animation;
-      }
+  >ul li {
+    animation: $fade-in-animation;
   }
+
   li {
     font-size: $medium-font-size;
     margin: .125em;
@@ -41,14 +37,23 @@
         background-color: $light-accent-clr;
       }
     }
-
   }
+
+  &[data-attr=lecturer-groups] > ul:nth-child(2) li button {
+    width: 20rem;
+  }
+
   @include mobile {
     padding: 2rem 1rem;
     gap: 0;
     justify-content: space-around;
     li > button { 
         width: 100%;
+    }
+    &[data-attr=lecturer-groups] > ul:nth-child(2) li button {
+      width: 100%;
+      word-wrap: break-word;
+      overflow: hidden;
     }
   }
   .no-selection {

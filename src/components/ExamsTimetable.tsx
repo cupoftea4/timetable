@@ -21,7 +21,7 @@ const ExamsTimetable: FC<OwnProps> = ({exams}) => {
           <p>{exam.number} пара</p>
           <h3>{exam.subject}</h3>
           <p>{exam.lecturer}</p>
-          <p>{exam.date.toLocaleString(undefined, {weekday: "long", day: "numeric", month: "long"})}</p>
+          <p>{exam.date.toLocaleString("ja-JP", {weekday: "long", day: "numeric", month: "long"})}</p>
         </div>
       ))}
     </div>

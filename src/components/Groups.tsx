@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import BackIcon from '../assets/BackIcon';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import { SCREEN_BREAKPOINT } from '../utils/constants';
+import TimetableUtil from '../utils/TimetableUtil';
 import styles from './Groups.module.scss';
 
 enum Year {
@@ -11,9 +12,10 @@ enum Year {
   Fourth
 }
 
-const Groups = ({groups}: {groups: string[][]}) => {
+const Groups = ({groups}: {groups: string[]}) => {
   const { width } = useWindowDimensions();
   const isMobile = width < SCREEN_BREAKPOINT;
+  const groupsByYear = TimetableUtil.sortGroupsByYear(groups);
 
   // ммм, та
   const reload = () => window.location.reload();
@@ -29,11 +31,11 @@ const Groups = ({groups}: {groups: string[][]}) => {
       
       { 
         [Year.First, Year.Second, Year.Third, Year.Fourth].map((year) => 
-          groups[year]?.length && groups[year].length !== 0 ?
+          groupsByYear[year]?.length && groupsByYear[year].length !== 0 ?
               <ul key={year} className={styles.year} 
                   data-value={`${year} Курс`}
                 >
-                  { groups[year].map(group => (
+                  {groupsByYear[year].map(group => (
                                       <li key={group}>
                                         <Link to={"/" + group}>
                                           {group}

@@ -15,25 +15,26 @@ type OwnProps = {
 }
 
 const HomePage: FC<OwnProps>  = ({timetableType}) => {
-  const [institutes, setInstitutes] = useState<CachedInstitute[]>([]);
-  const [majors, setMajors] = useState<string[]>([]);
-  const [groupsByYear, setGroupsByYear] = useState<string[][]>([]); // groupsByYear[year][groupIndex]
-  const [selectedInstitute, setSelectedInstitute] = useState<CachedInstitute | null>(null);
-  const [selectedMajor, setSelectedMajor] = useState<string | null>(null);
+  const [firstLayer, setFirstLayer] = useState<CachedInstitute[]>([]); // institutes/alphabet
+  const [secondLayer, setSecondLayer] = useState<string[]>([]); // majors/departments/selective
+  const [thirdLayer, setThirdLayer] = useState<string[]>([]); // groups/lecturers
+  const [selectedFirst, setSelectedFirst] = useState<CachedInstitute | null>(null);
+  const [selectedSecond, setSelectedSecond] = useState<string | null>(null);
 
   const { width } = useWindowDimensions();
   const isMobile = width < SCREEN_BREAKPOINT;
-  const showMajorSelection = !isMobile || !selectedMajor;
-  const showInstituteSelection = showMajorSelection;
-  const showGroupsSelection = selectedInstitute && showMajorSelection;
+  const showSecondLayer = !isMobile || !selectedSecond;
+  const showFirstLayer = showSecondLayer;
+  const showThirdLayer = selectedFirst && showSecondLayer;
   
   useEffect(() => {
+    setThirdLayer([]);
     TimetableManager.getLastOpenedInstitute().then((inst) => {
-      setSelectedInstitute(inst);
+      setSelectedFirst(inst);
       updateMajors(timetableType, inst);
     });
     TimetableManager.getFirstLayerSelectionByType(timetableType)
-      .then(setInstitutes)
+      .then(setFirstLayer)
       .catch(handler.handleError);
     // BUG: In strict mode it kinda ruins nonexisting group error toast
     return () => handler.hideAllMessages();
@@ -42,25 +43,25 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   const updateMajors = (timetableType: TimetableType, query: string) => {
     TimetableManager.updateLastOpenedInstitute(query);   
     handler.handlePromise(TimetableManager.getSecondLayerByType(timetableType, query), 'Fetching groups...')
-      .then(setMajors)
+      .then(setSecondLayer)
       .catch(handler.handleError);
-    setSelectedMajor(null);
+    setSelectedSecond(null);
   };
 
   const updateGroups = (timetableType: TimetableType, query: string) => {
     handler.handlePromise(TimetableManager.getThirdLayerByType(timetableType, query), 'Fetching timetables...')
-      .then(setGroupsByYear)
+      .then(setThirdLayer)
       .catch(handler.handleError);
   };
 
   const handleInstituteChange = (institute: CachedInstitute | null) => {
-    setSelectedInstitute(institute);
+    setSelectedFirst(institute);
     if (!institute) return;
     updateMajors(timetableType, institute);
   };
 
   const handleMajorChange = (major: string | null) => {
-    setSelectedMajor(major);
+    setSelectedSecond(major);
     if (!major) return;
     updateGroups(timetableType, major);
   };
@@ -70,15 +71,21 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
       <HeaderPanel timetableType={timetableType}/>
       <main>
         <section className={styles.selection} data-attr={timetableType + "-groups"}>
-          {showInstituteSelection &&
-              <List items={institutes} selectedState={[selectedInstitute, handleInstituteChange]} />
+          {showFirstLayer &&
+              <List items={firstLayer} selectedState={[selectedFirst, handleInstituteChange]} />
           } 
-          {showGroupsSelection &&
-              <List items={majors} selectedState={[selectedMajor, handleMajorChange]} />
+          {showThirdLayer &&
+              <List items={secondLayer} selectedState={[selectedSecond, handleMajorChange]} />
           }
 
-          {selectedMajor ?
-              <Groups groups={groupsByYear} />
+          {selectedSecond ?
+            (timetableType === 'lecturer' ?
+              <ul>
+                {thirdLayer.map((lecturer) => <li>{lecturer}</li>)}
+              </ul>
+              :
+              <Groups groups={thirdLayer} />
+            )
             : 
               <div className={styles['no-selection']}>
                 <img src={catImage} alt="cat" />

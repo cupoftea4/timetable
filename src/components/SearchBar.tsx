@@ -7,12 +7,26 @@ import 'react-datalist-input/dist/styles.scss';
 import TimetableManager from '../utils/TimetableManager';
 import { useNavigate } from 'react-router-dom';
 import { SCREEN_BREAKPOINT } from '../utils/constants';
+import { TimetableType } from '../utils/types';
 
-const SearchBar = ( {toggleSearchBar}: {toggleSearchBar: Function} ) => {
+const getSearchBarOptions = (timetableType: TimetableType) => {
+  switch (timetableType) {
+    case "lecturer":
+      return TimetableManager.getCachedLecturers().map(lecturer => ({id: lecturer, value: lecturer}));
+    case "selective":
+      return TimetableManager.getCachedSelectiveGroups().map(selective => ({id: selective, value: selective}));
+    case "timetable":
+      return TimetableManager.getCachedGroups().map(group => ({id: group, value: group}));
+  }
+}
+
+const SearchBar = ( {toggleSearchBar, timetableType}: {toggleSearchBar: Function, timetableType: TimetableType} ) => {
   const { width } = useWindowDimensions();
   const [showSearchBar, setShowSearchBar] = useState(width > SCREEN_BREAKPOINT);
-  const options = TimetableManager.getCachedGroups().map(group => ({id: group, value: group}));
+  const options = getSearchBarOptions(timetableType);;
   const navigate = useNavigate();
+
+
 
   return (
     <span className={`${styles.bar} ${!showSearchBar && styles['hidden-search']}`}>
