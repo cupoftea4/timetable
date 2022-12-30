@@ -1,0 +1,16 @@
+@use '../styles/variables' as *;
+
+.exams {
+  display: flex;
+  flex-direction: column;
+  gap: .125rem;
+  div {
+    padding: .75rem 1rem;
+    animation: $appear-animation;
+    border-radius: .5rem;
+    &.active {
+      background-color: $light-accent-clr;
+    }
+  }
+  
+}

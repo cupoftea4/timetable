@@ -1,5 +1,6 @@
 import { FC } from 'react'
-import { ExamsTimetableItem } from '../utils/types'
+import { ExamsTimetableItem } from '../utils/types';
+import styles from './ExamsTimetable.module.scss';
 
 type OwnProps = {
   exams: ExamsTimetableItem[]
@@ -14,15 +15,16 @@ const ExamsTimetable: FC<OwnProps> = ({exams}) => {
       a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
 
   return (
-    <>
-      {exams.sort(compareDates).map((exam, index) => (
-        <div key={index} className={isSameDay(exam.date, new Date()) ? "active" : ""}>
+    <div className={styles.exams}>
+      {exams?.sort(compareDates).map((exam, index) => (
+        <div key={index} className={`${isSameDay(exam.date, new Date()) && styles.active}`}>
+          <p>{exam.number} пара</p>
           <h3>{exam.subject}</h3>
           <p>{exam.lecturer}</p>
-          <p>{exam.date.toLocaleString()}</p>
+          <p>{exam.date.toLocaleString(undefined, {weekday: "long", day: "numeric", month: "long"})}</p>
         </div>
       ))}
-    </>
+    </div>
   )
 };
 

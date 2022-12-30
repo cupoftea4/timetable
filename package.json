@@ -1,7 +1,7 @@
 {
   "name": "timetable",
   "version": "0.1.0",
-  "homepage": "/timetable-alpha",
+  "homepage": "/timetable",
   "private": true,
   "dependencies": {
     "@types/node": "^16.11.62",

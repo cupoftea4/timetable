@@ -2,7 +2,9 @@ import React from 'react'
 
 type ListProps = {
   items: string[],
-  selectedState: [string | null, React.Dispatch<React.SetStateAction<string | null>>],
+  selectedState: 
+    [string | null, React.Dispatch<React.SetStateAction<string | null>>] 
+    | [string | null, ((state: string | null) => void)],
 }
 
 const List = ({items, selectedState}: ListProps) => {

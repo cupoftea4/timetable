@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Groups from "../components/Groups";
 import HeaderPanel from "../components/HeaderPanel";
 import TimetableManager from "../utils/TimetableManager";
-import { CachedInstitute, TimetableType, Year } from "../utils/types";
+import { CachedInstitute, TimetableType } from "../utils/types";
 import styles from "./HomePage.module.scss";
 import catImage from "../assets/cat.png";
 import useWindowDimensions from "../hooks/useWindowDimensions";
@@ -10,22 +10,11 @@ import List from "../components/List";
 import * as handler from '../utils/requestHandler'
 import { SCREEN_BREAKPOINT } from "../utils/constants";
 
-const getGroupName = (group: string, timetableType: TimetableType) => {
-  if (timetableType === "selective") return group.split("-")[0] + "-" + group.split("-")[1];
-  return group.split("-")[0];
-};
-
-const sortGroupsByYear = (groups: string[]) =>{
-  return groups.reduce((acc, group) => {
-    const yearIndex = +(group.split("-")?.at(-1)?.at(0) ?? 0);
-    if (!acc[yearIndex]) acc[yearIndex] = [];
-    acc[yearIndex].push(group);
-    return acc;
-  }, [] as string[][]);
+type OwnProps = {
+  timetableType: TimetableType;
 }
 
-const HomePage = () => {
-  const [timetableType, setTimetableType] = useState<TimetableType>("timetable");
+const HomePage: FC<OwnProps>  = ({timetableType}) => {
   const [institutes, setInstitutes] = useState<CachedInstitute[]>([]);
   const [majors, setMajors] = useState<string[]>([]);
   const [groupsByYear, setGroupsByYear] = useState<string[][]>([]); // groupsByYear[year][groupIndex]
@@ -35,61 +24,61 @@ const HomePage = () => {
   const { width } = useWindowDimensions();
   const isMobile = width < SCREEN_BREAKPOINT;
   const showMajorSelection = !isMobile || !selectedMajor;
-  const showInstituteSelection = timetableType === "timetable" && showMajorSelection;
-  const showGroupsSelection = (timetableType === "selective" || selectedInstitute) && showMajorSelection;
+  const showInstituteSelection = showMajorSelection;
+  const showGroupsSelection = selectedInstitute && showMajorSelection;
   
   useEffect(() => {
-    TimetableManager.getLastOpenedInstitute().then(setSelectedInstitute);
-    TimetableManager.getInstitutes()
+    TimetableManager.getLastOpenedInstitute().then((inst) => {
+      setSelectedInstitute(inst);
+      updateMajors(timetableType, inst);
+    });
+    TimetableManager.getFirstLayerSelectionByType(timetableType)
       .then(setInstitutes)
       .catch(handler.handleError);
+    // BUG: In strict mode it kinda ruins nonexisting group error toast
     return () => handler.hideAllMessages();
-  }, []);
+  }, [timetableType]);
 
-  const updateGroups = useCallback((timetableType: TimetableType, institute?: CachedInstitute | null) => {
-    if (timetableType === "timetable") {
-      if (!institute) return;
-      TimetableManager.updateLastOpenedInstitute(institute);
-    }
-    
-    handler.handlePromise(TimetableManager.getGroups(institute ?? undefined), 'Fetching groups...')
-      .then((data) => {
-        const tempGroups = new Set<string>(data.map((group) => getGroupName(group, timetableType)));     
-        setMajors(Array.from(tempGroups));
-        setGroupsByYear(sortGroupsByYear(data));
-        setSelectedMajor(null);
-      })
+  const updateMajors = (timetableType: TimetableType, query: string) => {
+    TimetableManager.updateLastOpenedInstitute(query);   
+    handler.handlePromise(TimetableManager.getSecondLayerByType(timetableType, query), 'Fetching groups...')
+      .then(setMajors)
       .catch(handler.handleError);
-  }, []);
+    setSelectedMajor(null);
+  };
 
-  useEffect(() => {
-    TimetableManager.changeTimetableType(timetableType);  
-    updateGroups(timetableType, selectedInstitute);
-  }, [selectedInstitute, timetableType, updateGroups]);
+  const updateGroups = (timetableType: TimetableType, query: string) => {
+    handler.handlePromise(TimetableManager.getThirdLayerByType(timetableType, query), 'Fetching timetables...')
+      .then(setGroupsByYear)
+      .catch(handler.handleError);
+  };
 
-  const getSelectedGroups = () => {
-    return [Year.First, Year.Second, Year.Third, Year.Fourth].map(
-      (year) =>
-        groupsByYear[year]?.filter(
-          (group) => getGroupName(group, timetableType) === selectedMajor
-        ) ?? []
-    );
+  const handleInstituteChange = (institute: CachedInstitute | null) => {
+    setSelectedInstitute(institute);
+    if (!institute) return;
+    updateMajors(timetableType, institute);
+  };
+
+  const handleMajorChange = (major: string | null) => {
+    setSelectedMajor(major);
+    if (!major) return;
+    updateGroups(timetableType, major);
   };
 
   return (
     <>
-      <HeaderPanel setTimetableType={setTimetableType}/>
+      <HeaderPanel timetableType={timetableType}/>
       <main>
         <section className={styles.selection} data-attr={timetableType + "-groups"}>
           {showInstituteSelection &&
-              <List items={institutes} selectedState={[selectedInstitute, setSelectedInstitute]} />
+              <List items={institutes} selectedState={[selectedInstitute, handleInstituteChange]} />
           } 
           {showGroupsSelection &&
-              <List  items={majors} selectedState={[selectedMajor, setSelectedMajor]} />
+              <List items={majors} selectedState={[selectedMajor, handleMajorChange]} />
           }
 
           {selectedMajor ?
-              <Groups groups={getSelectedGroups()} />
+              <Groups groups={groupsByYear} />
             : 
               <div className={styles['no-selection']}>
                 <img src={catImage} alt="cat" />

@@ -8,7 +8,6 @@
   flex-wrap: wrap;
 }
 
-
 /* Timetable on mobile */
 .container {
   margin: auto 0;
@@ -23,7 +22,6 @@
       }
     }
   }
- 
 }
 
 .update {
@@ -33,9 +31,6 @@
   margin: 2rem 0;
   gap: .125rem;
   button {
-    background-color: $light-accent-clr;
-    padding: .25rem .75rem;
-    color: $text-clr;
-    border-radius: 2rem;
+    @include light-pillow-button;
   }
 }

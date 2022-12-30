@@ -4,8 +4,8 @@
 .container {
   @include flex-center;
   height: 100vh;
-  width: 100vw;
-  background-image: linear-gradient(hsla(0, 0%, 0%, 0.6), hsla(0, 0%, 0%, 0.2));
+  height: 100dvh;
+  background-image: linear-gradient(hsla(0, 0%, 10%, 0.501), hsla(0, 0%, 10%, 0.20));
   div {
     @include flex-center;
     gap: 1rem;

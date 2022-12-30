@@ -6,24 +6,29 @@ import useWindowDimensions from '../hooks/useWindowDimensions';
 import styles from './HeaderPanel.module.scss';
 import { SCREEN_BREAKPOINT } from '../utils/constants';
 import { TimetableType } from '../utils/types';
+import { Link } from 'react-router-dom';
+
+const timetableTypes: {[key in TimetableType]: string} = 
+{
+  "timetable": "Студент",
+  "selective": "Вибіркові",
+  "lecturer": "Викладач"
+}
 
 type OwnProps = {
-  setTimetableType: React.Dispatch<React.SetStateAction<TimetableType>>;
+  timetableType: TimetableType;
 };
 
-const HeaderPanel : FC<OwnProps> = ({setTimetableType}) => {
+const HeaderPanel : FC<OwnProps> = ({timetableType}) => {
   const { width } = useWindowDimensions();
   const shouldShrinkSearchBar = useMemo(() => width < SCREEN_BREAKPOINT, [width]);
   const [shrinkSearchBar, setShrinkSearchBar] = React.useState(shouldShrinkSearchBar);
-  // const [timetableType, setTimetableType] = timetableTypeState;
-  
 
   const toggleSearchBar = () => {
     if (shouldShrinkSearchBar) {
       setShrinkSearchBar(!shrinkSearchBar);
     }
   };
-
 
   return (
     <header className={styles.header}>
@@ -32,11 +37,19 @@ const HeaderPanel : FC<OwnProps> = ({setTimetableType}) => {
         null 
         :
         <nav className={styles['nav-buttons']}>
-          <select name="timetable-types" onChange={(e) => setTimetableType(e.target.value as TimetableType)}>
-            <option value="timetable">Студент</option>
-            <option value="selective">Вибіркові</option> 
-            <option value="lecturer">Викладач</option>
-          </select>
+          <div className={styles['timetable-types']}>
+            {
+              (Object.keys(timetableTypes) as TimetableType[]).map(type =>
+                <Link 
+                  to={"/" + (type === "timetable" ? "" : type)}
+                  key={type}
+                  className={timetableType === type ? styles.active : ""}
+                >
+                  {timetableTypes[type]}
+                </Link>
+              )
+            }
+          </div>
           <SavedMenu />
           {/* <ThemesIcon /> */}
         </nav> 

@@ -29,6 +29,7 @@ export const UPDATE_SUBGROUP_ERROR = "Couldn't update subgroup, try again later"
 export const UNKNOWN_ERROR = "Unknown error, try again later";
 export const INIT_ERROR = getRandomValue(initErrors);
 export const NONEXISTING_GROUP = getRandomValue(nonexistingGroupErrors);
+export const NONEXISTING_TIMETABLE = "This timetable does not exist";
 
 export function handleError(error: string, userError: string = FETCH_ERROR) {
   console.error("[Handler] " + error);

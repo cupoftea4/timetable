@@ -1,5 +1,5 @@
 @use '../styles/_variables' as *;
-
+@use '../styles/_mixins' as *;
 
 .saved {
   position: relative;
@@ -15,10 +15,13 @@
   position: absolute;
   top: 100%;
   left: -30%;
+  width: 15rem;
   &.home {
     left: 50%;
   }
-  width: 16rem;
+  @include tablet {
+    width: 13rem;
+  }
   background-color: hsla(0, 0%, 64%, 0.27);
   border-radius: 1rem;
   box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);

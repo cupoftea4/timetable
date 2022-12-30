@@ -11,8 +11,6 @@ import HomeIcon from '../assets/HomeIcon';
 import styles from './TimetablePage.module.scss';
 import { getNULPWeek } from '../utils/date';
 import * as handler from '../utils/requestHandler';
-import ExamsIcon from '../assets/ExamsIcon';
-import FilledExamsIcon from '../assets/FilledExamsIcon';
 import ExamsTimetable from '../components/ExamsTimetable';
 
 
@@ -25,13 +23,15 @@ const TimetablePage = () => {
   const [timetableGroup, setTimetableGroup] = useState<string | null>();
   const [timetable, setTimetable] = useState<TimetableItem[]>();
   const [examsTimetable, setExamsTimetable] = useState<ExamsTimetableItem[]>([]);
+  console.log(examsTimetable);
+  
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup); 
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
 
   const [isExamsTimetable, setIsExamsTimetable] = useState(false);
 
   const time = TimetableManager.getCachedTime(group);
-
+    
   const getTimetable = (group: string, exams: boolean, checkCache: boolean = true) => {
     const onCatch = (e: string) => {
       handler.handleError(e);
@@ -39,10 +39,14 @@ const TimetablePage = () => {
     };
     if (exams) {
       return TimetableManager.getExamsTimetable(group, checkCache)
-        .then(setExamsTimetable)
+        .then((timetable) => {
+          setExamsTimetable(timetable);
+          console.log(timetable);
+          
+      })
         .catch(onCatch);
     } else {
-      return TimetableManager.getTimetable(group, checkCache)
+      return TimetableManager.getTimetable(group, undefined, checkCache)
         .then(data => {
           setTimetable(data);
           setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
@@ -50,21 +54,20 @@ const TimetablePage = () => {
     }
   };
 
-  const initGroup = async (group: string) => {
-    if (!TimetableManager.isInited()) 
-      await TimetableManager.init().catch(e => handler.handleError(e, handler.INIT_ERROR));
-    if (!TimetableManager.ifGroupExists(group)) {
-      setTimetableGroup(null);
-      throw new Error(`Group ${group} doesn't exist`);
-    }  
-    setTimetableGroup(group);
-  };
-
   useEffect(
     () => {
-      initGroup(group).then(() => {
-        handler.handlePromise(getTimetable(group, isExamsTimetable));
-      }).catch(e => handler.handleError(e, handler.NONEXISTING_GROUP));
+      const type = TimetableManager.ifTimetableExists(group);
+      if (!type) {
+        handler.handleError(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
+        setTimetableGroup(null);
+        return;
+      }  
+      if (type === 'selective' && isExamsTimetable) { // selective group doesn't have exams timetable
+        setIsExamsTimetable(false);
+        return;
+      }
+      setTimetableGroup(group);
+      handler.handlePromise(getTimetable(group, isExamsTimetable));
     }, [group, isExamsTimetable]);
 
   const changeIsSecondSubgroup = (isSecond: boolean | ((isSecond: boolean) => boolean)) => {
@@ -78,6 +81,11 @@ const TimetablePage = () => {
     handler.handlePromise(getTimetable(group, isExamsTimetable, checkCache));
   };
 
+  const handleIsExamsTimetableChange = (isExams: boolean) => {
+    if (isExams && TimetableManager.ifTimetableExists(group) !== 'timetable') return;
+    setIsExamsTimetable(isExams);
+  }
+
   return (
     <>
       {timetableGroup !== null ? 
@@ -88,6 +96,13 @@ const TimetablePage = () => {
                 <Link to="/"><HomeIcon className={headerStyles.home}/></Link>
                 <SavedMenu likable={true}/>
                 <h1>{timetableGroup}</h1>
+                <button 
+                    className={headerStyles.exams} 
+                    title={isExamsTimetable ? "Переключити на розклад пар" : "Переключити на розклад екзаменів"} 
+                    onClick={() => handleIsExamsTimetableChange(!isExamsTimetable)}
+                >
+                  {isExamsTimetable ? "Екзамени" : "Пари"}
+                </button>
               </nav>
               <span className={styles.params}>
                 {!isExamsTimetable &&
@@ -100,13 +115,6 @@ const TimetablePage = () => {
                         states={['По чисельнику', 'По знаменнику']} />
                     </>
                 }
-                <button 
-                    className={styles.cr69} 
-                    title={isExamsTimetable ? "Розклад пар" : "Розклад екзаменів"} 
-                    onClick={() => setIsExamsTimetable(!isExamsTimetable)}
-                >
-                  {isExamsTimetable ? <FilledExamsIcon /> : <ExamsIcon />}
-                </button>
               </span>
             </header>
             <main className={styles.container}>

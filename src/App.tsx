@@ -33,12 +33,22 @@ const App = () => {
   );
 
   return (
-    <BrowserRouter basename="/timetable-alpha">
-      <Routes>
-        <Route path="/" element={status ? <HomePage/> : <LoadingPage/>} />
-        <Route path="/:group" element={status ? <TimetablePage/> : <LoadingPage/>} />
-      </Routes>
-    </BrowserRouter>
+    <>
+     {status ?
+      <>
+        <BrowserRouter basename="/timetable">
+          <Routes>
+            <Route path="/" element={<HomePage timetableType="timetable"/>} />
+            <Route path="selective" element={<HomePage timetableType="selective"/>} />
+            <Route path="lecturer" element={<HomePage timetableType="lecturer"/>} />
+            <Route path="/:group" element={<TimetablePage/>} />
+          </Routes>
+        </BrowserRouter>
+      </> 
+       :
+      <LoadingPage/>
+      }
+    </>
   );
 };
  
