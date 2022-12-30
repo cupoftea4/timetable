@@ -39,6 +39,7 @@ class TimetableManager {
 			this.institutes = (await storage.getItem(INSTITUTES)) || [];
 			this.groups = (await storage.getItem(GROUPS)) || [];
 			this.timetables = (await storage.getItem(TIMETABLES)) || [];
+			this.examsTimetables = (await storage.getItem(EXAMS_TIMETABLES)) || [];
 			this.selectiveGroups = (await storage.getItem(SELECTIVE_GROUPS)) || [];
 			this.lecturers = (await storage.getItem("lecturers")) || [];
 		} catch (e) { 
