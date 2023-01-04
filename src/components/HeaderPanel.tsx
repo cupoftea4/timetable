@@ -1,19 +1,12 @@
 import SavedMenu from './SavedMenu'
-import React, { FC, useMemo } from 'react'
+import { FC, useMemo, useState } from 'react'
 import SearchBar from './SearchBar';
 // import ThemesIcon from '../assets/ThemesIcon';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import styles from './HeaderPanel.module.scss';
-import { SCREEN_BREAKPOINT } from '../utils/constants';
+import { MOBILE_BREAKPOINT, NARROW_BREAKPOINT } from '../utils/constants';
 import { TimetableType } from '../utils/types';
-import { Link } from 'react-router-dom';
-
-const timetableTypes: {[key in TimetableType]: string} = 
-{
-  "timetable": "Студент",
-  "selective": "Вибіркові",
-  "lecturer": "Викладач"
-}
+import Navigation from './Navigation';
 
 type OwnProps = {
   timetableType: TimetableType;
@@ -21,38 +14,26 @@ type OwnProps = {
 
 const HeaderPanel : FC<OwnProps> = ({timetableType}) => {
   const { width } = useWindowDimensions();
-  const shouldShrinkSearchBar = useMemo(() => width < SCREEN_BREAKPOINT, [width]);
-  const [shrinkSearchBar, setShrinkSearchBar] = React.useState(shouldShrinkSearchBar);
+  const shouldShrinkSearchBar = useMemo(() => width < MOBILE_BREAKPOINT && width > NARROW_BREAKPOINT, [width]);
+  const [showSearchBar, setShowSearchBar] = useState(!shouldShrinkSearchBar);
 
   const toggleSearchBar = () => {
     if (shouldShrinkSearchBar) {
-      setShrinkSearchBar(!shrinkSearchBar);
+      setShowSearchBar(!showSearchBar);
     }
   };
 
   return (
     <header className={styles.header}>
-      <SearchBar toggleSearchBar={toggleSearchBar} timetableType={timetableType} /> 
-      {!shrinkSearchBar && shouldShrinkSearchBar ?
+      <SearchBar toggleSearchBar={toggleSearchBar} timetableType={timetableType} show={showSearchBar} /> 
+      {showSearchBar && shouldShrinkSearchBar ?
         null 
         :
-        <nav className={styles['nav-buttons']}>
-          <div className={styles['timetable-types']}>
-            {
-              (Object.keys(timetableTypes) as TimetableType[]).map(type =>
-                <Link 
-                  to={"/" + (type === "timetable" ? "" : type)}
-                  key={type}
-                  className={timetableType === type ? styles.active : ""}
-                >
-                  {timetableTypes[type]}
-                </Link>
-              )
-            }
-          </div>
+        <div className={styles['right-buttons']}>
+          <Navigation timetableType={timetableType} />
           <SavedMenu />
           {/* <ThemesIcon /> */}
-        </nav> 
+        </div> 
       }
     </header>
   )

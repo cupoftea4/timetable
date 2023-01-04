@@ -40,7 +40,13 @@ $icon-size: 1em;
       border-radius: 2% 2% 2% 6%;
       box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
       backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
       font-family: 'Oswald', sans-serif;
+      
+      // for firefox
+      scrollbar-width: 2rem;
+      scrollbar-color: $light-accent-clr $light-accent-clr;
+      
       &::-webkit-scrollbar {
         width: 12px;
       }

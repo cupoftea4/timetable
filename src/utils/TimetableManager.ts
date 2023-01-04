@@ -96,10 +96,10 @@ class TimetableManager {
 				const data = await this.getSelectiveGroups();
 				const tempGroups = new Set<string>(data.map((group) => Util.getGroupName(group, type)));
 				return [...tempGroups].filter((group) => 
-					group.startsWith(query.at(0) ?? "") || group.startsWith(query.at(-1) ?? ""));
+					group.startsWith(query?.at(0) ?? "") || group.startsWith(query.at(-1) ?? ""));
 			case "lecturer":
 				return (await this.getLecturerDepartments()).filter((group) => 
-					group.startsWith(query.at(0) ?? "") || group.startsWith(query.at(-1) ?? ""));
+					group.startsWith(query?.at(0) ?? "") || group.startsWith(query.at(-1) ?? ""));
 			default:
 				const groups = await this.getTimetableGroups(query);
 				return [...new Set<string>(groups.map((group) => Util.getGroupName(group, type)))];
@@ -119,10 +119,10 @@ class TimetableManager {
 		}
 	}
 
-	async getLecturers(department = "All", force = false): Promise<string[]> {
-		if (this.lecturers.length > 0 && !force && department === "All") return this.lecturers;
+	async getLecturers(department?: string, force = false): Promise<string[]> {
+		if (this.lecturers.length > 0 && !force && !department) return this.lecturers;
 		const lecturers = await parser.getLecturers(department);
-		if (department === "All") {
+		if (!department) {
 			storage.setItem("lecturers", lecturers);
 			storage.setItem("lecturers" + UPDATED, Date.now());
 			this.lecturers = lecturers;
@@ -145,7 +145,6 @@ class TimetableManager {
 		if (checkCache && data && !Util.needsUpdate(data.time)) {
 			return storage.getItem(TIMETABLE + group);
 		}			
-		
 		const timetableType = type ?? this.tryToGetType(group);
 		if (!timetableType) {
 			throw Error(`Couldn't define a type! Group: ${group}, checkCache: ${checkCache}`);
@@ -169,9 +168,6 @@ class TimetableManager {
 	async getExamsTimetable(group: string, checkCache = true) : Promise<ExamsTimetableItem[]> {
 		group = group.trim();
 		const data = this.examsTimetables.find(el => el.group.toUpperCase() === group.toUpperCase());
-		console.log("getExamsTimetable", data);
-		const timetable = await storage.getItem(EXAMS_TIMETABLE + group);
-		console.log("getExamsTimetable1", timetable);
 		if (checkCache && data && !Util.needsUpdate(data.time)) {
 			return storage.getItem(EXAMS_TIMETABLE + group);
 		}

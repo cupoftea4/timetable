@@ -84,7 +84,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
         !isLoading ?
           <>
             <header className={headerStyles.header}>
-              <nav className={headerStyles['nav-buttons']}> 
+              <nav className={headerStyles['right-buttons']}> 
                 <Link to="/"><HomeIcon className={headerStyles.home}/></Link>
                 <SavedMenu likable={true}/>
                 <h1>{timetableGroup}</h1>

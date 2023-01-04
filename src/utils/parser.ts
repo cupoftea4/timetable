@@ -11,7 +11,7 @@ const TIMETABLE_EXAMS_SUFFIX = "students_exam";
 
 const PROXY = "https://api.codetabs.com/v1/proxy?quest=";
 
-const FALLBACK_URL = "https://raw.githubusercontent.com/zubiden/nulp-timetable-data/data/";
+const FALLBACK_URL = "https://raw.githubusercontent.com/cupoftea4/timetable-data/data/";
 
 const TIMEOUT = 3000; // 3s
 
@@ -35,7 +35,6 @@ class TimetableParser {
 		for(let key in params) {
 			originalUrl.searchParams.set(key, params[key]);
 		}
-		// let encoded = encodeURIComponent(originalUrl.href);
 		const proxiedUrl = PROXY + originalUrl.href;
 		return timeout(TIMEOUT, fetch(proxiedUrl)).then(response => {
 			if(!response.ok) throw Error(response.statusText);
@@ -52,8 +51,11 @@ class TimetableParser {
 								.sort((a, b) => a.localeCompare(b));
 			return groups;
 		}).catch(async err => {
-			console.warn("Error in getSelectiveGroups: ", err);
-			throw Error(err);
+			const fallback = FALLBACK_URL + `selective/groups.json`;
+			const response = await fetch(fallback);
+			if (!response.ok)
+				throw Error(err);
+			return await response.json() as string[];
 		})
 	}
 
@@ -70,7 +72,7 @@ class TimetableParser {
 			const response = await fetch(FALLBACK_URL + "institutes.json");
 			if (!response.ok)
 				throw Error(err);
-			return await response.json();
+			return await response.json() as string[];
 		});
 	}
 
@@ -82,9 +84,16 @@ class TimetableParser {
 									.map(child => (child as HTMLInputElement).value)
 									.filter(inst => inst !== "All")
 									.sort((a, b) => a.localeCompare(b));
+			
 			return lecturers;
-		}).catch(err => {
-			throw Error("Couldn't parse lecturers: " + err);
+		}).catch(async err => {
+			const fallback = FALLBACK_URL + "lecturers/" + (department ?  "grouped.json" : "all.json");
+			console.warn("Lecturers fallback url", fallback, department);
+			const response = await fetch(fallback);
+			if (!response.ok)
+				throw Error(err);
+			const data = await response.json() ;
+			return (department ? data[department] : data) as string[];
 		});
 	}
 
@@ -96,8 +105,12 @@ class TimetableParser {
 				.filter(depart => depart !== "All")
 				.sort((a, b) => a.localeCompare(b));
 			return departments;
-		}).catch(err => {
-			throw Error("Couldn't parse departments: " + err);
+		}).catch(async err => {
+			const fallback = FALLBACK_URL + `lecturers/departments.json`;
+			const response = await fetch(fallback);
+			if (!response.ok)
+				throw Error(err);
+			return await response.json() as string[];
 		});
 	}
 	
@@ -110,11 +123,11 @@ class TimetableParser {
 								.sort((a, b) => a.localeCompare(b));
 			return groups;
 		}).catch(async err => {
-			let fallback = FALLBACK_URL+`institutes/${departmentparent_abbrname_selective}.json`;
+			let fallbackPath = `institutes/${departmentparent_abbrname_selective}.json`;
 			if(departmentparent_abbrname_selective === "All") { //get all groups
-				fallback = FALLBACK_URL + `groups.json`;
+				fallbackPath = `groups.json`;
 			}
-			const response = await fetch(fallback);
+			const response = await fetch(FALLBACK_URL + fallbackPath);
 			if (!response.ok)
 				throw Error(err);
 			return await response.json() as string[];
@@ -130,7 +143,17 @@ class TimetableParser {
 			const days = Array.from(table.children);
 			return days.map((day) => this.parseDay(day)).flat(1);
 		} catch (err) {
-			throw Error("Error while getting timetable: " + err);
+			let fallbackPath = `timetables/${params?.studygroup_abbrname_selective}.json`;
+			if (suffix === LECTURER_SUFFIX) {
+				fallbackPath = `lecturers/timetables/${params?.teachername_selective}.json`;
+			}
+			if (suffix === SELECTIVE_SUFFIX) {
+				fallbackPath = `selective/timetables/${params?.studygroup_abbrname_selective}.json`;
+			}
+			console.warn("Timetable fallback url", FALLBACK_URL + fallbackPath);
+			const response = await fetch(FALLBACK_URL + fallbackPath);
+			if (!response.ok) throw Error("Couldn't fetch or parse timetable");
+			return await response.json() as TimetableItem[];
 		}
 	}
 	
@@ -163,7 +186,6 @@ class TimetableParser {
 								.map(this.parseExam)
 			return exams;
 		}).catch(async err => {
-			console.warn(err);
 			throw Error(err);
 		})
 	}
@@ -349,8 +371,6 @@ class TimetableParser {
 		if(location.includes("конс.")) return "consultation";
 		return "lecture";
 	}
-	
-
 	
 	private parseAndGetFirstElBySelector(html: string, css: string): HTMLElement | null {
 		const parser = new DOMParser();

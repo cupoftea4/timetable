@@ -9,13 +9,15 @@ import { Status } from "./utils/types";
 
 /* TODO:
   - Fix jumping of the timetable when switching between subgroups
-  - Add components for different timetable types (e.g. for teachers)
+  - Add exams for teachers
   - Jump to the current week day on mobile
-  - Not all groups fetch exams timetable successfully
   - Exams timetable item styles
   - Exams timetable icon or any other way to switch between timetables
   - Themes
   - horizontal scrolling on mobileS
+  - focusable years
+  - fix showing all items before fetching
+  - backend for caching
  */
 
 const App = () => {
@@ -36,7 +38,7 @@ const App = () => {
     <>
      {status ?
       <>
-        <BrowserRouter basename="/timetable-alpha">
+        <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage timetableType="timetable"/>} />
             <Route path="selective" element={<HomePage timetableType="selective"/>} />

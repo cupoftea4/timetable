@@ -5,7 +5,7 @@
   @include flex-center;
   height: 100vh;
   height: 100dvh;
-  background-image: linear-gradient(hsla(0, 0%, 10%, 0.501), hsla(0, 0%, 10%, 0.20));
+  background-color: rgba(0, 0, 0, 0.5);
   div {
     @include flex-center;
     gap: 1rem;

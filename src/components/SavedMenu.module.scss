@@ -26,6 +26,7 @@
   border-radius: 1rem;
   box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
   z-index: 1;
   transform: translateX(-50%);
   padding: 1.5rem 0;

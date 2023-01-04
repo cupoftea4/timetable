@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import Groups from "../components/Groups";
+import TimetablesSelection from "../components/TimetablesSelection";
 import HeaderPanel from "../components/HeaderPanel";
 import TimetableManager from "../utils/TimetableManager";
 import { CachedInstitute, TimetableType } from "../utils/types";
@@ -8,7 +8,7 @@ import catImage from "../assets/cat.png";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import List from "../components/List";
 import * as handler from '../utils/requestHandler'
-import { SCREEN_BREAKPOINT } from "../utils/constants";
+import { MOBILE_BREAKPOINT } from "../utils/constants";
 
 type OwnProps = {
   timetableType: TimetableType;
@@ -22,7 +22,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   const [selectedSecond, setSelectedSecond] = useState<string | null>(null);
 
   const { width } = useWindowDimensions();
-  const isMobile = width < SCREEN_BREAKPOINT;
+  const isMobile = width < MOBILE_BREAKPOINT;
   const showSecondLayer = !isMobile || !selectedSecond;
   const showFirstLayer = showSecondLayer;
   const showThirdLayer = selectedFirst && showSecondLayer;
@@ -77,15 +77,8 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
           {showThirdLayer &&
               <List items={secondLayer} selectedState={[selectedSecond, handleMajorChange]} />
           }
-
           {selectedSecond ?
-            (timetableType === 'lecturer' ?
-              <ul>
-                {thirdLayer.map((lecturer) => <li>{lecturer}</li>)}
-              </ul>
-              :
-              <Groups groups={thirdLayer} />
-            )
+            <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"}/>
             : 
               <div className={styles['no-selection']}>
                 <img src={catImage} alt="cat" />
