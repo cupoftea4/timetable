@@ -15,9 +15,7 @@ import ExamsTimetable from '../components/ExamsTimetable';
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => { // yeah, naming! :)
   const width = el.getBoundingClientRect().width;
-
-  let currentDay = getCurrentUADate().getDay(); // 0 - Sunday
-  if (currentDay === 0) currentDay = 7;
+  const currentDay = getCurrentUADate().getDay() || 7; // 0 - Sunday
   const inTimetable = timetable?.some(({day}) => Math.max(day, 5) >= currentDay);
   if (inTimetable) {
       el.scrollTo((currentDay - 1) * width, 0);
@@ -90,8 +88,6 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   };
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
-    // selective group doesn't have exams timetable
-    if (isExams && TimetableManager.ifTimetableExists(group) !== 'timetable') return;
     navigate('/' + group + (isExams ? '/exams' : ''));
   };
 
@@ -105,13 +101,17 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                 <Link to="/"><HomeIcon className={headerStyles.home}/></Link>
                 <SavedMenu likable={true}/>
                 <h1>{timetableGroup}</h1>
-                <button 
-                    className={headerStyles.exams} 
-                    title={isExamsTimetable ? "Переключити на розклад пар" : "Переключити на розклад екзаменів"} 
-                    onClick={() => handleIsExamsTimetableChange(!isExamsTimetable)}
-                >
-                  {isExamsTimetable ? "Екзамени" : "Пари"}
-                </button>
+                {
+                  // selective or lecturer groups don't have exams timetable
+                  TimetableManager.ifTimetableExists(group) === 'timetable' &&
+                    <button
+                      className={headerStyles.exams}
+                      title={isExamsTimetable ? "Переключити на розклад пар" : "Переключити на розклад екзаменів"} 
+                      onClick={() => handleIsExamsTimetableChange(!isExamsTimetable)}
+                    >
+                      {isExamsTimetable ? "Екзамени" : "Пари"}
+                    </button>
+                }
               </nav>
               <span className={styles.params}>
                 {!isExamsTimetable &&

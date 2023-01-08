@@ -4,7 +4,6 @@ import HeaderPanel from "../components/HeaderPanel";
 import TimetableManager from "../utils/TimetableManager";
 import { CachedInstitute, TimetableType } from "../utils/types";
 import styles from "./HomePage.module.scss";
-import catImage from "../assets/cat.png";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import List from "../components/List";
 import * as handler from '../utils/requestHandler'
@@ -81,7 +80,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
             <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"}/>
             : 
               <div className={styles['no-selection']}>
-                <img src={catImage} alt="cat" />
+                <img src={"images/cat.png"} alt="cat" width="800" height="800"/>
                 <p>Оберіть спецільність, щоб продовжити</p>
               </div>
           }
