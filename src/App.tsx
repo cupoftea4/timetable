@@ -8,17 +8,17 @@ import * as handler from './utils/requestHandler';
 import { Status } from "./utils/types";
 
 /* TODO:
-  - Fix jumping of the timetable when switching between subgroups
+  - Jump to the current week day on mobile done?
   - Add exams for teachers
-  - Jump to the current week day on mobile
-  - Exams timetable item styles
-  - Exams timetable icon or any other way to switch between timetables
+  - Fix showing all items before fetching
   - Themes
-  - horizontal scrolling on mobileS
   - focusable years
-  - fix showing all items before fetching
-  - backend for caching
+  ? Fix jumping of the timetable when switching between subgroups
+  ? Exams timetable icon or any other way to switch between timetables
+  ? horizontal scrolling on mobileS
+  ? backend for caching
  */
+console.log("I hate this world.");
 
 const App = () => {
   const [status, setStatus] = useState<Status>(Status.Loading);
@@ -38,7 +38,7 @@ const App = () => {
     <>
      {status ?
       <>
-        <BrowserRouter>
+        <BrowserRouter basename="/">
           <Routes>
             <Route path="/" element={<HomePage timetableType="timetable"/>} />
             <Route path="selective" element={<HomePage timetableType="selective"/>} />

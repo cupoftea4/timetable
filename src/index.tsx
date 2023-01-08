@@ -5,6 +5,7 @@ import App from "./App";
 import "./styles/main.scss";
 import 'react-toastify/dist/ReactToastify.css';
 
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
@@ -15,3 +16,11 @@ root.render(
       <MessageToast position="bottom-right" theme="colored" /> 
   </React.StrictMode>
 );
+
+console.log("Yay! We are going to use right service worker!");
+
+window.addEventListener("load", () => {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./service-worker.js");
+  }
+});

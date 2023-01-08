@@ -18,10 +18,17 @@ const ExamsTimetable: FC<OwnProps> = ({exams}) => {
     <div className={styles.exams}>
       {exams?.sort(compareDates).map((exam, index) => (
         <div key={index} className={`${isSameDay(exam.date, new Date()) && styles.active}`}>
-          <p>{exam.number} пара</p>
+          <div>
+            <p>{exam.date.toLocaleString("uk-UA", {weekday: "long", day: "numeric", month: "long"})}</p>
+            <p>{exam.number} пара</p>
+          </div>
           <h3>{exam.subject}</h3>
-          <p>{exam.lecturer}</p>
-          <p>{exam.date.toLocaleString("ja-JP", {weekday: "long", day: "numeric", month: "long"})}</p>
+          <div>
+            <p>{exam.lecturer}</p>
+            {exam.urls[0] ?
+              <a href={exam.urls[0]} target="_blank" rel="noreferrer">Посилання</a>
+            : null}
+          </div>
         </div>
       ))}
     </div>

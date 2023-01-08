@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import LoadingPage from './LoadingPage';
 import headerStyles from '../components/HeaderPanel.module.scss';
@@ -9,9 +9,20 @@ import TimetableManager from '../utils/TimetableManager';
 import { ExamsTimetableItem, TimetableItem, TimetableType } from '../utils/types';
 import HomeIcon from '../assets/HomeIcon';
 import styles from './TimetablePage.module.scss';
-import { getNULPWeek } from '../utils/date';
+import { getCurrentUADate, getNULPWeek } from '../utils/date';
 import * as handler from '../utils/requestHandler';
 import ExamsTimetable from '../components/ExamsTimetable';
+
+const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => { // yeah, naming! :)
+  const width = el.getBoundingClientRect().width;
+
+  let currentDay = getCurrentUADate().getDay(); // 0 - Sunday
+  if (currentDay === 0) currentDay = 7;
+  const inTimetable = timetable?.some(({day}) => Math.max(day, 5) >= currentDay);
+  if (inTimetable) {
+      el.scrollTo((currentDay - 1) * width, 0);
+  }
+};
 
 type OwnProps = {
   isExamsTimetable?: boolean;
@@ -29,6 +40,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup); 
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
   const navigate = useNavigate();
+  const timetableRef = useRef<HTMLElement>(null);
 
   const isLoading = isExamsTimetable ? !examsTimetable : !timetable;
   const time = TimetableManager.getCachedTime(group);
@@ -60,6 +72,11 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
       setTimetableGroup(group);
       handler.handlePromise(getTimetable(group, isExamsTimetable, type));
     }, [group, isExamsTimetable, navigate]);
+  
+  useEffect(() => {
+    if (isExamsTimetable || !timetable) return;
+    if (timetableRef.current) tryToScrollToCurrentDay(timetableRef.current, timetable);
+  }, [isExamsTimetable, timetable]);
 
   const changeIsSecondSubgroup = (isSecond: boolean | ((isSecond: boolean) => boolean)) => {
     if (typeof isSecond === 'function') isSecond = isSecond(isSecondSubgroup);
@@ -110,7 +127,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
               </span>
             </header>
             <main className={styles.container}>
-              <section className={styles.timetable}>
+              <section className={styles.timetable} ref={timetableRef}>
                 {!isExamsTimetable ?
                     <Timetable 
                       timetable={timetable ?? []} 
