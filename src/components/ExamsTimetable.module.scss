@@ -1,4 +1,5 @@
 @use '../styles/variables' as *;
+@use '../styles/mixins' as *;
 
 .exams {
   display: flex;
@@ -15,6 +16,10 @@
     padding: .75rem 1rem;
     animation: $appear-animation;
     border-radius: .5rem;
+    width: 30rem;
+    @include mobile {
+      width: 85vw;
+    }
     &.active {
       background-color: $light-accent-clr;
     }

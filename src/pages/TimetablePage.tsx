@@ -48,7 +48,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
       handler.handleError(e);
       setTimetableGroup(null);
     };
-    if (exams) return TimetableManager.getExamsTimetable(group, checkCache)
+    if (exams) return TimetableManager.getExamsTimetable(group, type, checkCache)
         .then(setExamsTimetable).catch(onCatch);
 
     return TimetableManager.getTimetable(group, type, checkCache).then(data => {
@@ -103,7 +103,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                 <h1>{timetableGroup}</h1>
                 {
                   // selective or lecturer groups don't have exams timetable
-                  TimetableManager.ifTimetableExists(group) === 'timetable' &&
+                  TimetableManager.ifTimetableExists(group) !== 'selective' &&
                     <button
                       className={headerStyles.exams}
                       title={isExamsTimetable ? "Переключити на розклад пар" : "Переключити на розклад екзаменів"} 

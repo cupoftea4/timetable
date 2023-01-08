@@ -165,14 +165,17 @@ class TimetableManager {
 		return timetable;
 	}
 
-	async getExamsTimetable(group: string, checkCache = true) : Promise<ExamsTimetableItem[]> {
+	async getExamsTimetable(group: string, type?: TimetableType, checkCache = true) : Promise<ExamsTimetableItem[]> {
 		group = group.trim();
 		const data = this.examsTimetables.find(el => el.group.toUpperCase() === group.toUpperCase());
 		if (checkCache && data && !Util.needsUpdate(data.time)) {
 			return storage.getItem(EXAMS_TIMETABLE + group);
 		}
-
-		const examsTimetable = await parser.getExamsTimetable(group);
+		const timetableType = type ?? this.tryToGetType(group);
+		if (!timetableType) {
+			throw Error(`Couldn't define a type! Group: ${group}, checkCache: ${checkCache}`);
+		}
+		const examsTimetable = await parser.getExamsTimetable(timetableType, group);
 		if (!examsTimetable) {
 			throw Error(`Failed to get exams timetable! Group: ${group}, checkCache: ${checkCache}`);
 		}

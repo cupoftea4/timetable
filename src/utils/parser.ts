@@ -8,6 +8,7 @@ const TIMETABLE_SUFFIX = "students_schedule";
 const SELECTIVE_SUFFIX = "schedule_selective";
 const LECTURER_SUFFIX = "lecturer_schedule";
 const TIMETABLE_EXAMS_SUFFIX = "students_exam";
+const LECTURER_EXAMS_SUFFIX = "lecturer_exam";
 
 const PROXY = "https://api.codetabs.com/v1/proxy?quest=";
 
@@ -19,7 +20,8 @@ type RequestSuffix =
 		  typeof TIMETABLE_SUFFIX
 		| typeof SELECTIVE_SUFFIX
 		| typeof LECTURER_SUFFIX
-		| typeof TIMETABLE_EXAMS_SUFFIX;
+		| typeof TIMETABLE_EXAMS_SUFFIX
+		| typeof LECTURER_EXAMS_SUFFIX;
 
 const timetableSuffixes: {[key in TimetableType]: RequestSuffix} = {
 	timetable:  "students_schedule" ,
@@ -30,7 +32,8 @@ const timetableSuffixes: {[key in TimetableType]: RequestSuffix} = {
 class TimetableParser {
 
 	private async fetchHtml(params: {[key: string]: string} = {}, suffix = TIMETABLE_SUFFIX) {
-		let baseUrl = ((suffix === LECTURER_SUFFIX) ? NULP_STAFF : NULP_STUDENTS) + suffix;
+		const isLecturer = suffix === LECTURER_SUFFIX || suffix === LECTURER_EXAMS_SUFFIX;
+		let baseUrl = (isLecturer ? NULP_STAFF : NULP_STUDENTS) + suffix;
 		const originalUrl = new URL(baseUrl);
 		for(let key in params) {
 			originalUrl.searchParams.set(key, params[key]);
@@ -176,11 +179,21 @@ class TimetableParser {
 		})
 	}
 	
-	async getExamsTimetable(group = "All", institute = "All") {
-		return this.fetchHtml({
-			departmentparent_abbrname_selective: institute,
-			studygroup_abbrname_selective: group
-		}, TIMETABLE_EXAMS_SUFFIX).then(html => {
+	async getExamsTimetable(type: TimetableType, group = "All", institute = "All") {
+		let request;
+		if (type === 'lecturer') {
+			request = this.fetchHtml({
+				namedepartment_selective: institute,
+				teachername_selective: group
+			}, LECTURER_EXAMS_SUFFIX)
+		} else {
+			request = this.fetchHtml({
+				departmentparent_abbrname_selective: institute,
+				studygroup_abbrname_selective: group
+			}, TIMETABLE_EXAMS_SUFFIX)
+		}
+
+		return request.then(html => {
 			const content = this.parseAndGetFirstElBySelector(html, ".view-content");
 			const exams = Array.from(content?.children ?? [])
 								.map(this.parseExam)
