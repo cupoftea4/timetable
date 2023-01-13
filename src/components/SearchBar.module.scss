@@ -1,9 +1,9 @@
 @use '../styles/_variables' as *;
+@use '../styles/_mixins' as *;
 
 $border-clr: hsla(0, 0%, 100%, 0.67);
 $placeholder-clr: hsla(0, 0%, 100%, 0.8);
 $icon-size: 1em;
-
 
 .bar {
   display: flex;
@@ -31,17 +31,17 @@ $icon-size: 1em;
     gap: 1em;
     
     ul {
+      @include fade-in-animation(0.05s);
       z-index: 1;
       max-height: 300px;
       overflow-y: auto;
       border: none;
       font-size: 1.25rem;
       background-color: hsla(0, 0%, 64%, 0.27);
-      border-radius: 2% 2% 2% 6%;
+      border-radius: 2% 2% 2% 0.675rem;
       box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
       backdrop-filter: blur(40px);
       -webkit-backdrop-filter: blur(40px);
-      font-family: 'Oswald', sans-serif;
       
       // for firefox
       scrollbar-width: 2rem;
@@ -100,7 +100,7 @@ $icon-size: 1em;
 }
 
 
-@media screen and (max-width: 600px) {
+@include tablet {
   .bar {
     font-size: 24px;
     width: 100%;

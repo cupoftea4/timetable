@@ -3,11 +3,6 @@
   "name": "NULP Timetable",
   "icons": [
     {
-      "src": "images/cat.png",
-      "sizes": "800x800",
-      "type": "image/png"
-    },
-    {
       "src": "images/favicon.ico",
       "sizes": "200x210",
       "type": "image/x-icon"

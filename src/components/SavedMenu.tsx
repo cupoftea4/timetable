@@ -12,15 +12,16 @@ const MAX_SAVED_ITEMS = 5;
 const SavedMenu = ({likable}: { likable?: boolean}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const groupParam = useParams().group?.trim();
   const [savedGroups, setSavedGroups] = useState<string[]>(getCachedGroups);
   const [selectedItem, setSelectedItem] = useState(0);
-  const groupParam = useParams().group?.trim();
   const navigate = useNavigate();
     
   function getCachedGroups(): string[] {
     const cachedGroups = TimetableManager.getCachedTimetables()
-    return cachedGroups.slice(Math.max(cachedGroups.length - MAX_SAVED_ITEMS, 0))
-                       .map(item => item.group);
+    const groups = cachedGroups.slice(Math.max(cachedGroups.length - MAX_SAVED_ITEMS, 0))
+                       .map(item => item.group)
+    return groups;
   }
 
   const openMenu = () => setIsMenuOpen(true);
@@ -67,7 +68,7 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
       {isMenuOpen &&
         <div className={`${styles['saved-menu']} ${groupParam && styles.home}`} >
           <span>
-            {savedGroups.length !== 0 ? "Saved" : "No saved items. Open any timetable to automatically save it."}
+            {savedGroups.length !== 0 ? "Збережені" : "Немає збережених. Відкрийте будь-який розклад, щоб автоматично зберегти."}
           </span>
           <ul>
             {savedGroups.map((group, index) => (

@@ -109,7 +109,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                       title={isExamsTimetable ? "Переключити на розклад пар" : "Переключити на розклад екзаменів"} 
                       onClick={() => handleIsExamsTimetableChange(!isExamsTimetable)}
                     >
-                      {isExamsTimetable ? "Екзамени" : "Пари"}
+                      {!isExamsTimetable ? "Екзамени" : "Пари"}
                     </button>
                 }
               </nav>

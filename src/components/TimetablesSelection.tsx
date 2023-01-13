@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { Link } from 'react-router-dom';
 import BackIcon from '../assets/BackIcon';
 import useWindowDimensions from '../hooks/useWindowDimensions';
-import { MOBILE_BREAKPOINT } from '../utils/constants';
+import { TABLET_SCREEN_BREAKPOINT } from '../utils/constants';
 import TimetableUtil from '../utils/TimetableUtil';
 import styles from './TimetablesSelection.module.scss';
 
@@ -20,7 +20,7 @@ type OwnProps = {
 
 const TimetablesSelection: FC<OwnProps> = ({timetables, withYears = false}) => {
   const { width } = useWindowDimensions();
-  const isMobile = width < MOBILE_BREAKPOINT;
+  const isMobile = width < TABLET_SCREEN_BREAKPOINT;
   const groupsByYear = TimetableUtil.sortGroupsByYear(timetables);
 
   // ммм, та
@@ -38,7 +38,7 @@ const TimetablesSelection: FC<OwnProps> = ({timetables, withYears = false}) => {
       {withYears ?
           [Year.First, Year.Second, Year.Third, Year.Fourth].map((year) => 
             groupsByYear[year]?.length && groupsByYear[year].length !== 0 ?
-                <ul key={year} className={styles.year} 
+                <ul key={year} className={`${styles.year} ${styles[`theme-light`]}`} 
                     data-value={`${year} Курс`}
                   >
                     {groupsByYear[year].map(group => (

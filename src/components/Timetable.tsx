@@ -31,17 +31,16 @@ const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) 
   [maxLessonNumber]);
 
   const days = useMemo(() => 
-    [null, "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].slice(0, maxDayNumber + 1), 
+    [null, "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"].slice(0, maxDayNumber + 1), 
   [maxDayNumber]);
 
   const getCurrentLessonNumber = () => {
-    const curDate = stringToDate("15:23");
+    const curDate = new Date();
     return lessonsTimes.findIndex(time => stringToDate(time.start) <= curDate && curDate <= stringToDate(time.end));
   } 
 
   const currentDay =  getCurrentUADate().getDay();
   const currentLessonNumber = getCurrentLessonNumber();
-  
 
   const getLessonByDayAndTime = (number: number, day: number) => {
     if (timetable) {

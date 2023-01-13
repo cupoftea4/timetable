@@ -26,7 +26,7 @@ const MobileSelect: FC<OwnProps> = ({items, selectedState}) => {
           <div className={styles.select} onClick={() => setShowSelect(false)}>
             <ul>
               {items.map((item) => (
-                item.value !== selected &&
+                // item.value !== selected &&
                   <li key={item.value}>
                     <button onClick={() => onItemClicked(item.value)}>
                       {item.name}

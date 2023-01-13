@@ -7,7 +7,8 @@ import styles from "./HomePage.module.scss";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import List from "../components/List";
 import * as handler from '../utils/requestHandler'
-import { MOBILE_BREAKPOINT } from "../utils/constants";
+import { TABLET_SCREEN_BREAKPOINT } from "../utils/constants";
+import catImage from '../assets/cat.svg';
 
 type OwnProps = {
   timetableType: TimetableType;
@@ -21,16 +22,22 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   const [selectedSecond, setSelectedSecond] = useState<string | null>(null);
 
   const { width } = useWindowDimensions();
-  const isMobile = width < MOBILE_BREAKPOINT;
+  const isMobile = width < TABLET_SCREEN_BREAKPOINT;
   const showSecondLayer = !isMobile || !selectedSecond;
   const showFirstLayer = showSecondLayer;
-  const showThirdLayer = selectedFirst && showSecondLayer;
+  const showThirdLayer = Boolean(selectedSecond);
   
   useEffect(() => {
     setThirdLayer([]);
     TimetableManager.getLastOpenedInstitute().then((inst) => {
+      if (!TimetableManager.firstLayerItemExists(timetableType, inst)) {
+        setSecondLayer([]);
+        setSelectedFirst(null);
+        setSelectedSecond(null);
+        return;
+      }
       setSelectedFirst(inst);
-      updateMajors(timetableType, inst);
+      updateSecondLayer(timetableType, inst);        
     });
     TimetableManager.getFirstLayerSelectionByType(timetableType)
       .then(setFirstLayer)
@@ -39,7 +46,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
     return () => handler.hideAllMessages();
   }, [timetableType]);
 
-  const updateMajors = (timetableType: TimetableType, query: string) => {
+  const updateSecondLayer = (timetableType: TimetableType, query: string) => {
     TimetableManager.updateLastOpenedInstitute(query);   
     handler.handlePromise(TimetableManager.getSecondLayerByType(timetableType, query), 'Fetching groups...')
       .then(setSecondLayer)
@@ -56,7 +63,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   const handleInstituteChange = (institute: CachedInstitute | null) => {
     setSelectedFirst(institute);
     if (!institute) return;
-    updateMajors(timetableType, institute);
+    updateSecondLayer(timetableType, institute);
   };
 
   const handleMajorChange = (major: string | null) => {
@@ -73,14 +80,14 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
           {showFirstLayer &&
               <List items={firstLayer} selectedState={[selectedFirst, handleInstituteChange]} />
           } 
-          {showThirdLayer &&
+          {showSecondLayer &&
               <List items={secondLayer} selectedState={[selectedSecond, handleMajorChange]} />
           }
-          {selectedSecond ?
+          {showThirdLayer ?
             <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"}/>
             : 
               <div className={styles['no-selection']}>
-                <img src={"images/cat.png"} alt="cat" width="800" height="800"/>
+                <img src={catImage} alt="cat" width="800" height="800"/>
                 <p>Оберіть спецільність, щоб продовжити</p>
               </div>
           }

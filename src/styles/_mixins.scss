@@ -46,6 +46,19 @@
       }
 }
 
+@mixin fade-in-animation($time) {
+  animation: fade-in $time ease-in-out forwards;
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 @mixin timetable-mobile {
   @media only screen and (max-width: 1000px) {
       @content;

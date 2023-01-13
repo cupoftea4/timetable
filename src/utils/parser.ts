@@ -1,88 +1,62 @@
-import { timeout } from "./promiseHandling";
+import LPNUData from "./LPNUData";
 import { ExamsTimetableItem, TimetableItem, TimetableItemType, TimetableType } from "./types";
-
-const NULP_STUDENTS = "https://student.lpnu.ua/";
-const NULP_STAFF = "https://staff.lpnu.ua/";
-
-const TIMETABLE_SUFFIX = "students_schedule";
-const SELECTIVE_SUFFIX = "schedule_selective";
-const LECTURER_SUFFIX = "lecturer_schedule";
-const TIMETABLE_EXAMS_SUFFIX = "students_exam";
-const LECTURER_EXAMS_SUFFIX = "lecturer_exam";
-
-const PROXY = "https://api.codetabs.com/v1/proxy?quest=";
 
 const FALLBACK_URL = "https://raw.githubusercontent.com/cupoftea4/timetable-data/data/";
 
-const TIMEOUT = 3000; // 3s
+const INSTITUTES_SELECTOR = "#edit-departmentparent-abbrname-selective";
+const GROUPS_SELECTOR = "#edit-studygroup-abbrname-selective";
+const SELECTIVE_GROUPS_SELECTOR = "#edit-studygroup-abbrname-selective";
+const LECTURERS_SELECTOR = "#edit-teachername-selective";
+const DEPARTMENTS_SELECTOR = "#edit-department-name-selective";
+const TIMETABLE_SELECTOR = ".view-content";
 
-type RequestSuffix = 
-		  typeof TIMETABLE_SUFFIX
-		| typeof SELECTIVE_SUFFIX
-		| typeof LECTURER_SUFFIX
-		| typeof TIMETABLE_EXAMS_SUFFIX
-		| typeof LECTURER_EXAMS_SUFFIX;
-
-const timetableSuffixes: {[key in TimetableType]: RequestSuffix} = {
-	timetable:  "students_schedule" ,
-	selective: "schedule_selective",
-	lecturer: "lecturer_schedule"
-}
 
 class TimetableParser {
-
-	private async fetchHtml(params: {[key: string]: string} = {}, suffix = TIMETABLE_SUFFIX) {
-		const isLecturer = suffix === LECTURER_SUFFIX || suffix === LECTURER_EXAMS_SUFFIX;
-		let baseUrl = (isLecturer ? NULP_STAFF : NULP_STUDENTS) + suffix;
-		const originalUrl = new URL(baseUrl);
-		for(let key in params) {
-			originalUrl.searchParams.set(key, params[key]);
-		}
-		const proxiedUrl = PROXY + originalUrl.href;
-		return timeout(TIMEOUT, fetch(proxiedUrl)).then(response => {
-			if(!response.ok) throw Error(response.statusText);
-			return response.text();
-		})
-	}
-
-	async getSelectiveGroups() {
-		return this.fetchHtml({}, SELECTIVE_SUFFIX).then(html => {
-			const select = this.parseAndGetFirstElBySelector(html, "#edit-studygroup-abbrname-selective");
-			const groups = Array.from(select?.children ?? [])
-								.map(child => (child as HTMLInputElement).value)
-								.filter(group => group !== "All")
-								.sort((a, b) => a.localeCompare(b));
-			return groups;
-		}).catch(async err => {
-			const fallback = FALLBACK_URL + `selective/groups.json`;
-			const response = await fetch(fallback);
-			if (!response.ok)
-				throw Error(err);
-			return await response.json() as string[];
-		})
-	}
-
 	async getInstitutes() {
-		return this.fetchHtml().then(html => {
-	
-			const select = this.parseAndGetFirstElBySelector(html, "#edit-departmentparent-abbrname-selective");
+		return LPNUData.fetchInstitutes().then(html => {
+			const select = 
+				this.parseAndGetFirstElBySelector(html, INSTITUTES_SELECTOR);
 			const institutes = Array.from(select?.children ?? [])
 									.map(child => (child as HTMLInputElement).value)
 									.filter(inst => inst !== "All")
 									.sort((a, b) => a.localeCompare(b));
 			return institutes;
 		}).catch(async err => {
-			const response = await fetch(FALLBACK_URL + "institutes.json");
-			if (!response.ok)
-				throw Error(err);
-			return await response.json() as string[];
+			return await this.fetchFromFallback("institutes.json") as string[];
 		});
 	}
 
+	async getGroups(institute?: string) {
+		return LPNUData.fetchGroups(institute).then(html => {
+			const select = this.parseAndGetFirstElBySelector(html, GROUPS_SELECTOR);
+			const groups = Array.from(select?.children ?? [])
+								.map(child => (child as HTMLInputElement).value)
+								.filter(inst => inst !== "All")
+								.sort((a, b) => a.localeCompare(b));
+			return groups;
+		}).catch(async err => {
+			const fallbackPath = institute ? `institutes/${institute}.json` : `groups.json`;
+			return await this.fetchFromFallback(fallbackPath) as string[];
+		})
+	}
+
+	async getSelectiveGroups() {
+		return LPNUData.fetchSelectiveGroups().then(html => {
+			const select = this.parseAndGetFirstElBySelector(html, SELECTIVE_GROUPS_SELECTOR);
+			const groups = Array.from(select?.children ?? [])
+								.map(child => (child as HTMLInputElement).value)
+								.filter(group => group !== "All")
+								.sort((a, b) => a.localeCompare(b));
+			return groups;
+		}).catch(async err => {
+			const fallback = 'selective/groups.json';
+			return await this.fetchFromFallback(fallback) as string[];
+		})
+	}
+
 	async getLecturers(department?: string) {
-		return this.fetchHtml(department ? 
-			{department_name_selective: department} : {}, LECTURER_SUFFIX).then(html => {
-			const select = this.parseAndGetFirstElBySelector(html, "#edit-teachername-selective");
+		return LPNUData.fetchLecturers(department).then(html => {
+			const select = this.parseAndGetFirstElBySelector(html, LECTURERS_SELECTOR);
 			const lecturers = Array.from(select?.children ?? [])
 									.map(child => (child as HTMLInputElement).value)
 									.filter(inst => inst !== "All")
@@ -90,117 +64,66 @@ class TimetableParser {
 			
 			return lecturers;
 		}).catch(async err => {
-			const fallback = FALLBACK_URL + "lecturers/" + (department ?  "grouped.json" : "all.json");
-			console.warn("Lecturers fallback url", fallback, department);
-			const response = await fetch(fallback);
-			if (!response.ok)
-				throw Error(err);
-			const data = await response.json() ;
+			const fallbackPath = "lecturers/" + (department ?  "grouped.json" : "all.json");
+			const data = await this.fetchFromFallback(fallbackPath);
 			return (department ? data[department] : data) as string[];
 		});
 	}
 
 	async getLecturerDepartments() {
-		return this.fetchHtml({}, LECTURER_SUFFIX).then(html => {
-			const select = this.parseAndGetFirstElBySelector(html, "#edit-department-name-selective");
+		return LPNUData.fetchLecturerDepartments().then(html => {;	
+			const select = this.parseAndGetFirstElBySelector(html, DEPARTMENTS_SELECTOR);
 			const departments = Array.from(select?.children ?? [])
 				.map(child => (child as HTMLInputElement).value)
 				.filter(depart => depart !== "All")
 				.sort((a, b) => a.localeCompare(b));
 			return departments;
-		}).catch(async err => {
-			const fallback = FALLBACK_URL + `lecturers/departments.json`;
-			const response = await fetch(fallback);
-			if (!response.ok)
-				throw Error(err);
-			return await response.json() as string[];
+		}).catch(async () => {
+			const fallback = `lecturers/departments.json`;
+			return await this.fetchFromFallback(fallback) as string[];
 		});
 	}
 	
-	async getGroups(departmentparent_abbrname_selective = "All") {
-		return this.fetchHtml({departmentparent_abbrname_selective}).then(html => {
-			const select = this.parseAndGetFirstElBySelector(html, "#edit-studygroup-abbrname-selective");
-			const groups = Array.from(select?.children ?? [])
-								.map(child => (child as HTMLInputElement).value)
-								.filter(inst => inst !== "All")
-								.sort((a, b) => a.localeCompare(b));
-			return groups;
-		}).catch(async err => {
-			let fallbackPath = `institutes/${departmentparent_abbrname_selective}.json`;
-			if(departmentparent_abbrname_selective === "All") { //get all groups
-				fallbackPath = `groups.json`;
-			}
-			const response = await fetch(FALLBACK_URL + fallbackPath);
-			if (!response.ok)
-				throw Error(err);
-			return await response.json() as string[];
-		})
+	
+	async getTimetable(type: TimetableType, timetableName?: string, timetableCategory?: string) {
+		return LPNUData.fetchTimetable(type, timetableName, timetableCategory)
+			.then(this.parseTimetable.bind(this))
+			.catch(async err => {
+				let fallbackPath = `timetables/${timetableName}.json`;
+				if (type === "lecturer") 
+					fallbackPath = `lecturers/timetables/${timetableName}.json`;
+				if (type === "selective") 
+					fallbackPath = `selective/timetables/${timetableName}.json`;
+				
+				return await this.fetchFromFallback(fallbackPath) as TimetableItem[];
+		});
 	}
 
-	private async parseTimetable(params: { [key: string]: string; }, suffix?: string) {
-		try {
-			const html = await this.fetchHtml(params, suffix);
-			const table = this.parseAndGetFirstElBySelector(html, ".view-content");
-			if (!table)
-				throw Error("No table found");
+	async getExamsTimetable(type: TimetableType, group = "All", institute = "All") {
+		return LPNUData.fetchExamsTimetable(type, group, institute)
+			.then(html => {
+				const content = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
+				const exams = Array.from(content?.children ?? [])
+									.map(this.parseExam)
+				return exams;
+			})
+			.catch(async err => {
+				throw Error(err);
+			})
+	}
+
+	private async fetchFromFallback(path: string) {
+		console.warn("Timetable fallback url", FALLBACK_URL + path);
+		const response = await fetch(FALLBACK_URL + path);
+		if (!response.ok) throw Error("Couldn't fetch or parse timetable");
+		return await response.json();
+	}
+
+	private async parseTimetable(html: string) {
+			const table = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
+			if (!table) throw Error("No table found");
 			const days = Array.from(table.children);
 			return days.map((day) => this.parseDay(day)).flat(1);
-		} catch (err) {
-			let fallbackPath = `timetables/${params?.studygroup_abbrname_selective}.json`;
-			if (suffix === LECTURER_SUFFIX) {
-				fallbackPath = `lecturers/timetables/${params?.teachername_selective}.json`;
-			}
-			if (suffix === SELECTIVE_SUFFIX) {
-				fallbackPath = `selective/timetables/${params?.studygroup_abbrname_selective}.json`;
-			}
-			console.warn("Timetable fallback url", FALLBACK_URL + fallbackPath);
-			const response = await fetch(FALLBACK_URL + fallbackPath);
-			if (!response.ok) throw Error("Couldn't fetch or parse timetable");
-			return await response.json() as TimetableItem[];
-		}
-	}
-	
-	async getTimetable(type: TimetableType, timetableName = "All", timetableCategory = "All") {
-		const suffix = timetableSuffixes[type];
-		if (suffix === SELECTIVE_SUFFIX) {
-			return this.parseTimetable({studygroup_abbrname_selective: timetableName}, suffix);
-		}
-		if (suffix === LECTURER_SUFFIX) {
-			return this.parseTimetable({
-				department_name_selective: timetableCategory,
-				teachername_selective: timetableName,
-				assetbuilding_name_selective: "весь семестр"
-			}, LECTURER_SUFFIX);
-		}
-		return this.parseTimetable({
-			departmentparent_abbrname_selective: timetableCategory,
-			studygroup_abbrname_selective: timetableName,
-			semestrduration: '1', // Why, NULP?
-		})
-	}
-	
-	async getExamsTimetable(type: TimetableType, group = "All", institute = "All") {
-		let request;
-		if (type === 'lecturer') {
-			request = this.fetchHtml({
-				namedepartment_selective: institute,
-				teachername_selective: group
-			}, LECTURER_EXAMS_SUFFIX)
-		} else {
-			request = this.fetchHtml({
-				departmentparent_abbrname_selective: institute,
-				studygroup_abbrname_selective: group
-			}, TIMETABLE_EXAMS_SUFFIX)
-		}
-
-		return request.then(html => {
-			const content = this.parseAndGetFirstElBySelector(html, ".view-content");
-			const exams = Array.from(content?.children ?? [])
-								.map(this.parseExam)
-			return exams;
-		}).catch(async err => {
-			throw Error(err);
-		})
 	}
 	
 	
@@ -263,24 +186,8 @@ class TimetableParser {
 	}
 
 	private dayToNumber(day: string) {
-		switch(day?.toLowerCase()) {
-			case "пн":
-				return 1;
-			case "вт":
-				return 2;
-			case "ср":
-				return 3;
-			case "чт":
-				return 4;
-			case "пт":
-				return 5;
-			case "сб":
-				return 6;
-			case "нд":
-				return 7;
-			default:
-				return -1;		
-		}
+		const days = ["пн", "вт", "ср", "чт", "пт", "сб", "нд"];
+		return (days.indexOf(day.toLowerCase()) + 1) || -1;
 	}
 	
 	private parseDay(day: Element) {
@@ -388,7 +295,7 @@ class TimetableParser {
 	private parseAndGetFirstElBySelector(html: string, css: string): HTMLElement | null {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(html, "text/html");
-		return doc.querySelector(css) ?? new HTMLElement();
+		return doc.querySelector(css);
 	}
 
 }

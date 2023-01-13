@@ -12,23 +12,23 @@
 }
 
 .saved-menu {
+  animation: show-menu 0.1s ease-in-out forwards;
   position: absolute;
   top: 100%;
-  left: -30%;
+  right: -60%;
   width: 15rem;
   &.home {
-    left: 50%;
+    right: -160%;
   }
   @include tablet {
     width: 13rem;
   }
   background-color: hsla(0, 0%, 64%, 0.27);
-  border-radius: 1rem;
+  border-radius: 0.675rem;
   box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   z-index: 1;
-  transform: translateX(-50%);
   padding: 1.5rem 0;
 
   /* Tittle */
@@ -84,4 +84,15 @@
     }
   }
 
+}
+
+@keyframes show-menu {
+  0% {
+    opacity: 0;
+    transform: translateY(.5rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

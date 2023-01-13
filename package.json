@@ -20,8 +20,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start:dev": "env-cmd -f dev.env npm start",
+    "build:beta": "env-cmd -f .env yarn run build"
   },
   "eslintConfig": {
     "extends": [
@@ -40,5 +40,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.3",
+    "env-cmd": "^10.1.0"
   }
 }

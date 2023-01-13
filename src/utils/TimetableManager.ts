@@ -42,11 +42,13 @@ class TimetableManager {
 			this.examsTimetables = (await storage.getItem(EXAMS_TIMETABLES)) || [];
 			this.selectiveGroups = (await storage.getItem(SELECTIVE_GROUPS)) || [];
 			this.lecturers = (await storage.getItem("lecturers")) || [];
+			this.departments = (await storage.getItem("departments")) || [];
 		} catch (e) { 
 			// sometimes chrome throws an error while trying to access idb
 			throw new Error("[TimetableManager.init] Error while loading cached data: " + e);
 		}
-		
+		const type = window.location.pathname.split("/").at(-1);
+
 		const institutesUpdated = await storage.getItem(INSTITUTES + UPDATED);
 		if (this.institutes.length === 0 || Util.needsUpdate(institutesUpdated)) {
 			console.log("Downloading institute list...");
@@ -70,6 +72,14 @@ class TimetableManager {
 			console.log("Downloading lecturers list...");
 			await this.getLecturers(undefined, true);
 		}
+
+		if (type === "lecturer") {
+			const departmentsUpdated = await storage.getItem("departments" + UPDATED);
+			if (this.departments.length === 0 || Util.needsUpdate(departmentsUpdated)) {
+				console.log("Downloading departments list...");
+				await this.getLecturerDepartments(true);
+			}
+		}
 		
 	}
 
@@ -87,6 +97,22 @@ class TimetableManager {
 				return Util.getFirstLetters(await this.getLecturerDepartments());
 			default: 
 				return this.getInstitutes();
+		}
+	}
+
+	firstLayerItemExists(type: TimetableType, query: string) {
+		const isInstitute = this.institutes.includes(query);
+		switch (type) {
+			case "selective":
+				return !isInstitute && 
+					this.selectiveGroups.some((group) => group.startsWith(query[0]) || group.startsWith(query.at(-1) ?? ""));
+			case "lecturer":
+				return !isInstitute && 
+					this.departments.some((department) => department.startsWith(query[0]) || department.startsWith(query.at(-1) ?? ""));
+			case "timetable":
+				return isInstitute;
+			default:
+				return false;
 		}
 	}
 
@@ -133,7 +159,7 @@ class TimetableManager {
 	async getLecturerDepartments(force = false): Promise<string[]> {
 		if (this.departments.length > 0 && !force) return this.departments;
 		const departments = await parser.getLecturerDepartments();
-		storage.setItem("departments_", departments);
+		storage.setItem("departments", departments);
 		storage.setItem("departments" + UPDATED, Date.now());
 		this.departments = departments;
 		return departments;

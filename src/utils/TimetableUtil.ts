@@ -5,6 +5,7 @@ const UPDATE_PERIOD = 3 * 24 * 60 * 60 * 1000; // 3 days
 export default class TimetableUtil {
   static getGroupName(group: string, timetableType: TimetableType) {
     if (timetableType === "selective") return group.split("-")[0] + "-" + group.split("-")[1];
+    if (timetableType === "lecturer") return group;
     return group.split("-")[0];
   }
 

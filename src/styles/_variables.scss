@@ -11,11 +11,15 @@ $timetable-pract-hover-clr: rgb(153, 112, 179);
 $text-clr: hsla(0, 0%, 100%, 1);
 $extra-text-clr: hsla(0, 0%, 100%, 0.8);
 
-$bg-theme-dark-1: linear-gradient(45deg, hsl(176, 77%, 26%), hsl(216, 69%, 16%));
-$bg-theme-dark-2: linear-gradient(45deg, hsl(231, 42%, 22%), hsl(240, 43%, 3%));
+$bg-theme-dark-1: linear-gradient(135deg, rgba(15, 116, 110, 1), rgba(13, 36, 70, 1));
+$bg-theme-dark-2: linear-gradient(45deg, hsl(231, 33%, 39%), hsl(240, 32%, 9%));
 
 $bg-theme-light-1: linear-gradient(45deg, hsl(230, 40%, 43%), hsl(162, 58%, 54%));
-$bg-theme-light-2: linear-gradient(45deg, hsl(292, 58%, 60%), hsl(212, 76%, 66%), hsl(54, 70%, 57%));
+$bg-theme-light-2: linear-gradient(45deg, hsl(292, 64%, 53%), hsl(212, 98%, 63%), hsl(54, 73%, 47%));
+$bg-theme-light-3: linear-gradient(110deg, hsl(227, 47%, 34%), hsl(0, 31%, 58%));
+$bg-theme-light-4: linear-gradient(145deg, #9B3838, #292F6A);
+// $bg-theme-light-5: linear-gradient(45deg, hsl(315, 78%, 68%), hsl(212, 38%, 63%), hsl(130, 79%, 57%));
+// $bg-theme-light-6: linear-gradient(110deg, hsl(41, 73%, 54%), hsl(0, 31%, 58%));;
 
 $thin-font: 300;
 $regular-font: 400;
@@ -36,17 +40,6 @@ $spin-animation: spin 2s ease-in-out infinite reverse;
   }
   100% {
     transform: rotate(360deg);
-  }
-}
-
-$fade-in-animation: fade-in 0.3s ease-in-out;
-
-@keyframes fade-in {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
   }
 }
 

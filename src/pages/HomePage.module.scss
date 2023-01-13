@@ -9,27 +9,23 @@
   padding: .5rem 10rem;
   width: 100%;
   >ul li {
-    animation: $fade-in-animation;
+    @include fade-in-animation(0.3s);
   }
 
   li {
     font-size: $medium-font-size;
     margin: .125em;
-    font-family: 'Ubuntu', sans-serif;
     button {
       font-weight: 700;
       padding: .125em .5em;  
       width: 7em;
       text-align: left;
-      border-radius: 5px;
+      border-radius: 0.375rem;
       background-color: transparent;
       border: none;
       cursor: pointer;
       transition: all .2s ease-in-out;
-      &[data-state=selected] {
-        background-color: $light-accent-clr;
-      }
-      &:hover {
+      &[data-state=selected], &:hover {
         background-color: $light-accent-clr;
       }
     }
@@ -37,6 +33,10 @@
 
   &[data-attr=lecturer-groups] > ul:nth-child(2) li button {
     width: 20rem;
+  }
+
+  &[data-attr=lecturer-groups] > ul:nth-child(1) li button {
+    width: 4rem;
   }
 
   @include timetable-mobile {

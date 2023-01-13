@@ -1,33 +1,44 @@
-$text--light: black;
-$text--dark: white;
-$bg--light: white;
-$bg--dark: black;
+// $text--light: black;
+// $text--dark: white;
+// $bg--light: white;
+// $bg--dark: black;
 
 $themes: (
-        light: (
-                bg: $bg--light,
-                text: $text--light,
-        ),
         dark: (
-                bg: $bg--dark,
-                text: $text--dark,
+          accent: hsla(0, 0%, 6%, 0.251),
+          text: hsl(0, 0%, 100%)
+        ),
+        light: (
+          accent: hsla(0, 0%, 36%, 0.316),
+          text: hsl(0, 0%, 0%)
         ),
 );
 
-@mixin themed() {
-  @each $theme, $map in $themes {
-    .theme--#{$theme} & {
-      $theme-map: () !global;
-      @each $key, $submap in $map {
-        $value: map-get(map-get($themes, $theme), '#{$key}');
-        $theme-map: map-merge($theme-map, ($key: $value)) !global;
-      }
-      @content;
-      $theme-map: null !global;
+@mixin themify($property, $key, $themes: $themes) {
+  @each $theme, $colors in $themes {
+    //  ( `.media.theme-unicorn, .theme-unicorn .media`)
+    &.theme-#{$theme},
+    .theme-#{$theme} & {
+      #{$property}: map-get($colors, $key);
     }
   }
 }
 
-@function t($key) {
-  @return map-get($theme-map, $key);
+/// @access public
+/// @see {mixin} themify
+@mixin color($arguments...) {
+  @include themify('color', $arguments...);
 }
+
+/// @access public
+/// @see {mixin} themify
+@mixin border-color($arguments...) {
+  @include themify('border-color', $arguments...);
+}
+
+/// @access public
+/// @see {mixin} themify
+@mixin background-color($arguments...) {
+  @include themify('background-color', $arguments...);
+}
+

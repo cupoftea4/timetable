@@ -33,10 +33,10 @@ const SearchBar: FC<OwnProps> = ({toggleSearchBar, timetableType, show}) => {
       <SearchIcon onClick={() => toggleSearchBar()}/>
       <span className={styles.search}>
         <DatalistInput
-          placeholder="Група"
+          placeholder={timetableType === "lecturer" ? "Викладач" : "Група"}
           label=""
           onSelect={item => navigate(`/${item.value}`)}
-          items={[{id: "group", value: "i don't exist"}, ...options]}
+          items={options}
         />
       </span>
     </span>

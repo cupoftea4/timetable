@@ -14,6 +14,23 @@
   .timetable {
     @include timetable-mobile {
       overflow-x: auto;
+      scrollbar-width: thin;
+      scrollbar-color: $light-accent-clr $light-accent-clr;
+      
+      &::-webkit-scrollbar {
+        height: .325rem;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: $light-accent-clr;
+        border-radius: 1rem;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background-color: $light-accent-clr;
+        border-radius: .5rem;
+      }
+
       scroll-snap-type: x mandatory;
       max-width: 90vw;
       td, th {

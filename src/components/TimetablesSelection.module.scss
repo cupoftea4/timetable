@@ -1,5 +1,6 @@
 @use '../styles/variables' as *;
 @use '../styles/mixins' as *;
+@use '../styles/themes' as *;
 
 @mixin expand-year {
   li {
@@ -76,7 +77,9 @@
       flex-wrap: wrap;
       gap: .5rem;
       background-color: $light-accent-clr;
-      border-radius: 1rem;
+      // @include background-color('accent');
+      // @include color('text');
+      border-radius: 0.675rem;
       padding: 1rem;
     }
   }

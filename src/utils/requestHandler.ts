@@ -1,4 +1,5 @@
 import { toast } from "react-toastify";
+import { showErrorToast, showPromiseToast } from "./promiseHandling";
 
 const initErrors = [
   "The creator run out of imagination, failed to initialize cache",
@@ -33,11 +34,13 @@ export const NONEXISTING_TIMETABLE = "This timetable does not exist";
 
 export function handleError(error: string, userError: string = FETCH_ERROR) {
   console.error("[Handler] " + error);
-  toast.error(userError);
+  showErrorToast(userError);
 }
 
 export function handlePromise<T>(promise: Promise<T>, pending: string = FETCH_PENDING, error?: string) {
-  return toast.promise(promise, error ? {pending, error} : {pending});
+  const params = error ? {pending, error} : {pending};
+  showPromiseToast(promise, params);
+  return promise;
 }
 
 export function hideAllMessages() {

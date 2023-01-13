@@ -6,19 +6,21 @@ import TimetablePage from "./pages/TimetablePage";
 import LoadingPage from "./pages/LoadingPage";
 import * as handler from './utils/requestHandler';
 import { Status } from "./utils/types";
+import { ToastContainer as MessageToast } from "react-toastify";
+import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 
 /* TODO:
-  - Jump to the current week day on mobile done?
-  - Add exams for teachers
-  - Fix showing all items before fetching
-  - Themes
+  - fix timetables list on mobile
+  - delete saved button on lecturer timetable
+  - webpack cache
+  - add css classes
+  - Themes ?
   - focusable years
   ? Fix jumping of the timetable when switching between subgroups
   ? Exams timetable icon or any other way to switch between timetables
   ? horizontal scrolling on mobileS
   ? backend for caching
  */
-console.log("I hate this world.");
 
 const App = () => {
   const [status, setStatus] = useState<Status>(Status.Loading);
@@ -37,20 +39,21 @@ const App = () => {
   return (
     <>
      {status ?
-      <>
-        <BrowserRouter basename="/">
-          <Routes>
-            <Route path="/" element={<HomePage timetableType="timetable"/>} />
-            <Route path="selective" element={<HomePage timetableType="selective"/>} />
-            <Route path="lecturer" element={<HomePage timetableType="lecturer"/>} />
-            <Route path="/:group" element={<TimetablePage/>} />
-            <Route path="/:group/exams" element={<TimetablePage isExamsTimetable/>} />
-          </Routes>
-        </BrowserRouter>
-      </> 
-       :
-      <LoadingPage/>
+        <>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomePage timetableType="timetable"/>} />
+              <Route path="selective" element={<HomePage timetableType="selective"/>} />
+              <Route path="lecturer" element={<HomePage timetableType="lecturer"/>} />
+              <Route path="/:group" element={<TimetablePage/>} />
+              <Route path="/:group/exams" element={<TimetablePage isExamsTimetable/>} />
+            </Routes>
+          </BrowserRouter>
+        </> 
+        :
+        <LoadingPage/>
       }
+      <MessageToast position="bottom-right" theme="colored" autoClose={TOAST_AUTO_CLOSE_TIME} /> 
     </>
   );
 };

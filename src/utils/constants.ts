@@ -1,2 +1,4 @@
-export const MOBILE_BREAKPOINT = 600;
-export const NARROW_BREAKPOINT = 360;
+export const TABLET_SCREEN_BREAKPOINT = 768;
+export const NARROW_SCREEN_BREAKPOINT = 360;
+
+export const TOAST_AUTO_CLOSE_TIME = 5000;

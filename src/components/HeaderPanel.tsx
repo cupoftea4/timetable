@@ -4,7 +4,7 @@ import SearchBar from './SearchBar';
 // import ThemesIcon from '../assets/ThemesIcon';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import styles from './HeaderPanel.module.scss';
-import { MOBILE_BREAKPOINT, NARROW_BREAKPOINT } from '../utils/constants';
+import { TABLET_SCREEN_BREAKPOINT, NARROW_SCREEN_BREAKPOINT } from '../utils/constants';
 import { TimetableType } from '../utils/types';
 import Navigation from './Navigation';
 
@@ -14,7 +14,7 @@ type OwnProps = {
 
 const HeaderPanel : FC<OwnProps> = ({timetableType}) => {
   const { width } = useWindowDimensions();
-  const shouldShrinkSearchBar = useMemo(() => width < MOBILE_BREAKPOINT && width > NARROW_BREAKPOINT, [width]);
+  const shouldShrinkSearchBar = useMemo(() => width < TABLET_SCREEN_BREAKPOINT && width > NARROW_SCREEN_BREAKPOINT, [width]);
   const [showSearchBar, setShowSearchBar] = useState(!shouldShrinkSearchBar);
 
   const toggleSearchBar = () => {
