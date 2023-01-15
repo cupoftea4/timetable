@@ -3,11 +3,9 @@
 
 .saved {
   position: relative;
-  &:focus, &:hover {
-    outline: none;
-    svg {
-      transform: scale(1.1);
-    }
+  outline: none;
+  &:focus svg {
+    outline: auto;
   }
 }
 

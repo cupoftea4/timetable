@@ -10,15 +10,13 @@ import { ToastContainer as MessageToast } from "react-toastify";
 import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 
 /* TODO:
-  - fix timetables list on mobile
-  - delete saved button on lecturer timetable
+  - fix remove saved button on lecturer timetable
   - webpack cache
   - add css classes
   - Themes ?
-  - focusable years
   ? Fix jumping of the timetable when switching between subgroups
   ? Exams timetable icon or any other way to switch between timetables
-  ? horizontal scrolling on mobileS
+  ? smooth horizontal scrolling on mobileS
   ? backend for caching
  */
 

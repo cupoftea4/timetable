@@ -10,6 +10,9 @@
     display: none;
   }
   max-height: 60rem; // it could go wrong any time...
+  a {
+    pointer-events: auto;
+  }
 }
 
 .timetables {
@@ -45,6 +48,9 @@
       min-height: 5rem;
       max-height: 5rem;
       overflow: hidden;
+      a {
+        pointer-events: none;
+      }
 
       &::after {
         content: attr(data-value);
@@ -54,19 +60,21 @@
         animation: slideUp .2s ease forwards;
       }
 
-      &:hover {
-        @include expand-year;
-      }
-
-
       li {
         opacity: 0;
         transition: opacity .2s ease-in-out;
         @include animated-underline;
       }
 
-      @include mobile {
+
+      &.expanded {
         @include expand-year;
+      }
+
+      @include desktop {
+        &:hover {
+          @include expand-year;
+        }
       }
 
       height: fit-content;
@@ -78,7 +86,7 @@
       gap: .5rem;
       background-color: $light-accent-clr;
       // @include background-color('accent');
-      // @include color('text');
+      // @include color('text'); 
       border-radius: 0.675rem;
       padding: 1rem;
     }

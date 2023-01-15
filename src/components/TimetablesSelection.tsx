@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
 import BackIcon from '../assets/BackIcon';
 import useWindowDimensions from '../hooks/useWindowDimensions';
@@ -22,6 +22,7 @@ const TimetablesSelection: FC<OwnProps> = ({timetables, withYears = false}) => {
   const { width } = useWindowDimensions();
   const isMobile = width < TABLET_SCREEN_BREAKPOINT;
   const groupsByYear = TimetableUtil.sortGroupsByYear(timetables);
+  const [expandedYear, setExpandedYear] = useState<Year | null>(null); // for mobile onClick event and keyboard navigation
 
   // ммм, та
   const reload = () => window.location.reload();
@@ -38,15 +39,16 @@ const TimetablesSelection: FC<OwnProps> = ({timetables, withYears = false}) => {
       {withYears ?
           [Year.First, Year.Second, Year.Third, Year.Fourth].map((year) => 
             groupsByYear[year]?.length && groupsByYear[year].length !== 0 ?
-                <ul key={year} className={`${styles.year} ${styles[`theme-light`]}`} 
+                <ul key={year} className={`${styles.year} ${expandedYear === year ? styles.expanded : ''}`} 
                     data-value={`${year} Курс`}
+                    onClick={() => expandedYear === year ? setExpandedYear(null) : setExpandedYear(year)}
                   >
                     {groupsByYear[year].map(group => (
                                         <li key={group}>
-                                          <Link to={"/" + group}>
+                                          <Link to={"/" + group} onFocus={() => setExpandedYear(year)}>
                                             {group}
                                           </Link>
-                                        </li>)
+                                        </li>)  
                       ) 
                     }
                 </ul> 

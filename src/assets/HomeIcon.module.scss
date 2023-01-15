@@ -1,0 +1,6 @@
+.icon {
+  transition: all 0.2s ease-in-out;
+  &:hover, &:focus {
+    transform: scale(1.05);
+  }
+}

@@ -98,8 +98,8 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
           <>
             <header className={headerStyles.header}>
               <nav className={headerStyles['right-buttons']}> 
-                <Link to="/"><HomeIcon className={headerStyles.home}/></Link>
-                <SavedMenu likable={true}/>
+                <Link to="/"><HomeIcon /></Link>
+                <SavedMenu />
                 <h1>{timetableGroup}</h1>
                 {
                   // selective or lecturer groups don't have exams timetable

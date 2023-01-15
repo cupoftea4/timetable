@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CheckMarkIcon from '../assets/CheckMarkIcon';
-import HeartIcon from '../assets/HeartIcon';
+import HistoryIcon from '../assets/HistoryIcon';
 import RemoveIcon from '../assets/RemoveIcon';
 import TimetableManager from '../utils/TimetableManager'; 
 import styles from './SavedMenu.module.scss';
@@ -9,9 +9,8 @@ import * as handler from '../utils/requestHandler';
 
 const MAX_SAVED_ITEMS = 5;
 
-const SavedMenu = ({likable}: { likable?: boolean}) => {
+const SavedMenu = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
   const groupParam = useParams().group?.trim();
   const [savedGroups, setSavedGroups] = useState<string[]>(getCachedGroups);
   const [selectedItem, setSelectedItem] = useState(0);
@@ -32,11 +31,6 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
     TimetableManager.deleteTimetable(savedGroups[index]).then(
       () => setSavedGroups(getCachedGroups())
     ).catch((e) => handler.handleError(e, handler.DELETE_TIMETABLE_ERROR));
-  };
-
-  const likeItem = () => {
-    setIsLiked(!isLiked);
-    setSavedGroups(getCachedGroups);
   };
 
   const arrowNavigation = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -64,7 +58,7 @@ const SavedMenu = ({likable}: { likable?: boolean}) => {
       aria-expanded={isMenuOpen}
       aria-label="Saved groups menu"
     >
-      <HeartIcon onClick={likeItem} liked={likable && isLiked}  />
+      <HistoryIcon />
       {isMenuOpen &&
         <div className={`${styles['saved-menu']} ${groupParam && styles.home}`} >
           <span>
