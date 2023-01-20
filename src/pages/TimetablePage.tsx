@@ -6,7 +6,7 @@ import Timetable from '../components/Timetable';
 import SavedMenu from '../components/SavedMenu';
 import Toggle from '../components/Toggle';
 import TimetableManager from '../utils/TimetableManager';
-import { ExamsTimetableItem, TimetableItem, TimetableType } from '../utils/types';
+import { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from '../utils/types';
 import HomeIcon from '../assets/HomeIcon';
 import styles from './TimetablePage.module.scss';
 import { getCurrentUADate, getNULPWeek } from '../utils/date';
@@ -37,11 +37,13 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   const [examsTimetable, setExamsTimetable] = useState<ExamsTimetableItem[]>();
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup); 
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
+  const [partials, setPartials] = useState<HalfTerm[]>([]);
   const navigate = useNavigate();
   const timetableRef = useRef<HTMLElement>(null);
 
   const isLoading = isExamsTimetable ? !examsTimetable : !timetable;
-  const time = TimetableManager.getCachedTime(group);
+  const time = TimetableManager.getCachedTime(group, isExamsTimetable);
+
     
   const getTimetable = (group: string, exams: boolean, type?: TimetableType, checkCache: boolean = true) => {
     const onCatch = (e: string) => {
@@ -54,6 +56,9 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     return TimetableManager.getTimetable(group, type, checkCache).then(data => {
         setTimetable(data);
         setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
+        if (type === 'timetable') {
+          TimetableManager.getPartials(group).then(setPartials);
+        }
       }).catch(onCatch);
   };
 
@@ -103,7 +108,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                 <h1>{timetableGroup}</h1>
                 {
                   // selective or lecturer groups don't have exams timetable
-                  TimetableManager.ifTimetableExists(group) !== 'selective' &&
+                  TimetableManager.tryToGetType(group) !== 'selective' &&
                     <button
                       className={headerStyles.exams}
                       title={isExamsTimetable ? "Переключити на розклад пар" : "Переключити на розклад екзаменів"} 
@@ -111,6 +116,14 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                     >
                       {!isExamsTimetable ? "Екзамени" : "Пари"}
                     </button>
+                }
+                {
+                  !isExamsTimetable && partials.length > 0 &&
+                    <ul>
+                      {partials.map((partial, i) =>
+                        <li key={i} value={partial}>{partial}</li>
+                      )}
+                    </ul>
                 }
               </nav>
               <span className={styles.params}>
@@ -128,13 +141,15 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
             </header>
             <main className={styles.container}>
               <section className={styles.timetable} ref={timetableRef}>
-                {!isExamsTimetable ?
-                    <Timetable 
+                {!isExamsTimetable 
+                  ? <Timetable 
                       timetable={timetable ?? []} 
                       isSecondWeek={isSecondWeek} 
                       isSecondSubgroup={isSecondSubgroup} 
-                    /> :
-                    <ExamsTimetable exams={examsTimetable ?? []} /> 
+                    /> 
+                  : examsTimetable?.length === 0 
+                        ? <p>Розклад екзаменів пустий</p>
+                        : <ExamsTimetable exams={examsTimetable ?? []} /> 
                 }
               </section>
             </main> 

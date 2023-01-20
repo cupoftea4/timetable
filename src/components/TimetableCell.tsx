@@ -16,9 +16,9 @@ const TimetableCell = ({lesson, active}: TimetableCellProps) => {
   return ( 
     <>
       {innerLesson !== null ? (
-          <td className={`${!shouldAppear ? styles.hide : styles.show}`}>
+          <td className={`${!shouldAppear ? styles.hide : styles.show} ${active && styles.active}`}>
             <div className={`${styles.spacer} ${styles[innerLesson.type]}`}/>
-            <div className={`${styles.cell} ${active && styles.active}`} >
+            <div className={`${styles.cell}`} >
               <div className={styles.info}>
                 <span>
                   <h4>{innerLesson.subject.replace('`', '’')}</h4> 

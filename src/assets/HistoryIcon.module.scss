@@ -1,5 +1,7 @@
+@use '../styles/variables' as *;
+
 .icon {
-  max-width: 2.325rem;
+  max-width: $header-icon-size;
   transition: all .2s ease-in-out;
   &:hover, &:focus {
     transform: scale(1.05);

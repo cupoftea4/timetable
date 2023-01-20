@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TimetableItem } from '../utils/types';
 import TimetableCell from './TimetableCell';
 import styles from './Timetable.module.scss';
@@ -9,6 +9,8 @@ type TimetableProps = {
   isSecondSubgroup: boolean;
   isSecondWeek: boolean;
 };
+
+const MINUTE = 60 * 1000;
 
 const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) => {
   const maxLessonNumber = useMemo(() => 
@@ -34,26 +36,31 @@ const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) 
     [null, "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"].slice(0, maxDayNumber + 1), 
   [maxDayNumber]);
 
-  const getCurrentLessonNumber = () => {
-    const curDate = new Date();
-    return lessonsTimes.findIndex(time => stringToDate(time.start) <= curDate && curDate <= stringToDate(time.end));
-  } 
+  const getCurrentLessonNumber = useCallback(() => {
+    const curDate = getCurrentUADate();
+    return lessonsTimes.findIndex(time => curDate <= stringToDate(time.end));
+  }, [lessonsTimes]);
 
   const currentDay =  getCurrentUADate().getDay();
-  const currentLessonNumber = getCurrentLessonNumber();
+  const [currentLessonNumber, setCurrentLessonNumber] = useState(getCurrentLessonNumber());
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrentLessonNumber(getCurrentLessonNumber());
+    }, MINUTE);
+    return () => clearInterval(id);
+  }, [getCurrentLessonNumber]);
 
   const getLessonByDayAndTime = (number: number, day: number) => {
-    if (timetable) {
-      return timetable.find(item => 
-        item.day === day &&
-        item.number === number &&
-        ((item.isSecondSubgroup === isSecondSubgroup && item.isFirstSubgroup === !isSecondSubgroup) ||
-          (item.isFirstSubgroup && item.isSecondSubgroup)) &&
-        ((item.isSecondWeek === isSecondWeek && item.isFirstWeek === !isSecondWeek) ||
-          (item.isFirstWeek && item.isSecondWeek))
-      ) ?? null;
-    }
-    return null;
+    if (!timetable) return null;
+    return timetable.find(item => 
+      item.day === day &&
+      item.number === number &&
+      ((item.isSecondSubgroup === isSecondSubgroup && item.isFirstSubgroup === !isSecondSubgroup) ||
+        (item.isFirstSubgroup && item.isSecondSubgroup)) &&
+      ((item.isSecondWeek === isSecondWeek && item.isFirstWeek === !isSecondWeek) ||
+        (item.isFirstWeek && item.isSecondWeek))
+    ) ?? null;
   };
 
   return (
@@ -68,17 +75,16 @@ const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) 
             lessonsTimes.map((time, i) => 
               <tr key={time.start}>{
                 days.map((day, j) =>
-                  day === null ?
-                    <th key={time.start + day} style={{height: "5rem"}}>
-                      <span>{time.start}</span>
-                      <span>{i + 1}</span> 
-                      <span>{time.end}</span>
-                    </th> 
-                    :
-                      <TimetableCell 
-                        lesson={getLessonByDayAndTime(i + 1, j)} 
-                        active={currentLessonNumber === i && currentDay === j} 
-                        key={time.start + day}/>
+                  day === null 
+                    ? <th key={time.start + day} style={{height: "5rem"}}>
+                        <span>{time.start}</span>
+                        <span>{i + 1}</span> 
+                        <span>{time.end}</span>
+                      </th> 
+                    : <TimetableCell 
+                          lesson={getLessonByDayAndTime(i + 1, j)} 
+                          active={currentLessonNumber === i && currentDay === j} 
+                          key={time.start + day}/>
                 )
               }</tr>  
             )

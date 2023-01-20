@@ -108,6 +108,14 @@ export default class LPNUData {
 		});
 	}
 
+	static async fetchPartialGroups(semesterHalf: 1 | 2, institute = "All") {
+		const semesterParam = semesterHalf === 1 ? '2' : '3';
+		return this.fetchHtml({
+			departmentparent_abbrname_selective: institute,
+			semestrduration: semesterParam
+		}, TIMETABLE_SUFFIX);
+	}
+
 	static async fetchTimetable(type: TimetableType, timetableName = "All", timetableCategory = "All") {
 		const suffix = timetableSuffixes[type];
 		if (suffix === LECTURER_SUFFIX) {
@@ -123,6 +131,15 @@ export default class LPNUData {
 			semestrduration: '1', // Why, NULP?
 		}, suffix);
 	} 
+
+	static async fetchPartialTimetable(timetableName: string, semesterHalf: 1 | 2) {
+		const semesterParam = semesterHalf === 1 ? '2' : '3'
+		return this.fetchHtml({
+			departmentparent_abbrname_selective: "All",
+			studygroup_abbrname_selective: timetableName,
+			semestrduration: semesterParam
+		}, TIMETABLE_SUFFIX);
+	}
 
 	static async fetchExamsTimetable(type: TimetableType, group = "All", institute = "All") {
 		if (type === 'lecturer') {

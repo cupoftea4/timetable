@@ -30,6 +30,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   useEffect(() => {
     setThirdLayer([]);
     TimetableManager.getLastOpenedInstitute().then((inst) => {
+      if (!inst) return;
       if (!TimetableManager.firstLayerItemExists(timetableType, inst)) {
         setSecondLayer([]);
         setSelectedFirst(null);
@@ -87,7 +88,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
             <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"}/>
             : 
               <div className={styles['no-selection']}>
-                <img src={catImage} alt="cat" width="800" height="800"/>
+                <img src={catImage} draggable="false" alt="cat" width="800" height="800"/>
                 <p>Оберіть спецільність, щоб продовжити</p>
               </div>
           }

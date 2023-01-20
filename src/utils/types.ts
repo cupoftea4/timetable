@@ -41,3 +41,8 @@ export enum Status {
   Idle,
   Failed
 }
+
+export enum HalfTerm {
+  First = 1,
+  Second = 2
+}

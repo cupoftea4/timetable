@@ -46,6 +46,33 @@
       }
 }
 
+
+@mixin auto-scroll ($direction: y, $width: auto) {
+  overflow-#{$direction}: auto;
+  scrollbar-width: $width;
+  scrollbar-color: vars.$light-accent-clr vars.$light-accent-clr;
+
+  $scrollbar-width: .75rem;
+  @if $width == thin {
+    $scrollbar-width: .325rem;
+  } 
+  
+  &::-webkit-scrollbar {
+    height: $scrollbar-width;
+    width: $scrollbar-width;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: vars.$light-accent-clr;
+    border-radius: 1rem;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background-color: vars.$light-accent-clr;
+    border-radius: .5rem;
+  }
+}
+
 @mixin fade-in-animation($time) {
   animation: fade-in $time ease-in-out forwards;
 }

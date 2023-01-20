@@ -4,19 +4,17 @@
 .saved {
   position: relative;
   outline: none;
-  &:focus svg {
-    outline: auto;
-  }
+  @include flex-center;
 }
 
 .saved-menu {
   animation: show-menu 0.1s ease-in-out forwards;
   position: absolute;
-  top: 100%;
-  right: -60%;
+  top: 105%;
+  left: -90%;
   width: 15rem;
   &.home {
-    right: -160%;
+    left: 50%;
   }
   @include tablet {
     width: 13rem;
@@ -87,10 +85,10 @@
 @keyframes show-menu {
   0% {
     opacity: 0;
-    transform: translateY(.5rem);
+    transform: translate(-50%, .5rem);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(-50%, 0);
   }
 }

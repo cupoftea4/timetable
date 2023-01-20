@@ -83,6 +83,30 @@ class TimetableParser {
 			return await this.fetchFromFallback(fallback) as string[];
 		});
 	}
+
+	async getPartialGroups(half: 1 | 2) {
+		return LPNUData.fetchPartialGroups(half).then(html => {
+			const select = this.parseAndGetFirstElBySelector(html, GROUPS_SELECTOR);
+			const groups = Array.from(select?.children ?? [])
+								.map(child => (child as HTMLInputElement).value)
+								.filter(inst => inst !== "All")
+								.sort((a, b) => a.localeCompare(b));
+			return groups;
+		})
+		// .catch(async () => {
+		// 	const fallback = `partial/${half}.json`;
+		// 	return await this.fetchFromFallback(fallback) as string[];
+		// });
+	}
+
+	async getPartialTimetable(group: string, half: 1 | 2) {
+		return LPNUData.fetchPartialTimetable(group, half)
+			.then(this.parseTimetable.bind(this));
+		// .catch(async () => {
+		// 	const fallback = `partial/timetables/${group}.json`;
+		// 	return await this.fetchFromFallback(fallback) as TimetableItem[];
+		// });
+	}
 	
 	
 	async getTimetable(type: TimetableType, timetableName?: string, timetableCategory?: string) {

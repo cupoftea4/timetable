@@ -1,4 +1,5 @@
 @use '../styles/variables' as *;
+@use '../styles/mixins' as *;
 
 $spacer-width: 0.5rem;
 
@@ -31,6 +32,10 @@ td {
   max-width: 16rem;
   position: relative;
 
+  @include timetable-mobile {
+    max-width: initial;
+  }
+
   .info {
     display: flex;
     flex-direction: column;
@@ -54,6 +59,7 @@ td {
       color: $extra-text-clr;
       flex-wrap: wrap;
       gap: .5rem;
+      padding-right: .25rem;
       line-height: normal;
 
       a {
@@ -105,10 +111,10 @@ td {
 @keyframes disappear {
   0% {
     opacity: 1;
-    transform: translateY(.5rem);
+    transform: translateY(0);
   }
   100% {
     opacity: 0;
-    transform: translateY(0);
+    transform: translateY(-0.5rem);
   }
 }

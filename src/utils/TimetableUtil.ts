@@ -28,6 +28,11 @@ export default class TimetableUtil {
     return alphabetArray;
   }
 
+  static startsWithLetters = (str: string, letters: string) => { // letters = "А-Б"
+    const [start, end] = letters.split("-");
+    if (!end) return str.startsWith(start);
+    return str[0].localeCompare(start) >= 0 && str[0].localeCompare(end) <= 0;
+  }
 
   static needsUpdate(timestamp: number) {
     if (!timestamp) return true;
