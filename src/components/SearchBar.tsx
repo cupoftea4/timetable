@@ -10,11 +10,11 @@ import { TimetableType } from '../utils/types';
 const getSearchBarOptions = (timetableType: TimetableType) => {
   switch (timetableType) {
     case "lecturer":
-      return TimetableManager.getCachedLecturers().map(lecturer => ({id: lecturer, value: lecturer}));
+      return TimetableManager.cachedLecturers.map(lecturer => ({id: lecturer, value: lecturer}));
     case "selective":
-      return TimetableManager.getCachedSelectiveGroups().map(selective => ({id: selective, value: selective}));
+      return TimetableManager.cachedSelectiveGroups.map(selective => ({id: selective, value: selective}));
     case "timetable":
-      return TimetableManager.getCachedGroups().map(group => ({id: group, value: group}));
+      return TimetableManager.cachedGroups.map(group => ({id: group, value: group}));
   }
 }
 
