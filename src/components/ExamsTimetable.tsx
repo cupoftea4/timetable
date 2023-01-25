@@ -25,7 +25,7 @@ const ExamsTimetable: FC<OwnProps> = ({exams}) => {
           </div>
           <h3>{exam.subject}</h3>
           <div>
-            <p>{exam.lecturer}</p>
+            <p>{exam.lecturer.trim().replace(/,$/, '')}</p>
             <TimetableLink urls={exam.urls} type={'lab'} />
           </div>
         </div>

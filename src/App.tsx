@@ -9,6 +9,10 @@ import { Status } from "./utils/types";
 import { ToastContainer as MessageToast } from "react-toastify";
 import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 
+/* TODO:
+  - update partials
+  - add exams and partial timetables to timetable-data
+ */
 
 const App = () => {
   const [status, setStatus] = useState<Status>(Status.Loading);

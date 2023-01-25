@@ -20,7 +20,7 @@ const SavedMenu = () => {
     const cachedGroups = TimetableManager.getCachedTimetables()
     const groups = cachedGroups.slice(Math.max(cachedGroups.length - MAX_SAVED_ITEMS, 0))
                        .map(item => item.group)
-    return groups;
+    return groups.reverse();
   }
 
   const openMenu = () => setIsMenuOpen(true);
