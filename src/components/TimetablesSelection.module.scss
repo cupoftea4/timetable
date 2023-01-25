@@ -20,6 +20,11 @@
   height: fit-content;
   display: grid;
   gap: 1rem;
+  
+  @include timetable-mobile {
+    padding: 0rem;
+  }
+  font-size: $medium-font-size;
 
   button.back {
     justify-self: flex-start;
@@ -29,30 +34,30 @@
       padding: 1rem;
       padding-top: 0;
       li {
-        padding: .25rem 0;
         a {
-          padding: .75rem 0;
+          display: inline-block;
+          padding: .25rem;
+          transition: all .2s ease-in;
+          &:hover {
+            transform: scale(1.05);
+          }
         }
       }
     }
     @include desktop {
       ul {
-        overflow-y: hidden;
-        max-height: 80vh;
-        width: fit-content;
-        &:hover {
-          @include auto-scroll(y, thin);
-        }
+        max-height: $main-height;;
+        @include scroll-on-hover(y, thin, transparent);
       }      
     }
   }
   
   &.with-years {
     grid-template-columns: repeat(2, 1fr);
-    
+    padding: 0 3rem;
     @include timetable-mobile {
-      padding: 0;
       grid-template-columns: 1fr;
+      padding: 0 1rem;
     }
 
     .year {
@@ -75,18 +80,19 @@
 
       li {
         opacity: 0;
+        padding: .125rem;;
         transition: opacity .2s ease-in-out;
         @include desktop {
           @include animated-underline;
         }
+        
       }
-
 
       &.expanded {
         @include expand-year;
       }
 
-      @include desktop {
+      @include can-hover {
         &:hover {
           @include expand-year;
         }
@@ -100,9 +106,7 @@
       flex-wrap: wrap;
       gap: .5rem;
       background-color: $light-accent-clr;
-      // @include background-color('accent');
-      // @include color('text'); 
-      border-radius: 0.675rem;
+      border-radius: $border-radius;
       padding: 1rem;
     }
   }

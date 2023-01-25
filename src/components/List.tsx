@@ -1,13 +1,13 @@
 import React from 'react'
 
-type ListProps = {
+type OwnProps = {
   items: string[],
   selectedState: 
     [string | null, React.Dispatch<React.SetStateAction<string | null>>] 
     | [string | null, ((state: string | null) => void)],
 }
 
-const List = ({items, selectedState}: ListProps) => {
+const List = ({items, selectedState}: OwnProps) => {
   const [selected, onSelect] = selectedState;
   return (
     <ul>

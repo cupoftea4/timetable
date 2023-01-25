@@ -147,9 +147,14 @@ class TimetableManager {
     return data;
   }
 
-  async getPartials(group: string) {
-    return ([HalfTerm.First, HalfTerm.Second] as const)
-      .filter(async (halfTerm) => await this.ifPartialTimetableExists(group, halfTerm));
+  async getPartials(group: string): Promise<HalfTerm[]> {
+    const result: HalfTerm[] = [];
+    const addPartial = async (halfTerm: HalfTerm) => {
+      if (await this.ifPartialTimetableExists(group, halfTerm)) result.push(halfTerm);
+    };
+    await addPartial(HalfTerm.First);
+    await addPartial(HalfTerm.Second);
+    return result;
   }
 
   async getTimetable(group: string, type?: TimetableType, checkCache = true) {

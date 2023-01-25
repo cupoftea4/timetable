@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import TimetablesSelection from "../components/TimetablesSelection";
 import HeaderPanel from "../components/HeaderPanel";
 import TimetableManager from "../utils/TimetableManager";
@@ -12,7 +12,7 @@ import catImage from '../assets/cat.svg';
 
 type OwnProps = {
   timetableType: TimetableType;
-}
+};
 
 const HomePage: FC<OwnProps>  = ({timetableType}) => {
   const [firstLayer, setFirstLayer] = useState<CachedInstitute[]>([]); // institutes/alphabet
@@ -22,10 +22,37 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   const [selectedSecond, setSelectedSecond] = useState<string | null>(null);
 
   const { width } = useWindowDimensions();
-  const isMobile = width < TABLET_SCREEN_BREAKPOINT;
-  const showSecondLayer = !isMobile || !selectedSecond;
+  const isTablet = width < TABLET_SCREEN_BREAKPOINT;
+  const showSecondLayer = !isTablet || !selectedSecond;
   const showFirstLayer = showSecondLayer;
   const showThirdLayer = Boolean(selectedSecond);
+  
+  const getHash = () => decodeURI(window.location.hash.slice(1));
+  const handleHashChange = (newHash: string) => {
+    const hash = decodeURI(window.location.hash.slice(1));
+    if (hash === "") window.history.pushState(newHash, 'custom', `#${newHash}` );
+    if (hash !== newHash) window.history.replaceState(newHash, 'custom', `#${newHash}` );
+  }
+
+  const handleSecondSelect = useCallback((major: string | null) => {
+    setSelectedSecond(major);
+    if (!major) return;
+    handleHashChange(major);
+    handler.handlePromise(TimetableManager.getThirdLayerByType(timetableType, major), 'Fetching timetables...')
+      .then(setThirdLayer)
+      .catch(handler.handleError);
+  }, [timetableType]);
+
+  useEffect(() => {
+    if (secondLayer.includes(getHash())) {
+      handleSecondSelect(getHash());
+    }
+  }, [secondLayer, handleSecondSelect]);
+
+  useEffect(() => {
+      window.onpopstate = () => {setSelectedSecond(null)}
+      return () => {window.onpopstate = null}
+  }, []);
   
   useEffect(() => {
     setThirdLayer([]);
@@ -33,8 +60,8 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
       if (!inst) return;
       if (!TimetableManager.firstLayerItemExists(timetableType, inst)) {
         setSecondLayer([]);
-        setSelectedFirst(null);
         setSelectedSecond(null);
+        setSelectedFirst(null);
         return;
       }
       setSelectedFirst(inst);
@@ -52,13 +79,6 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
     handler.handlePromise(TimetableManager.getSecondLayerByType(timetableType, query), 'Fetching groups...')
       .then(setSecondLayer)
       .catch(handler.handleError);
-    setSelectedSecond(null);
-  };
-
-  const updateGroups = (timetableType: TimetableType, query: string) => {
-    handler.handlePromise(TimetableManager.getThirdLayerByType(timetableType, query), 'Fetching timetables...')
-      .then(setThirdLayer)
-      .catch(handler.handleError);
   };
 
   const handleInstituteChange = (institute: CachedInstitute | null) => {
@@ -67,22 +87,17 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
     updateSecondLayer(timetableType, institute);
   };
 
-  const handleMajorChange = (major: string | null) => {
-    setSelectedSecond(major);
-    if (!major) return;
-    updateGroups(timetableType, major);
-  };
-
   return (
     <>
       <HeaderPanel timetableType={timetableType}/>
       <main>
-        <section className={styles.selection} data-attr={timetableType + "-groups"}>
+        <section className={`${styles.selection} ${isTablet && selectedSecond && styles["one-column"]}`} 
+          data-attr={timetableType + "-groups"}>
           {showFirstLayer &&
               <List items={firstLayer} selectedState={[selectedFirst, handleInstituteChange]} />
           } 
           {showSecondLayer &&
-              <List items={secondLayer} selectedState={[selectedSecond, handleMajorChange]} />
+              <List items={secondLayer} selectedState={[selectedSecond, handleSecondSelect]} />
           }
           {showThirdLayer ?
             <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"}/>

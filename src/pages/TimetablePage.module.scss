@@ -6,6 +6,9 @@
   @include flex-center;
   gap: 1rem;
   flex-wrap: wrap;
+  @include timetable-mobile {
+    width: 100%;
+  }
 }
 
 /* Timetable on mobile */
@@ -17,7 +20,8 @@
       scroll-snap-type: x mandatory;
       max-width: 90vw;
       td, th {
-        min-width: 90vw;
+        $external-padding: calc(env(safe-area-inset-right) + env(safe-area-inset-left) + $main-padding * 2);
+        min-width: min(90vw, 100vw - $external-padding);
         scroll-snap-align: center;
       }
     }

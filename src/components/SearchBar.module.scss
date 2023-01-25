@@ -8,7 +8,7 @@ $icon-size: 1em;
 .bar {
   display: flex;
   align-items: center;
-  font-size: 22px;
+  font-size: $large-font-size;
   width: 22rem;
 
   svg {
@@ -35,13 +35,13 @@ $icon-size: 1em;
       z-index: 1;
       max-height: 300px;
       border: none;
-      font-size: 1.25rem;
+      font-size: $medium-font-size;
       background-color: hsla(0, 0%, 64%, 0.27);
-      border-radius: 2% 2% 2% 0.675rem;
+      border-radius: 2% 2% 2% $border-radius;
       box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
       backdrop-filter: blur(30px);
       -webkit-backdrop-filter: blur(40px);
-      @include auto-scroll(y, thin);
+      @include auto-scroll(y);
       
       mark {
         background-color: $light-accent-clr;

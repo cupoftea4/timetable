@@ -9,16 +9,6 @@ import { Status } from "./utils/types";
 import { ToastContainer as MessageToast } from "react-toastify";
 import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 
-/* TODO:
-  - fix remove saved button on lecturer timetable
-  - webpack cache
-  - add css classes
-  - Themes ?
-  ? Fix jumping of the timetable when switching between subgroups
-  ? Exams timetable icon or any other way to switch between timetables
-  ? smooth horizontal scrolling on mobileS
-  ? backend for caching
- */
 
 const App = () => {
   const [status, setStatus] = useState<Status>(Status.Loading);

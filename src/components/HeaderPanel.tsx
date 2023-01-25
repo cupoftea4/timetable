@@ -17,15 +17,15 @@ const HeaderPanel : FC<OwnProps> = ({timetableType}) => {
   const shouldShrinkSearchBar = useMemo(() => width < TABLET_SCREEN_BREAKPOINT && width > NARROW_SCREEN_BREAKPOINT, [width]);
   const [showSearchBar, setShowSearchBar] = useState(!shouldShrinkSearchBar);
 
-  const toggleSearchBar = () => {
+  const toggleSearchBar = (state = !showSearchBar) => {
     if (shouldShrinkSearchBar) {
-      setShowSearchBar(!showSearchBar);
+      setShowSearchBar(state);
     }
   };
 
   return (
     <header className={styles.header}>
-      <SearchBar toggleSearchBar={toggleSearchBar} timetableType={timetableType} show={showSearchBar} /> 
+      <SearchBar toggleSearchBar={toggleSearchBar} show={showSearchBar} /> 
       {showSearchBar && shouldShrinkSearchBar ?
         null 
         :

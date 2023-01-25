@@ -47,11 +47,19 @@
 }
 
 
-@mixin auto-scroll ($direction: y, $width: auto) {
+@mixin auto-scroll (
+  $direction: y, 
+  $width: auto, 
+  $track-color: vars.$light-accent-clr, 
+  $thumb-color: vars.$light-accent-clr, 
+  $setForFirefox: true
+) {
   overflow-#{$direction}: auto;
   scrollbar-width: $width;
-  scrollbar-color: vars.$light-accent-clr vars.$light-accent-clr;
-
+  @if $setForFirefox {
+    scrollbar-color: $thumb-color $track-color;
+  } 
+  
   $scrollbar-width: .75rem;
   @if $width == thin {
     $scrollbar-width: .325rem;
@@ -63,13 +71,29 @@
   }
   
   &::-webkit-scrollbar-track {
-    background: vars.$light-accent-clr;
+    background: $track-color;
     border-radius: 1rem;
   }
   
   &::-webkit-scrollbar-thumb {
-    background-color: vars.$light-accent-clr;
+    background-color: $thumb-color;
     border-radius: .5rem;
+
+  }
+
+}
+
+
+@mixin scroll-on-hover ($direction: y, $width: auto, $track-color: vars.$light-accent-clr, $thumb-color: vars.$light-accent-clr) {
+  @include can-hover {
+    overflow-#{$direction}: hidden;
+    &:hover {
+      @include auto-scroll($direction, $width, $track-color, $thumb-color);
+    }
+  }
+
+  @include touchscreen {
+    @include auto-scroll($direction, $width, $track-color, $thumb-color, false);
   }
 }
 
@@ -112,6 +136,18 @@
 
 @mixin large-screen {
   @media (min-width: 1600px) {
+      @content;
+  }
+}
+
+@mixin touchscreen {
+  @media (hover: none) {
+      @content;
+  }
+}
+
+@mixin can-hover {
+  @media (hover: hover) {
       @content;
   }
 }

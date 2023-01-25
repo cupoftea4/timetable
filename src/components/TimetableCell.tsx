@@ -1,35 +1,39 @@
-import { memo } from 'react';
+import { FC, memo } from 'react';
 import { useDelayedProp } from '../hooks/useDelayedProp';
 import { TimetableItem } from '../utils/types';
 import styles from './TimetableCell.module.scss';
+import TimetableLink from './TimetableLink';
 
-type TimetableCellProps = {
+type OwnProps = {
   lesson: null | TimetableItem;
   active: boolean;
+  cellSubgroup?: boolean;
 };
 
 const ANIMATION_DURATION = 300;
 
-const TimetableCell = ({lesson, active}: TimetableCellProps) => {
+const TimetableCell: FC<OwnProps> = ({lesson, active, cellSubgroup}) => {
   const [innerLesson, shouldAppear] = useDelayedProp(lesson, ANIMATION_DURATION);
+  const isForBothSubgroups = innerLesson?.isFirstSubgroup && innerLesson?.isSecondSubgroup;
 
   return ( 
     <>
       {innerLesson !== null ? (
-          <td className={`${!shouldAppear ? styles.hide : styles.show} ${active && styles.active}`}>
+          <td className={`${styles['timetable-td']} ${!shouldAppear ? styles.hide : styles.show} ${active && styles.active}`}>
             <div className={`${styles.spacer} ${styles[innerLesson.type]}`}/>
             <div className={`${styles.cell}`} >
               <div className={styles.info}>
-                <span>
+                {cellSubgroup && !isForBothSubgroups  && 
+                  <span className={styles.subgroup}>
+                    {innerLesson.isSecondSubgroup ? "II" : "I"} підгрупа
+                  </span>}
+                <span className={styles.title}>
                   <h4>{innerLesson.subject.replace('`', '’')}</h4> 
-                  {innerLesson.lecturer}
+                  {innerLesson.lecturer.trim().replace(/,$/, '')}
                 </span> 
                 <span>  
                   {innerLesson.location.replaceAll(/,./g, '').trim()} 
-                  {innerLesson.urls[0] && 
-                    <a href={innerLesson.urls[0]} target="_blank" rel="noreferrer"
-                    className={styles[innerLesson.type]}>Приєднатись</a>
-                  }
+                  <TimetableLink urls={innerLesson.urls} type={innerLesson.type} />
                 </span>
               </div>      
             </div>

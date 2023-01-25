@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import { ExamsTimetableItem } from '../utils/types';
 import styles from './ExamsTimetable.module.scss';
+import TimetableLink from './TimetableLink';
 
 type OwnProps = {
   exams: ExamsTimetableItem[]
@@ -25,9 +26,7 @@ const ExamsTimetable: FC<OwnProps> = ({exams}) => {
           <h3>{exam.subject}</h3>
           <div>
             <p>{exam.lecturer}</p>
-            {exam.urls[0] ?
-              <a href={exam.urls[0]} target="_blank" rel="noreferrer">Посилання</a>
-            : null}
+            <TimetableLink urls={exam.urls} type={'lab'} />
           </div>
         </div>
       ))}

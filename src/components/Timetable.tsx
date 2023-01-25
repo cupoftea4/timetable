@@ -1,18 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { TimetableItem } from '../utils/types';
 import TimetableCell from './TimetableCell';
 import styles from './Timetable.module.scss';
 import { getCurrentUADate, stringToDate } from '../utils/date';
 
-type TimetableProps = {
+type OwnProps = {
   timetable: TimetableItem[];
   isSecondSubgroup: boolean;
   isSecondWeek: boolean;
+  cellSubgroup?: boolean;
 };
 
 const MINUTE = 60 * 1000;
 
-const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) => {
+const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cellSubgroup}) => {
   const maxLessonNumber = useMemo(() => 
     timetable?.reduce((max, item) => item.number > max ? item.number : max, 0) || 0, 
   [timetable]);
@@ -51,15 +52,16 @@ const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) 
     return () => clearInterval(id);
   }, [getCurrentLessonNumber]);
 
+  const forBothSubgroups = (item: TimetableItem) => item.isFirstSubgroup && item.isSecondSubgroup;
+  const forAllWeeks = (item: TimetableItem) => item.isFirstWeek && item.isSecondWeek;
+
   const getLessonByDayAndTime = (number: number, day: number) => {
     if (!timetable) return null;
     return timetable.find(item => 
       item.day === day &&
       item.number === number &&
-      ((item.isSecondSubgroup === isSecondSubgroup && item.isFirstSubgroup === !isSecondSubgroup) ||
-        (item.isFirstSubgroup && item.isSecondSubgroup)) &&
-      ((item.isSecondWeek === isSecondWeek && item.isFirstWeek === !isSecondWeek) ||
-        (item.isFirstWeek && item.isSecondWeek))
+      (cellSubgroup || item.isSecondSubgroup === isSecondSubgroup || forBothSubgroups(item)) &&
+      (item.isSecondWeek === isSecondWeek || forAllWeeks(item))
     ) ?? null;
   };
 
@@ -84,7 +86,9 @@ const Timetable = ({timetable, isSecondSubgroup, isSecondWeek}: TimetableProps) 
                     : <TimetableCell 
                           lesson={getLessonByDayAndTime(i + 1, j)} 
                           active={currentLessonNumber === i && currentDay === j} 
-                          key={time.start + day}/>
+                          key={time.start + day}
+                          cellSubgroup={cellSubgroup}
+                    />
                 )
               }</tr>  
             )

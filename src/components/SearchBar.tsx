@@ -6,34 +6,35 @@ import 'react-datalist-input/dist/styles.scss';
 import TimetableManager from '../utils/TimetableManager';
 import { useNavigate } from 'react-router-dom';
 import { TimetableType } from '../utils/types';
+import useOnClickOutside from '../hooks/useOnOutsideClick';
 
-const getSearchBarOptions = (timetableType: TimetableType) => {
-  switch (timetableType) {
-    case "lecturer":
-      return TimetableManager.cachedLecturers.map(lecturer => ({id: lecturer, value: lecturer}));
-    case "selective":
-      return TimetableManager.cachedSelectiveGroups.map(selective => ({id: selective, value: selective}));
-    case "timetable":
-      return TimetableManager.cachedGroups.map(group => ({id: group, value: group}));
-  }
+const getSearchBarOptions = () => {
+  return (
+    TimetableManager.cachedGroups.map(group => ({id: group + '-student', value: group}))
+  ).concat(
+    TimetableManager.cachedSelectiveGroups.map(selective => ({id: selective + '-selective', value: selective}))
+  ).concat(
+    TimetableManager.cachedLecturers.map(lecturer => ({id: lecturer + '-lecturer', value: lecturer}))
+  )
 }
 
 type OwnProps = {
-  toggleSearchBar: Function;
-  timetableType: TimetableType;
+  toggleSearchBar: (state?: boolean) => void;
+  timetableType?: TimetableType;
   show: boolean;
 }
 
-const SearchBar: FC<OwnProps> = ({toggleSearchBar, timetableType, show}) => {
-  const options = getSearchBarOptions(timetableType);;
+const SearchBar: FC<OwnProps> = ({toggleSearchBar, show}) => {
+  const options = getSearchBarOptions();;
   const navigate = useNavigate();
+  const ref = useOnClickOutside(() => toggleSearchBar(false));
 
   return (
-    <span className={`${styles.bar} ${!show && styles['hidden-search']}`}>
+    <span className={`${styles.bar} ${!show && styles['hidden-search']}`} ref={ref}>
       <SearchIcon onClick={() => toggleSearchBar()}/>
       <span className={styles.search}>
         <DatalistInput
-          placeholder={timetableType === "lecturer" ? "Викладач" : "Група"}
+          placeholder={"Розклад..."}
           label=""
           onSelect={item => navigate(`/${item.value}`)}
           items={options}

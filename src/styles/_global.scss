@@ -13,39 +13,25 @@
   @include large-screen {
     $max-content-width: 120rem;
   }
+  
+  @include auto-scroll(y, auto, transparent, $light-accent-clr, false);
+  overflow: overlay; // deprecated :(
 }
 
 body {
   background: $bg-theme-dark-1;
-  // font-family: 'Roboto Flex', sans-serif;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   font-family: 'Ubuntu', sans-serif;
   
   font-weight: $regular-font;
   
   @media screen and (prefers-color-scheme: dark) {
-    // background: $bg-theme-dark-1;
     background: $bg-theme-dark-1;
-    // background: $bg-theme-light-2;
-    // background: $bg-theme-light-3;
-    // background: $bg-theme-light-4;
-    // background: $bg-theme-light-5;
-    // background: $bg-theme-light-6;
-    // $light-accent-clr: rgba(0, 0, 0, 0.108);
-    // $text-clr: rgb(31, 31, 31);
-    // color: $text-clr;
   }
   color: $text-clr;
   main {
     @include flex-center;
-    padding: 1rem;
+    padding: $main-padding;
   }
 }
-
-// * {
-//   @media screen and (prefers-color-scheme: dark) {
-//     $light-accent-clr: rgba(0, 0, 0, 0.108);
-//     $text-clr: rgb(31, 31, 31);
-//   }
-
-// }
 

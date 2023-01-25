@@ -23,15 +23,5 @@
     &.active {
       background-color: $light-accent-clr;
     }
-    a {
-      font-size: $small-font-size;
-      padding: 0.1875em 0.375em; 
-      width: fit-content;
-      border-radius: 1rem;
-      background-color: $timetable-lab-clr;
-      &:hover {
-        background-color: $timetable-lab-hover-clr;
-      }
-    }
   }  
 }

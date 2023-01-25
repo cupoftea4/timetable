@@ -13,8 +13,12 @@
   a {
     padding: .25rem .75rem;
     border-radius: 1rem;
+    transition: all .2s ease-in-out;
     &.active {
       @include light-pillow-button;
+    }
+    &:hover:not(.active ) {
+      transform: scale(1.1);
     }
   }
 }

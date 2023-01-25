@@ -1,0 +1,86 @@
+@use '../styles/variables' as *;
+
+.links {
+  position: relative;
+  button {
+    color: $text-clr;
+    padding: 0.25em 0.5em;
+    border-radius: .5rem;
+  }
+  .dropdown {
+    position: absolute;
+    animation: show-menu 0.1s ease-in-out;
+    background-color: $light-accent-clr;
+    backdrop-filter: blur(20px);
+    z-index: 100;
+    border-radius: 0.5rem;
+    li {
+      &:hover {
+        background-color: $light-accent-clr;
+      }
+      &:first-child {
+        border-radius: 0.5rem 0.5rem 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 0.5rem 0.5rem;
+      }
+    }
+    li a {
+      padding: .5rem;
+      z-index: 200;
+      background-color: transparent;
+      border-radius: 0;
+    }
+  }
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: $small-font-size;
+  cursor: pointer;
+  padding: 0.25em 0.5em; 
+  border-radius: 1rem;
+  color: $text-clr;
+  svg {
+    width: 1rem;
+    height: auto;
+  }
+}
+
+.lecture, .lection {
+  background-color: $timetable-lect-clr;
+}
+
+.lab {
+  background-color: $timetable-lab-clr;
+}
+
+.practical {
+  background-color: $timetable-pract-clr;
+}
+
+a, button {
+  &.lection:hover, &.lecture:hover {
+    background-color: $timetable-lect-hover-clr;
+  }
+  &.lab:hover {
+    background-color: $timetable-lab-hover-clr;
+  }
+  &.practical:hover {
+    background-color: $timetable-pract-hover-clr;
+  }
+}
+
+
+@keyframes show-menu {
+  0% {
+    opacity: 0;
+    transform: translateY(.5rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

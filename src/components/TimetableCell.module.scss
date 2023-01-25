@@ -2,10 +2,11 @@
 @use '../styles/mixins' as *;
 
 $spacer-width: 0.5rem;
+$min-cell-height: 5rem;
+$max-cell-width: 17rem;
 
-td {
+.timetable-td {
   position: relative;
-
   .spacer {
     position: absolute;
     top: 0;
@@ -14,75 +15,61 @@ td {
   }
 
   &.show {
-    animation: appear 300ms ease-in-out forwards;
+    animation: appear 300ms ease-in-out; // overlaps links dropdown with forwards :/
   }
-
   &.hide {
-    animation: disappear 300ms ease-in-out forwards;
-  }
-}
-
-.active {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.cell {
-  display: flex;
-  min-height: 5rem;
-  max-width: 16rem;
-  position: relative;
-
-  @include timetable-mobile {
-    max-width: initial;
+    animation: disappear 300ms ease-in-out forwards; // flickers without forwards :/
   }
 
-  .info {
+  .cell {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: .5rem;
-    width: 100%;
-    margin-left: $spacer-width;
-    /* Name and lecturer */
-    > :first-child {
-      font-size: $small-font-size;
-      line-height: 1.4;
-      h4 {
-        font-weight: $semi-bold-font;
-      }      
+    min-height: $min-cell-height;
+    max-width: $max-cell-width;
+    position: relative;
+  
+    @include timetable-mobile {
+      max-width: initial;
     }
-    /* Type and link */
-    > :last-child {
+  
+    .info {
       display: flex;
-      justify-content: space-between;
-      font-size: $small-font-size;
-      color: $extra-text-clr;
-      flex-wrap: wrap;
-      gap: .5rem;
-      padding-right: .25rem;
-      line-height: normal;
-
-      a {
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0 .5rem;
+      width: 100%;
+      margin-left: $spacer-width;
+      > :first-child {
+        margin-top: .325rem;
+      }
+      .subgroup {
         font-size: $small-font-size;
-        cursor: pointer;
-        padding: 0.1875em 0.375em; 
-        width: fit-content;
-        border-radius: 1rem;
-        color: $text-clr;
-        &.lection:hover, .lecture:hover {
-          background-color: $timetable-lect-hover-clr;
-        }
-        &.lab:hover {
-          background-color: $timetable-lab-hover-clr;
-        }
-        &.practical:hover {
-          background-color: $timetable-pract-hover-clr;
-        }
+        color: $extra-text-clr;
+      }
+      /* Name and lecturer */
+      .title {
+        font-size: $small-font-size;
+        line-height: 1.4;
+        h4 {
+          font-weight: $semi-bold-font;
+        }      
+      }
+      /* Type and link */
+      > :last-child {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: .325rem;
+        font-size: $small-font-size;
+        color: $extra-text-clr;
+        padding-right: .25rem;
+        line-height: normal;
       }
     }
-    
   }
-
+  td.active {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
 }
 
 .lecture, .lection {
@@ -96,6 +83,8 @@ td {
 .practical {
   background-color: $timetable-pract-clr;
 }
+
+
 
 @keyframes appear {
   0% {

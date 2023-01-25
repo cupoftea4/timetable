@@ -7,6 +7,8 @@
   @include flex-center;
 }
 
+$icon-size: 0.875rem;
+
 .saved-menu {
   animation: show-menu 0.1s ease-in-out forwards;
   position: absolute;
@@ -20,7 +22,7 @@
     width: 13rem;
   }
   background-color: hsla(0, 0%, 64%, 0.27);
-  border-radius: 0.675rem;
+  border-radius: $border-radius;
   box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
@@ -51,12 +53,11 @@
         display: none;
       }
       &:hover .remove {
-
         position: absolute;
         right: 1.5rem;
         display: block;
-        width: 0.875rem;
-        height: 0.875rem;
+        width: $icon-size;
+        height: $icon-size;
         transition: all 0.2s ease-in-out;
         &:hover, &:focus {
           outline: none;
@@ -72,10 +73,12 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        width: calc(100% - $icon-size - .5rem);
       }
       .check-mark {
-        width: 1rem;
-        height: 1rem;
+        width: $icon-size;
+        min-width: $icon-size;
+        height: $icon-size  ;
       }
     }
   }

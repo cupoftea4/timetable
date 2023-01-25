@@ -1,11 +1,12 @@
+import { FC } from 'react';
 import styles from './Toggle.module.scss';
 
-type ToggleProps = {
+type OwnProps = {
   toggleState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
   states: [string, string];
 };
 
-const Toggle = ({toggleState, states}: ToggleProps) => {
+const Toggle: FC<OwnProps> = ({toggleState, states}) => {
   const [active, setActive] = toggleState;
   
   const toggle = () => setActive(!active);

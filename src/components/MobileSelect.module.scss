@@ -20,7 +20,7 @@
     background-color: $light-accent-clr;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-radius: 0.675rem 0.675rem 0 0;
+    border-radius: $border-radius $border-radius 0 0;
     padding: .5rem 0;
     li {
       font-size: $medium-font-size;

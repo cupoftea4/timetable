@@ -4,9 +4,9 @@ $dark-accent-clr: hsla(0, 0%, 26%, 0.23);
 $timetable-lect-clr: rgb(45, 155, 233);
 $timetable-lect-hover-clr: hsl(205, 100%, 64%);
 $timetable-lab-clr: rgb(231, 129, 56);
-$timetable-lab-hover-clr: hsl(25, 100%, 66%);
-$timetable-pract-clr: rgb(151, 106, 179);
-$timetable-pract-hover-clr: rgb(153, 112, 179);
+$timetable-lab-hover-clr: hsl(25, 100%, 64%);
+$timetable-pract-clr: hsl(277, 32%, 56%);
+$timetable-pract-hover-clr: hsl(277, 32%, 64%);
 
 $text-clr: hsla(0, 0%, 100%, 1);
 $extra-text-clr: hsla(0, 0%, 100%, 0.8);
@@ -19,7 +19,9 @@ $bg-theme-light-2: linear-gradient(45deg, hsl(292, 64%, 53%), hsl(212, 98%, 63%)
 $bg-theme-light-3: linear-gradient(110deg, hsl(227, 47%, 34%), hsl(0, 31%, 58%));
 $bg-theme-light-4: linear-gradient(145deg, #9B3838, #292F6A);
 // $bg-theme-light-5: linear-gradient(45deg, hsl(315, 78%, 68%), hsl(212, 38%, 63%), hsl(130, 79%, 57%));
-// $bg-theme-light-6: linear-gradient(110deg, hsl(41, 73%, 54%), hsl(0, 31%, 58%));;
+// $bg-theme-light-6: linear-gradient(110deg, hsl(41, 73%, 54%), hsl(0, 31%, 58%));
+
+$border-radius: .625rem;
 
 $thin-font: 300;
 $regular-font: 400;
@@ -31,6 +33,9 @@ $medium-font-size: 1.25rem;
 $large-font-size: 1.5rem;
 
 $max-content-width: 100rem;
+$main-height: 80vh;
+$main-padding: 1rem;
+
 $header-icon-size: 2.325rem;
 
 $spin-animation: spin 2s ease-in-out infinite reverse;

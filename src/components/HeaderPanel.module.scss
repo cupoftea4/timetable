@@ -7,6 +7,7 @@
   padding: 2rem 4rem .75rem 4rem;
   @include tablet {
     padding: 2rem 2.5rem .75rem 2.5rem;
+    gap: .5rem;
   }
   display: flex;
   justify-content: space-between;
@@ -21,9 +22,7 @@
     justify-content: center;
     button.exams {
       @include light-pillow-button;
-      border-radius: .625rem;
-      align-self: flex-end;
-      margin-bottom: .425rem;
+      border-radius: $border-radius;
     }
 
     svg {
@@ -38,6 +37,7 @@
       font-size: 2rem;
       font-weight: $semi-bold-font;
       color: $text-clr;
+      text-align: center;
     }
   }
 }

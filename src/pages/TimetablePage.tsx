@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import LoadingPage from './LoadingPage';
 import headerStyles from '../components/HeaderPanel.module.scss';
@@ -12,6 +12,7 @@ import styles from './TimetablePage.module.scss';
 import { getCurrentUADate, getNULPWeek } from '../utils/date';
 import * as handler from '../utils/requestHandler';
 import ExamsTimetable from '../components/ExamsTimetable';
+import TimetablePartials from '../components/TimetablePartials';
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => { // yeah, naming! :)
   const width = el.getBoundingClientRect().width;
@@ -43,6 +44,8 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
 
   const isLoading = isExamsTimetable ? !examsTimetable : !timetable;
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
+  const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
+  const isLecturers = timetableType === 'lecturer';
 
     
   const getTimetable = (group: string, exams: boolean, type?: TimetableType, checkCache: boolean = true) => {
@@ -64,17 +67,15 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
 
   useEffect(
     () => {
-      const type = TimetableManager.tryToGetType(group);
-      if (!type) {
+      if (!timetableType) {
         handler.handleError(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
         setTimetableGroup(null);
         return;
       }  
-      // selective group doesn't have exams timetable
-      if (type === 'selective' && isExamsTimetable) navigate('/' + group);
+      if (timetableType === 'selective' && isExamsTimetable) navigate('/' + group);
       setTimetableGroup(group);
-      handler.handlePromise(getTimetable(group, isExamsTimetable, type));
-    }, [group, isExamsTimetable, navigate]);
+      handler.handlePromise(getTimetable(group, isExamsTimetable, timetableType));
+    }, [group, isExamsTimetable, navigate, timetableType]);
   
   useEffect(() => {
     if (isExamsTimetable || !timetable) return;
@@ -96,6 +97,11 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     navigate('/' + group + (isExams ? '/exams' : ''));
   };
 
+  const getPartialTimetable = (partial: HalfTerm | 0) => {
+    if (partial === 0) return updateTimetable(true);
+    handler.handlePromise(TimetableManager.getPartialTimetable(group, partial).then(setTimetable));
+  };
+
   return (
     <>
       {timetableGroup !== null ? 
@@ -107,8 +113,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                 <SavedMenu />
                 <h1>{timetableGroup}</h1>
                 {
-                  // selective or lecturer groups don't have exams timetable
-                  TimetableManager.tryToGetType(group) !== 'selective' &&
+                  timetableType !== 'selective' &&
                     <button
                       className={headerStyles.exams}
                       title={isExamsTimetable ? "Переключити на розклад пар" : "Переключити на розклад екзаменів"} 
@@ -118,20 +123,17 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                     </button>
                 }
                 {
-                  !isExamsTimetable && partials.length > 0 &&
-                    <ul>
-                      {partials.map((partial, i) =>
-                        <li key={i} value={partial}>{partial}</li>
-                      )}
-                    </ul>
+                  !isExamsTimetable && 
+                    <TimetablePartials partials={partials} handlePartialClick={getPartialTimetable} />
                 }
               </nav>
               <span className={styles.params}>
                 {!isExamsTimetable &&
                     <>
+                      {!isLecturers && 
                       <Toggle 
                         toggleState={[isSecondSubgroup, changeIsSecondSubgroup]} 
-                        states={["I підгрупа", "II підгрупа"]} />
+                        states={["I підгрупа", "II підгрупа"]} />}
                       <Toggle 
                         toggleState={[isSecondWeek, setIsSecondWeek]} 
                         states={['По чисельнику', 'По знаменнику']} />
@@ -145,7 +147,8 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                   ? <Timetable 
                       timetable={timetable ?? []} 
                       isSecondWeek={isSecondWeek} 
-                      isSecondSubgroup={isSecondSubgroup} 
+                      isSecondSubgroup={isSecondSubgroup}
+                      cellSubgroup={isLecturers} 
                     /> 
                   : examsTimetable?.length === 0 
                         ? <p>Розклад екзаменів пустий</p>
