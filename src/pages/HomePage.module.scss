@@ -42,6 +42,12 @@ $lecturers-second-layer-width: 20rem;
       @include scroll-on-hover(y, thin, transparent);
     }
     overflow: hidden;
+    &:nth-child(1) li { // first layer list items
+      max-width: calc(var(--first-layer-width) - var(--scrollbar-width, 0)); 
+    }
+    &:nth-child(2) li { // second layer list items
+      max-width: calc(var(--second-layer-width) - var(--scrollbar-width, 0)); 
+    }
     
     li {
       @include fade-in-animation(0.3s);
@@ -51,7 +57,6 @@ $lecturers-second-layer-width: 20rem;
       button {
         word-wrap: break-word;
         width: 100%;
-        max-width: calc(var(--second-layer-width) - var(--scrollbar-width, 0)); 
         padding: .1em .5em;  
         font-weight: 700;
         text-align: left;
@@ -79,12 +84,17 @@ $lecturers-second-layer-width: 20rem;
 
   .no-selection {
     padding-left: calc($lecturers-second-layer-width - $second-layer-width);
+
+    &:nth-child(2) { // there's no second layer
+      padding-left: 0;
+      grid-column: 2 / 4;
+    }
     padding-top: 3rem;
     @include tablet {
       display: none;
     }
-    height: 70vh;
-    height: 70dvh;
+    height: 65vh;
+    height: 65dvh;
     @include flex-center;
     flex-direction: column;
     img {

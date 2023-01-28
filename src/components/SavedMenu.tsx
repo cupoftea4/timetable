@@ -30,7 +30,7 @@ const SavedMenu = () => {
   const deleteItem = (index: number) => {
     TimetableManager.deleteTimetable(savedGroups[index]).then(
       () => setSavedGroups(getCachedGroups())
-    ).catch((e) => handler.handleError(e, handler.DELETE_TIMETABLE_ERROR));
+    ).catch((e) => handler.error(e, handler.DELETE_TIMETABLE_ERROR));
   };
 
   const arrowNavigation = (e: React.KeyboardEvent<HTMLDivElement>) => {

@@ -23,8 +23,8 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
 
   const { width } = useWindowDimensions();
   const isTablet = width < TABLET_SCREEN_BREAKPOINT;
-  const showSecondLayer = !isTablet || !selectedSecond;
-  const showFirstLayer = showSecondLayer;
+  const showFirstLayer = (!isTablet || !selectedSecond);
+  const showSecondLayer = showFirstLayer && secondLayer.length > 0;
   const showThirdLayer = Boolean(selectedSecond);
   
   const getHash = () => decodeURI(window.location.hash.slice(1));
@@ -38,9 +38,9 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
     setSelectedSecond(major);
     if (!major) return;
     handleHashChange(major);
-    handler.handlePromise(TimetableManager.getThirdLayerByType(timetableType, major), 'Fetching timetables...')
+    handler.promise(TimetableManager.getThirdLayerByType(timetableType, major), 'Fetching timetables...')
       .then(setThirdLayer)
-      .catch(handler.handleError);
+      .catch(handler.error);
   }, [timetableType]);
 
   useEffect(() => {
@@ -56,6 +56,12 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   
   useEffect(() => {
     setThirdLayer([]);
+    handler.promise(
+      TimetableManager.getFirstLayerSelectionByType(timetableType), 
+      "Fetching institutes...")
+    .then(setFirstLayer)
+    .catch(handler.error);
+
     TimetableManager.getLastOpenedInstitute().then((inst) => {
       if (!inst) return;
       if (!TimetableManager.firstLayerItemExists(timetableType, inst)) {
@@ -67,18 +73,15 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
       setSelectedFirst(inst);
       updateSecondLayer(timetableType, inst);        
     });
-    TimetableManager.getFirstLayerSelectionByType(timetableType)
-      .then(setFirstLayer)
-      .catch(handler.handleError);
     // BUG: In strict mode it kinda ruins nonexisting group error toast
     return () => handler.hideAllMessages();
   }, [timetableType]);
 
   const updateSecondLayer = (timetableType: TimetableType, query: string) => {
     TimetableManager.updateLastOpenedInstitute(query);   
-    handler.handlePromise(TimetableManager.getSecondLayerByType(timetableType, query), 'Fetching groups...')
+    handler.promise(TimetableManager.getSecondLayerByType(timetableType, query), 'Fetching groups...')
       .then(setSecondLayer)
-      .catch(handler.handleError);
+      .catch(handler.error);
   };
 
   const handleInstituteChange = (institute: CachedInstitute | null) => {

@@ -44,18 +44,10 @@ class TimetableManager {
   private lecturers: string[] = [];
 
   async init() {
-    const type = window.location.pathname.split("/").at(-1);
-
     // request data from server if needed
     this.groups = await this.getData(GROUPS, parser.getGroups);
     this.selectiveGroups = await this.getData(SELECTIVE_GROUPS, parser.getSelectiveGroups);
     this.lecturers = await this.getData(LECTURERS, parser.getLecturers);
-
-    // not essential data for first paint
-    this.getData(INSTITUTES, parser.getInstitutes).then(data => this.institutes = data);
-    if (type === "lecturer") 
-      this.getData(DEPARTMENTS, parser.getLecturerDepartments)
-        .then(data => this.departments = data);
 
     // cache only data
     this.timetables = (await storage.getItem(TIMETABLES)) || [];
@@ -326,12 +318,13 @@ class TimetableManager {
   
   private async getData<T>(cacheKey: string, parserFn: (...params: any[]) => Promise<T>, ...parserArgs: any[]) {
     const cached = await this.getFromCache<T>(cacheKey);
-    if (cached) return cached;
+    if (Array.isArray(cached) && cached.length > 0) return cached;
+    if (!Array.isArray(cached) && cached) return cached;
 
     console.log("Getting data from server", cacheKey);
-    const data = await parserFn.call(parser, ...parserArgs);
+    const data: T = await parserFn.call(parser, ...parserArgs);
     this.updateCache(cacheKey, data);
-    return data as T;
+    return data;
   }
 
   private async getFromCache<T>(key: string) {

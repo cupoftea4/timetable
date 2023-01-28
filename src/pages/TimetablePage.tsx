@@ -50,7 +50,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     
   const getTimetable = (group: string, exams: boolean, type?: TimetableType, checkCache: boolean = true) => {
     const onCatch = (e: string) => {
-      handler.handleError(e);
+      handler.error(e);
       setTimetableGroup(null);
     };
     if (exams) return TimetableManager.getExamsTimetable(group, type, checkCache)
@@ -68,13 +68,13 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   useEffect(
     () => {
       if (!timetableType) {
-        handler.handleError(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
+        handler.error(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
         setTimetableGroup(null);
         return;
       }  
       if (timetableType === 'selective' && isExamsTimetable) navigate('/' + group);
       setTimetableGroup(group);
-      handler.handlePromise(getTimetable(group, isExamsTimetable, timetableType));
+      handler.promise(getTimetable(group, isExamsTimetable, timetableType));
     }, [group, isExamsTimetable, navigate, timetableType]);
   
   useEffect(() => {
@@ -86,11 +86,11 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     if (typeof isSecond === 'function') isSecond = isSecond(isSecondSubgroup);
     setIsSecondSubgroup(isSecond);
     TimetableManager.updateSubgroup(group, isSecond ? 2 : 1)
-      ?.catch(e => handler.handleError(e, handler.UPDATE_SUBGROUP_ERROR));
+      ?.catch(e => handler.error(e, handler.UPDATE_SUBGROUP_ERROR));
   };
 
   const updateTimetable = (checkCache = false) => {
-    handler.handlePromise(getTimetable(group, isExamsTimetable, undefined, checkCache));
+    handler.promise(getTimetable(group, isExamsTimetable, undefined, checkCache));
   };
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
@@ -99,7 +99,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
 
   const getPartialTimetable = (partial: HalfTerm | 0) => {
     if (partial === 0) return updateTimetable(true);
-    handler.handlePromise(TimetableManager.getPartialTimetable(group, partial).then(setTimetable));
+    handler.promise(TimetableManager.getPartialTimetable(group, partial).then(setTimetable));
   };
 
   return (

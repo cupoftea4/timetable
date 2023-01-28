@@ -23,7 +23,7 @@ const App = () => {
         .then(() => setStatus(Status.Idle))
         .catch((e) => {
           setStatus(Status.Failed);
-          handler.handleError(e, handler.INIT_ERROR + ". Try again or use another browser.");
+          handler.error(e, handler.INIT_ERROR + ". Try again or use another browser.");
         });
     }, []
   );

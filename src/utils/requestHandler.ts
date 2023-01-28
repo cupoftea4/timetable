@@ -32,12 +32,12 @@ export const INIT_ERROR = getRandomValue(initErrors);
 export const NONEXISTING_GROUP = getRandomValue(nonexistingGroupErrors);
 export const NONEXISTING_TIMETABLE = "This timetable does not exist";
 
-export function handleError(error: string, userError: string = FETCH_ERROR) {
+export function error(error: string, userError: string = FETCH_ERROR) {
   console.error("[Handler] " + error);
   showErrorToast(userError);
 }
 
-export function handlePromise<T>(promise: Promise<T>, pending: string = FETCH_PENDING, error?: string) {
+export function promise<T>(promise: Promise<T>, pending: string = FETCH_PENDING, error?: string) {
   const params = error ? {pending, error} : {pending};
   showPromiseToast(promise, params);
   return promise;

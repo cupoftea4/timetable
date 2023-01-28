@@ -20,6 +20,7 @@ class TimetableParser {
 									.map(child => (child as HTMLInputElement).value)
 									.filter(inst => inst !== "All")
 									.sort((a, b) => a.localeCompare(b));
+			if (institutes.length === 0) throw new Error("No institutes found");
 			return institutes;
 		}).catch(async err => {
 			return await this.fetchFromFallback("institutes.json") as string[];
@@ -33,6 +34,7 @@ class TimetableParser {
 								.map(child => (child as HTMLInputElement).value)
 								.filter(inst => inst !== "All")
 								.sort((a, b) => a.localeCompare(b));
+			if (groups.length === 0) throw new Error("No groups found");
 			return groups;
 		}).catch(async err => {
 			const fallbackPath = institute ? `institutes/${institute}.json` : `groups.json`;
@@ -47,6 +49,7 @@ class TimetableParser {
 								.map(child => (child as HTMLInputElement).value)
 								.filter(group => group !== "All")
 								.sort((a, b) => a.localeCompare(b));
+			if (groups.length === 0) throw new Error("No groups found");
 			return groups;
 		}).catch(async err => {
 			const fallback = 'selective/groups.json';
@@ -61,12 +64,15 @@ class TimetableParser {
 									.map(child => (child as HTMLInputElement).value)
 									.filter(inst => inst !== "All")
 									.sort((a, b) => a.localeCompare(b));
-			
+			if (lecturers.length === 0) throw new Error("No institutes found");
 			return lecturers;
 		}).catch(async err => {
-			const fallbackPath = "lecturers/" + (department ?  "grouped.json" : "all.json");
-			const data = await this.fetchFromFallback(fallbackPath);
-			return (department ? data[department] : data) as string[];
+			if (department) {
+				const data: Record<string, string[]> = await this.fetchFromFallback("lecturers/grouped.json");
+				return data[department] ?? [];
+			}
+			const data: string[] = await this.fetchFromFallback("lecturers/all.json");
+			return ([...new Set(data)] ).sort((a, b) => a.localeCompare(b))
 		});
 	}
 
@@ -77,6 +83,7 @@ class TimetableParser {
 				.map(child => (child as HTMLInputElement).value)
 				.filter(depart => depart !== "All")
 				.sort((a, b) => a.localeCompare(b));
+			if (departments.length === 0) throw new Error("No institutes found");
 			return departments;
 		}).catch(async () => {
 			const fallback = `lecturers/departments.json`;
@@ -129,6 +136,7 @@ class TimetableParser {
 				const content = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
 				const exams = Array.from(content?.children ?? [])
 									.map(this.parseExam)
+				if (exams.length === 0) throw Error("Exams timetable is empty");
 				return exams;
 			})
 			.catch(async err => {
@@ -147,7 +155,9 @@ class TimetableParser {
 			const table = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
 			if (!table) throw Error("No table found");
 			const days = Array.from(table.children);
-			return days.map((day) => this.parseDay(day)).flat(1);
+			const timetable = days.map((day) => this.parseDay(day)).flat(1);
+			if (timetable.length === 0) throw Error("Timetable is empty");
+			return timetable;
 	}
 	
 	
