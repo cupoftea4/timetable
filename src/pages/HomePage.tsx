@@ -2,7 +2,7 @@ import { FC, useCallback, useEffect, useState } from "react";
 import TimetablesSelection from "../components/TimetablesSelection";
 import HeaderPanel from "../components/HeaderPanel";
 import TimetableManager from "../utils/TimetableManager";
-import { CachedInstitute, TimetableType } from "../utils/types";
+import { TimetableType } from "../utils/types";
 import styles from "./HomePage.module.scss";
 import useWindowDimensions from "../hooks/useWindowDimensions";
 import List from "../components/List";
@@ -14,11 +14,18 @@ type OwnProps = {
   timetableType: TimetableType;
 };
 
+const getHash = () => decodeURI(window.location.hash.slice(1));
+const handleHashChange = (newHash: string) => {
+  const hash = decodeURI(window.location.hash.slice(1));
+  if (hash === "") window.history.pushState(newHash, 'custom', `#${newHash}` );
+  if (hash !== newHash) window.history.replaceState(newHash, 'custom', `#${newHash}` ); 
+}
+
 const HomePage: FC<OwnProps>  = ({timetableType}) => {
-  const [firstLayer, setFirstLayer] = useState<CachedInstitute[]>([]); // institutes/alphabet
+  const [firstLayer, setFirstLayer] = useState<string[]>([]); // institutes/alphabet
   const [secondLayer, setSecondLayer] = useState<string[]>([]); // majors/departments/selective
   const [thirdLayer, setThirdLayer] = useState<string[]>([]); // groups/lecturers
-  const [selectedFirst, setSelectedFirst] = useState<CachedInstitute | null>(null);
+  const [selectedFirst, setSelectedFirst] = useState<string | null>(null);
   const [selectedSecond, setSelectedSecond] = useState<string | null>(null);
 
   const { width } = useWindowDimensions();
@@ -27,12 +34,6 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   const showSecondLayer = showFirstLayer && secondLayer.length > 0;
   const showThirdLayer = Boolean(selectedSecond);
   
-  const getHash = () => decodeURI(window.location.hash.slice(1));
-  const handleHashChange = (newHash: string) => {
-    const hash = decodeURI(window.location.hash.slice(1));
-    if (hash === "") window.history.pushState(newHash, 'custom', `#${newHash}` );
-    if (hash !== newHash) window.history.replaceState(newHash, 'custom', `#${newHash}` );
-  }
 
   const handleSecondSelect = useCallback((major: string | null) => {
     setSelectedSecond(major);
@@ -84,7 +85,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
       .catch(handler.error);
   };
 
-  const handleInstituteChange = (institute: CachedInstitute | null) => {
+  const handleInstituteChange = (institute: string | null) => {
     setSelectedFirst(institute);
     if (!institute) return;
     updateSecondLayer(timetableType, institute);
@@ -97,10 +98,10 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
         <section className={`${styles.selection} ${isTablet && selectedSecond && styles["one-column"]}`} 
           data-attr={timetableType + "-groups"}>
           {showFirstLayer &&
-              <List items={firstLayer} selectedState={[selectedFirst, handleInstituteChange]} />
+            <List items={firstLayer} selectedState={[selectedFirst, handleInstituteChange]} />
           } 
           {showSecondLayer &&
-              <List items={secondLayer} selectedState={[selectedSecond, handleSecondSelect]} />
+            <List items={secondLayer} selectedState={[selectedSecond, handleSecondSelect]} />
           }
           {showThirdLayer ?
             <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"}/>

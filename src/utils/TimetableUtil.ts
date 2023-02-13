@@ -1,6 +1,6 @@
 import { TimetableType } from "./types";
 
-const UPDATE_PERIOD = 3 * 24 * 60 * 60 * 1000; // 3 days
+const UPDATE_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 
 export default class TimetableUtil {
   static getGroupName(group: string, timetableType: TimetableType) {

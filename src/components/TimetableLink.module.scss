@@ -3,20 +3,20 @@
 .links {
   position: relative;
   button {
-    color: $text-clr;
+    color: var(--text-clr);
     padding: 0.25em 0.5em;
     border-radius: .5rem;
   }
   .dropdown {
     position: absolute;
     animation: show-menu 0.1s ease-in-out;
-    background-color: $light-accent-clr;
+    background: var(--accent-clr);
     backdrop-filter: blur(20px);
     z-index: 100;
     border-radius: 0.5rem;
     li {
       &:hover {
-        background-color: $light-accent-clr;
+        background: var(--accent-clr);
       }
       &:first-child {
         border-radius: 0.5rem 0.5rem 0 0;
@@ -42,7 +42,7 @@
   cursor: pointer;
   padding: 0.25em 0.5em; 
   border-radius: 1rem;
-  color: $text-clr;
+  color: var(--text-clr);
   svg {
     width: 1rem;
     height: auto;

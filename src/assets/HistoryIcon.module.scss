@@ -3,6 +3,7 @@
 .icon {
   max-width: $header-icon-size;
   transition: all .2s ease-in-out;
+  will-change: transform;
   &:hover, &:focus {
     transform: scale(1.05);
   }

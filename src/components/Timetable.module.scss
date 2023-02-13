@@ -6,6 +6,7 @@
 .timetable {
   max-width: $max-content-width;
   border-collapse: collapse;
+  color: hsla(0, 0%, 100%, 0.8);
   
   td, th {
     border: 1px solid hsla(0, 0%, 100%, 0.2);

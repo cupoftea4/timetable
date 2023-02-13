@@ -15,7 +15,8 @@
 @mixin light-pillow-button {
   padding: .25rem .75rem;
   border-radius: 1rem;
-  background-color: vars.$light-accent-clr;
+  background-color: var(--accent-clr);
+  border: var(--border-clr) solid 1px;
   cursor: pointer;
   transition: all .2s ease-in-out;
   &:hover {
@@ -34,7 +35,7 @@
           bottom: 0;
           left: 50%;
           transform: translateX(-50%) scaleX(0);
-          background-color: vars.$text-clr;
+          background-color: var(--text-clr);
           border-radius: .7rem;
           visibility: hidden;
           transition: .25s linear;
@@ -50,8 +51,8 @@
 @mixin auto-scroll (
   $direction: y, 
   $width: auto, 
-  $track-color: vars.$light-accent-clr, 
-  $thumb-color: vars.$light-accent-clr, 
+  $track-color: var(--accent-clr), 
+  $thumb-color: var(--accent-clr), 
   $setForFirefox: true
 ) {
   overflow-#{$direction}: auto;
@@ -84,7 +85,7 @@
 }
 
 
-@mixin scroll-on-hover ($direction: y, $width: auto, $track-color: vars.$light-accent-clr, $thumb-color: vars.$light-accent-clr) {
+@mixin scroll-on-hover ($direction: y, $width: auto, $track-color: var(--accent-clr), $thumb-color: var(--accent-clr)) {
   @include can-hover {
     overflow-#{$direction}: hidden;
     &:hover {

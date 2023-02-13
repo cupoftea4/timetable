@@ -1,6 +1,3 @@
-// @import url('https://fonts.googleapis.com/css2?family=Literata:opsz@7..72&family=Roboto+Flex:opsz,wght@8..144,300;8..144,400;8..144,500;8..144,600;8..144,700&family=Roboto+Mono:ital,wght@0,400;0,600;0,700;1,300;1,600&display=swap');
-// @import url('https://fonts.googleapis.com/css2?family=Oswald&display=swap');
-// @import url('https://fonts.googleapis.com/css2?family=Ubuntu&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,700;1,700&display=swap');
 
 :root {
@@ -14,24 +11,59 @@
     $max-content-width: 120rem;
   }
   
-  @include auto-scroll(y, auto, transparent, $light-accent-clr, false);
+  @include auto-scroll(y, auto, transparent, var(--accent-clr), false);
   overflow: overlay; // deprecated :(
 }
 
+:root {
+  --primary-glow: radial-gradient(rgba(1, 65, 255, 0.4), rgba(1, 65, 255, 0));
+  --secondary-glow: linear-gradient(
+    to bottom right,
+    rgba(1, 65, 255, 0),
+    rgba(1, 65, 255, 0),
+    hsla(210, 100%, 65%, 0.3)
+  );
+} 
+
 body {
-  background: $bg-theme-dark-1;
+  background-image: $bg-light;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   font-family: 'Ubuntu', sans-serif;
   
   font-weight: $regular-font;
   
   @media screen and (prefers-color-scheme: dark) {
-    background: $bg-theme-dark-1;
+    --background-start-rgb: 0, 00, 10;
+    --background-end-rgb: 0, 0, 10;
+
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgb(var(--background-end-rgb))
+      )
+      rgb(var(--background-start-rgb)
+    );
   }
-  color: $text-clr;
+  color: var(--text-clr);
   main {
-    @include flex-center;
     padding: $main-padding;
+    @media screen and (prefers-color-scheme: dark) {
+      &::before {
+        content: '';
+        left: 50%;
+        top: 50%;
+        position: absolute;
+        filter: blur(45px);
+        transform: translateZ(0);
+        background: var(--secondary-glow);
+        border-radius: 50%;
+        width: 70%;
+        height: 60%;
+        transform: translateX(-60%) translateY(-60%);
+        z-index: -1;
+      }
+    }
+   
   }
 }
 

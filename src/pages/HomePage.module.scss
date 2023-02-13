@@ -13,7 +13,6 @@ $lecturers-second-layer-width: 20rem;
   grid-template-columns: var(--first-layer-width) var(--second-layer-width) auto;
   gap: 2rem;
   padding: .5rem 9rem;
-  width: 100%;
   max-width: $max-content-width;
   &[data-attr=lecturer-groups]  {
     --second-layer-width: #{$lecturers-second-layer-width};
@@ -65,8 +64,10 @@ $lecturers-second-layer-width: 20rem;
         border: none;
         cursor: pointer;
         transition: all .2s ease-in-out;
+        border: transparent solid 1px;
         &[data-state=selected], &:hover{
-          background-color: $light-accent-clr;
+          background: var(--accent-clr);
+          border: var(--border-clr) solid 1px;
         }
       }
     }

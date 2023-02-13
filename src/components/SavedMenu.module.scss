@@ -21,7 +21,8 @@ $icon-size: 0.875rem;
   @include tablet {
     width: 13rem;
   }
-  background-color: hsla(0, 0%, 64%, 0.27);
+  background: linear-gradient(190deg, var(--accent-clr) -8.75%, rgba(255, 255, 255, 0.07) 83.95%);
+  border: var(--border-clr) solid 1px;
   border-radius: $border-radius;
   box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(40px);
@@ -45,7 +46,7 @@ $icon-size: 0.875rem;
       align-items: center;
       position: relative;
       &:hover, &.selected {
-        background-color: hsla(0, 0%, 100%, 0.15);
+        background-color: var(--accent-clr);
         cursor: pointer;
       }
       /* Remove Item Icon */

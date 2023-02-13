@@ -1,5 +1,5 @@
 import storage from "./storage"
-import parser from "./parser"
+import parser from "./Parser"
 import {
   CachedGroup,
   CachedInstitute,
@@ -10,6 +10,7 @@ import {
   TimetableType
 } from "./types";
 import Util from "./TimetableUtil";
+import { DEVELOP } from "./constants";
 
 // storage keys
 const LAST_OPENED_INSTITUTE = "last_opened_institute";
@@ -320,8 +321,8 @@ class TimetableManager {
     const cached = await this.getFromCache<T>(cacheKey);
     if (Array.isArray(cached) && cached.length > 0) return cached;
     if (!Array.isArray(cached) && cached) return cached;
-
-    console.log("Getting data from server", cacheKey);
+    
+    if (DEVELOP) console.log("Getting data from server", cacheKey);
     const data: T = await parserFn.call(parser, ...parserArgs);
     this.updateCache(cacheKey, data);
     return data;

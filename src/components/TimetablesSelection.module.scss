@@ -38,8 +38,14 @@
           display: inline-block;
           padding: .25rem;
           transition: all .2s ease-in;
+          border-radius: .625rem;
+          // will-change: transform;
+          // backface-visibility: hidden;
+          // transform: translateZ(0);
+          // -webkit-font-smoothing: subpixel-antialiased;
           &:hover {
-            transform: scale(1.05);
+            background-color: var(--accent-clr);
+            // transform: scale(1.05) perspective(2px);
           }
         }
       }
@@ -98,14 +104,13 @@
         }
       }
 
-      height: fit-content;
-      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
       gap: .5rem;
-      background-color: $light-accent-clr;
+      background: linear-gradient(145.37deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.1) 73.95%);
+      border: var(--border-clr) solid 1px;
       border-radius: $border-radius;
       padding: 1rem;
     }

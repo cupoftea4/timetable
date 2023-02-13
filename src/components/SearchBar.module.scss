@@ -1,7 +1,6 @@
 @use '../styles/_variables' as *;
 @use '../styles/_mixins' as *;
 
-$border-clr: hsla(0, 0%, 100%, 0.67);
 $placeholder-clr: hsla(0, 0%, 100%, 0.8);
 $icon-size: 1em;
 
@@ -21,9 +20,8 @@ $icon-size: 1em;
 
   .search {
     flex: 1;
-    width: 100%;
-    background-color: $light-accent-clr;
-    border: 0.1875rem solid $border-clr;
+    background: linear-gradient(145.37deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.1) 93.95%);
+    border: var(--border-clr) solid 2px;
     display: flex;
     align-items: center;
     padding: 0.125em 1em;
@@ -31,20 +29,23 @@ $icon-size: 1em;
     gap: 1em;
     
     ul {
+      margin-top: 3px;
       @include fade-in-animation(0.05s);
       z-index: 1;
       max-height: 300px;
       border: none;
       font-size: $medium-font-size;
-      background-color: hsla(0, 0%, 64%, 0.27);
+      color: white;
+      background: linear-gradient(45.37deg, var(--accent-clr) 0.75%, rgba(255, 255, 255, 0.07) 83.95%);
+      border: var(--border-clr) solid 1px;
       border-radius: 2% 2% 2% $border-radius;
       box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
-      backdrop-filter: blur(30px);
+      backdrop-filter: blur(40px);
       -webkit-backdrop-filter: blur(40px);
       @include auto-scroll(y);
       
       mark {
-        background-color: $light-accent-clr;
+        background: var(--accent-clr);
       }
       li {
         padding: 0.25em 1em;
@@ -59,16 +60,16 @@ $icon-size: 1em;
     }
 
     input {
+      $gap: 0.325em;
+      --left-margin: calc(#{$icon-size} + #{$gap});
       font-weight: $regular-font;
-      flex: 1;
-      width: 100%;
-      max-width: 15rem;
+      max-width: calc(100% - var(--left-margin));
       background-color: transparent;
-      color: $text-clr;
+      color: var(--text-clr);
       border: none;
       outline: none;
       padding: 0;
-      margin-left: calc($icon-size + 0.325em);
+      margin-left: var(--left-margin);
       font-size: 1em;
 
       &::placeholder {
@@ -92,13 +93,11 @@ $icon-size: 1em;
     }
     svg {
       transition: all .5s ease;
-      width: 2rem;
-      height: 2rem;
+      width: 1.75rem;
+      height: 1.75rem;
       &:hover, &:focus {
-
         transform: scale(1.1);
         cursor: pointer;
-        
       }
     }
     &.hidden-search {
@@ -107,8 +106,8 @@ $icon-size: 1em;
         display: none;
       }
       svg {
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2.1rem;
+        height: 2.125rem;
         &:hover, &:focus {
           transform: scale(1);
         }

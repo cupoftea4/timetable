@@ -21,7 +21,7 @@
       width: 85vw;
     }
     &.active {
-      background-color: $light-accent-clr;
+      background: var(--accent-clr);
     }
   }  
 }

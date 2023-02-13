@@ -13,7 +13,7 @@
 
 /* Timetable on mobile */
 .container {
-  margin: auto 0;
+  @include flex-center;
   .timetable {
     @include timetable-mobile {
       @include auto-scroll(x, thin);
@@ -23,6 +23,7 @@
         $external-padding: calc(env(safe-area-inset-right) + env(safe-area-inset-left) + $main-padding * 2);
         min-width: min(90vw, 100vw - $external-padding);
         scroll-snap-align: center;
+        scroll-snap-stop: always;
       }
     }
   }
