@@ -13,13 +13,16 @@ import { getCurrentUADate, getNULPWeek } from '../utils/date';
 import * as handler from '../utils/requestHandler';
 import ExamsTimetable from '../components/ExamsTimetable';
 import TimetablePartials from '../components/TimetablePartials';
+import { optimisticRender } from '../utils/utils';
+import useWindowDimensions from '../hooks/useWindowDimensions';
+import { MOBILE_SCREEN_BREAKPOINT } from '../utils/constants';
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => { // yeah, naming! :)
   const width = el.getBoundingClientRect().width;
   const currentDay = getCurrentUADate().getDay() || 7; // 0 - Sunday
   const inTimetable = timetable?.some(({day}) => Math.max(day, 5) >= currentDay);
   if (inTimetable) {
-      el.scrollTo((currentDay - 1) * width, 0);
+    el.scrollTo((currentDay - 1) * width, 0);
   }
 };
 
@@ -39,6 +42,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup); 
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
   const [partials, setPartials] = useState<HalfTerm[]>([]);
+  const { width } = useWindowDimensions();
   const navigate = useNavigate();
   const timetableRef = useRef<HTMLElement>(null);
 
@@ -46,41 +50,43 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
   const isLecturers = timetableType === 'lecturer';
+  const isMobile = width < MOBILE_SCREEN_BREAKPOINT;
 
-    
-  const getTimetable = (group: string, exams: boolean, type?: TimetableType, checkCache: boolean = true) => {
-    const onCatch = (e: string) => {
-      handler.error(e);
+  useEffect(() => {
+    if (!timetableType) {
+      handler.error(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
       setTimetableGroup(null);
-    };
-    if (exams) return TimetableManager.getExamsTimetable(group, type, checkCache)
-        .then(setExamsTimetable).catch(onCatch);
-
-    return TimetableManager.getTimetable(group, type, checkCache).then(data => {
-        setTimetable(data);
-        setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
-        if (type === 'timetable') {
-          TimetableManager.getPartials(group).then(setPartials);
-        }
-      }).catch(onCatch);
-  };
-
-  useEffect(
-    () => {
-      if (!timetableType) {
-        handler.error(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
-        setTimetableGroup(null);
-        return;
-      }  
-      if (timetableType === 'selective' && isExamsTimetable) navigate('/' + group);
-      setTimetableGroup(group);
-      handler.promise(getTimetable(group, isExamsTimetable, timetableType));
-    }, [group, isExamsTimetable, navigate, timetableType]);
+      return;
+    } 
+    if (timetableType === 'selective' && isExamsTimetable) navigate('/' + group);
+    setTimetableGroup(group);
+    handler.promise(getTimetable(group, isExamsTimetable, timetableType));
+  }, [group, isExamsTimetable, navigate, timetableType]);
   
   useEffect(() => {
     if (isExamsTimetable || !timetable) return;
     if (timetableRef.current) tryToScrollToCurrentDay(timetableRef.current, timetable);
   }, [isExamsTimetable, timetable]);
+
+  function getTimetable(group: string, exams: boolean, type?: TimetableType, checkCache: boolean = true) {
+    const onError = (e: string) => {
+      handler.error(e);
+      setTimetableGroup(null);
+    };
+    if (exams) 
+      return optimisticRender(
+        setExamsTimetable, onError, 
+        TimetableManager.getExamsTimetable(group, type, checkCache)
+      );
+
+    setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
+    if (type === 'timetable') TimetableManager.getPartials(group).then(setPartials);
+    
+    return optimisticRender(
+      setTimetable, onError, 
+      TimetableManager.getTimetable(group, type, checkCache)
+    );
+  };
 
   const changeIsSecondSubgroup = (isSecond: boolean | ((isSecond: boolean) => boolean)) => {
     if (typeof isSecond === 'function') isSecond = isSecond(isSecondSubgroup);
@@ -111,7 +117,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
               <nav className={headerStyles['right-buttons']}> 
                 <Link to="/"><HomeIcon /></Link>
                 <SavedMenu />
-                <h1>{timetableGroup}</h1>
+                <h1 className={styles.title}>{timetableGroup}</h1>
                 {
                   timetableType !== 'selective' &&
                     <button
@@ -133,10 +139,10 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                       {!isLecturers && 
                       <Toggle 
                         toggleState={[isSecondSubgroup, changeIsSecondSubgroup]} 
-                        states={["I підгрупа", "II підгрупа"]} />}
+                        states={isMobile ? ["I підг.", "II підг."] : ["I підгрупа", "II підгрупа"]} />}
                       <Toggle 
                         toggleState={[isSecondWeek, setIsSecondWeek]} 
-                        states={['По чисельнику', 'По знаменнику']} />
+                        states={isMobile ? ["По чис.", "По знам."] : ['По чисельнику', 'По знаменнику']} />
                     </>
                 }
               </span>

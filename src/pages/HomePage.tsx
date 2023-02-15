@@ -94,7 +94,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   return (
     <>
       <HeaderPanel timetableType={timetableType}/>
-      <main>
+      <main className={styles.container}>
         <section className={`${styles.selection} ${isTablet && selectedSecond && styles["one-column"]}`} 
           data-attr={timetableType + "-groups"}>
           {showFirstLayer &&

@@ -1,5 +1,4 @@
 import storage from "./storage"
-import parser from "./Parser"
 import {
   CachedGroup,
   CachedInstitute,
@@ -11,6 +10,9 @@ import {
 } from "./types";
 import Util from "./TimetableUtil";
 import { DEVELOP } from "./constants";
+import LPNUData from "./LPNUData";
+import FallbackData from "./CachedData";
+import * as handler from '../utils/requestHandler';
 
 // storage keys
 const LAST_OPENED_INSTITUTE = "last_opened_institute";
@@ -46,9 +48,9 @@ class TimetableManager {
 
   async init() {
     // request data from server if needed
-    this.groups = await this.getData(GROUPS, parser.getGroups);
-    this.selectiveGroups = await this.getData(SELECTIVE_GROUPS, parser.getSelectiveGroups);
-    this.lecturers = await this.getData(LECTURERS, parser.getLecturers);
+    this.groups = await this.getData(GROUPS, FallbackData.getGroups);
+    this.selectiveGroups = await this.getData(SELECTIVE_GROUPS, FallbackData.getSelectiveGroups);
+    this.lecturers = await this.getData(LECTURERS, FallbackData.getLecturers);
 
     // cache only data
     this.timetables = (await storage.getItem(TIMETABLES)) || [];
@@ -132,9 +134,9 @@ class TimetableManager {
     const key = PARTIAL_TIMETABLE + group + "_" + halfTerm;
 
     if (checkCache) 
-      return await this.getData(key, parser.getPartialTimetable, group, halfTerm);
+      return await this.getData(key, LPNUData.getPartialTimetable, group, halfTerm);
     
-    const data = await parser.getPartialTimetable(group, halfTerm);
+    const data = await LPNUData.getPartialTimetable(group, halfTerm);
     if (!data) throw new Error(`Failed to get partial timetable! Group: ${group}, halfTerm: ${halfTerm}`);
     this.updateCache(key, data);
     return data;
@@ -148,18 +150,18 @@ class TimetableManager {
       .filter(el => el) as HalfTerm[];
   }
 
-  async getTimetable(group: string, type?: TimetableType, checkCache = true) {
+  getTimetable(group: string, type?: TimetableType, checkCache = true) {
+    let cacheData: Promise<TimetableItem[]>, fetchData: Promise<TimetableItem[] | null>;
     group = group.trim();
     const data = this.timetables.find(el => el.group.toUpperCase() === group.toUpperCase());
-    if (checkCache && data && !Util.needsUpdate(data.time)) {
-      return storage.getItem(TIMETABLE + group) as Promise<TimetableItem[]>;
-    }
-
     const timetableType = type ?? this.tryToGetType(group);
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${group}`);
 
-    const timetable = await parser.getTimetable(timetableType, group);
-    if (!timetable) throw Error(`Failed to get timetable! Group: ${group}`);
+    if (checkCache && data && !Util.needsUpdate(data.time)) {
+      cacheData = storage.getItem(TIMETABLE + group);      
+    } else {
+      cacheData = FallbackData.getTimetable(timetableType, group);
+    }
 
     this.timetables = this.timetables.filter(
       el => el.group.toUpperCase() !== group.toUpperCase()
@@ -169,31 +171,57 @@ class TimetableManager {
       time: Date.now(),
       subgroup: data?.subgroup
     });
-    storage.setItem(TIMETABLES, this.timetables);
-    storage.setItem(TIMETABLE + group, timetable);
-    return timetable;
+
+    const setStorageData = (timetable: TimetableItem[] | null) => {
+      if(!timetable) return;
+      storage.setItem(TIMETABLE + group, timetable);
+      storage.setItem(TIMETABLES, this.timetables);
+    }
+
+    fetchData = LPNUData.getTimetable(timetableType, group).catch(() => {
+      cacheData.then(setStorageData);
+      handler.warn("Data is possibly outdated!");
+      return null;
+    });
+
+    fetchData.then(setStorageData);
+    
+    return [cacheData, fetchData] as const;
   }
 
-  async getExamsTimetable(group: string, type?: TimetableType, checkCache = true) {
+  getExamsTimetable(group: string, type?: TimetableType, checkCache = true) {
+    let cacheData: Promise<ExamsTimetableItem[]>, fetchData: Promise<ExamsTimetableItem[] | null>;
     group = group.trim();
     const data = this.examsTimetables.find(el => el.group.toUpperCase() === group.toUpperCase());
-    if (checkCache && data && !Util.needsUpdate(data.time)) {
-      return storage.getItem(EXAMS_TIMETABLE + group) as Promise<ExamsTimetableItem[]>;
-    }
     const timetableType = type ?? this.tryToGetType(group);
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${group}`);
 
-    const examsTimetable = await parser.getExamsTimetable(timetableType, group);
-    if (!examsTimetable) throw Error(`Failed to get exams timetable! Group: ${group}`);
+    if (checkCache && data && !Util.needsUpdate(data.time)) {
+      cacheData = storage.getItem(EXAMS_TIMETABLE + group);      
+    } else {
+      cacheData = FallbackData.getExamsTimetable(timetableType, group);
+    }
 
     this.examsTimetables = this.examsTimetables.filter(
       el => el.group.toUpperCase() !== group.toUpperCase()
-    ); 
+    );
     this.examsTimetables.push({ group: group, time: Date.now() });
 
-    storage.setItem(EXAMS_TIMETABLES, this.examsTimetables);
-    storage.setItem(EXAMS_TIMETABLE + group, examsTimetable);
-    return examsTimetable;
+    const setStorageData = (timetable: ExamsTimetableItem[] | null) => {
+      if(!timetable) return;
+      storage.setItem(EXAMS_TIMETABLE + group, timetable);
+      storage.setItem(EXAMS_TIMETABLES, this.examsTimetables);
+    }
+
+    fetchData = LPNUData.getExamsTimetable(timetableType, group).then(() => null).catch(() => {
+      cacheData.then(setStorageData);
+      handler.warn("Data is possibly outdated!");
+      return null;
+    });
+
+    fetchData.then(setStorageData);
+    
+    return [cacheData, fetchData] as const;
   }
 
   updateSubgroup(group?: string, subgroup: 1 | 2 = 1) {
@@ -264,7 +292,7 @@ class TimetableManager {
 
   private async getInstitutes(): Promise<CachedInstitute[]> {
     if (this.institutes.length > 0) return this.institutes;
-    return this.institutes = await this.getData(INSTITUTES, parser.getInstitutes);
+    return this.institutes = await this.getData(INSTITUTES, FallbackData.getInstitutes);
   }
 
   private async ifPartialTimetableExists(group: string, halfTerm: 1 | 2) {
@@ -276,12 +304,12 @@ class TimetableManager {
   private async getPartialGroups(halfTerm: 1 | 2) {
     if (halfTerm === 1) {
       if (this.firstHalfTermGroups.length !== 0) return this.firstHalfTermGroups;
-      const data = await this.getData(PARTIAL_GROUPS_1, parser.getPartialGroups, halfTerm);
+      const data = await this.getData(PARTIAL_GROUPS_1, LPNUData.getPartialGroups, halfTerm);
       this.firstHalfTermGroups = data;
       return data;
     } else {
       if (this.secondHalfTermGroups.length !== 0) return this.secondHalfTermGroups;
-      const data = await this.getData(PARTIAL_GROUPS_2, parser.getPartialGroups, halfTerm);
+      const data = await this.getData(PARTIAL_GROUPS_2, LPNUData.getPartialGroups, halfTerm);
       this.secondHalfTermGroups = data;
       return data;
     }
@@ -291,19 +319,19 @@ class TimetableManager {
     const key = GROUPS + (institute ? ("_" + institute) : "");
     if (!institute && this.groups.length > 0) return this.groups;
 
-    const data = await this.getData(key, parser.getGroups, institute);
+    const data = await this.getData(key, FallbackData.getGroups, institute);
     if (!institute) this.groups = data;
     return data;
   }
 
   private async getSelectiveGroups(): Promise<string[]> {
     if (this.selectiveGroups.length > 0) return this.selectiveGroups;
-    return this.selectiveGroups = await this.getData(SELECTIVE_GROUPS, parser.getSelectiveGroups);
+    return this.selectiveGroups = await this.getData(SELECTIVE_GROUPS, FallbackData.getSelectiveGroups);
   }
 
   private async getLecturers(department?: string): Promise<string[]> {
     if (this.lecturers.length > 0 && !department) return this.lecturers;
-    const lecturers = await parser.getLecturers(department);
+    const lecturers = await FallbackData.getLecturers(department);
     if (!department) {
       this.updateCache(LECTURERS, lecturers);
       this.lecturers = lecturers;
@@ -313,17 +341,18 @@ class TimetableManager {
 
   private async getLecturerDepartments(): Promise<string[]> {
     if (this.departments.length > 0) return this.departments;
-    return this.departments = await this.getData(DEPARTMENTS, parser.getLecturerDepartments);
+    return this.departments = await this.getData(DEPARTMENTS, FallbackData.getLecturerDepartments);
   }
 
   
-  private async getData<T>(cacheKey: string, parserFn: (...params: any[]) => Promise<T>, ...parserArgs: any[]) {
+  private async getData<T>(cacheKey: string, fn: (...params: any[]) => Promise<T>, ...args: any[]) {    
     const cached = await this.getFromCache<T>(cacheKey);
     if (Array.isArray(cached) && cached.length > 0) return cached;
     if (!Array.isArray(cached) && cached) return cached;
     
     if (DEVELOP) console.log("Getting data from server", cacheKey);
-    const data: T = await parserFn.call(parser, ...parserArgs);
+    const binding = (cacheKey.includes("partial")) ? LPNUData : FallbackData;
+    const data: T = await fn.call(binding, ...args);
     this.updateCache(cacheKey, data);
     return data;
   }

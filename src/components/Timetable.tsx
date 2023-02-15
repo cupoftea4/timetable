@@ -3,6 +3,7 @@ import { TimetableItem } from '../utils/types';
 import TimetableCell from './TimetableCell';
 import styles from './Timetable.module.scss';
 import { getCurrentUADate, stringToDate } from '../utils/date';
+import TimetableUtil from '../utils/TimetableUtil';
 
 type OwnProps = {
   timetable: TimetableItem[];
@@ -21,16 +22,8 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
     timetable?.reduce((max, item) => item.day > max ? item.day : max, 0) || 0,
   [timetable]);
 
-  const lessonsTimes = useMemo(() => [ 
-      {start:  "8:30", end: "10:05"},
-      {start: "10:20", end: "11:55"},
-      {start: "12:10", end: "13:45"},
-      {start: "14:15", end: "15:50"},
-      {start: "16:00", end: "17:35"},
-      {start: "17:40", end: "19:15"},
-      {start: "19:20", end: "20:55"},
-      {start: "21:00", end: "22:35"}
-    ].slice(0, maxLessonNumber), 
+  const lessonsTimes = useMemo(() => 
+    TimetableUtil.lessonsTimes.slice(0, maxLessonNumber), 
   [maxLessonNumber]);
 
   const days = useMemo(() => 

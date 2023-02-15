@@ -13,10 +13,10 @@ $icon-size: 0.875rem;
   animation: show-menu 0.1s ease-in-out forwards;
   position: absolute;
   top: 105%;
-  left: -90%;
+  left: -120%;
   width: 15rem;
   &.home {
-    left: 50%;
+    left: 80%;
   }
   @include tablet {
     width: 13rem;
@@ -27,7 +27,7 @@ $icon-size: 0.875rem;
   box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
-  z-index: 1;
+  z-index: 100;
   padding: 1.5rem 0;
 
   /* Tittle */

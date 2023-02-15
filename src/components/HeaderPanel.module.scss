@@ -16,7 +16,7 @@
   gap: 2rem;
   .right-buttons {
     display: flex;
-    gap: 1rem;
+    gap: .5rem;
     align-items: center;
     flex-wrap: wrap;
     justify-content: center;
@@ -26,15 +26,15 @@
     }
 
     svg {
-      width: 2.75rem;
-      height: 2.75rem; 
+      width: clamp(2rem, 8vw, 2.75rem);
+      height: clamp(2rem, 8vw, 2.75rem); 
       transition: all .2s ease-in-out;
       transform-origin: center;
       cursor: pointer;
     }
     h1 {
       align-self: flex-end;
-      font-size: 2rem;
+      font-size: clamp(1rem, 8vw, 2rem);
       font-weight: $semi-bold-font;
       color: var(--text-clr);
       text-align: center;

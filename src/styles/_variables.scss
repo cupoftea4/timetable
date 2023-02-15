@@ -1,5 +1,7 @@
 
 :root {
+
+  --max-app-width: 90rem;
   --accent-clr: hsla(0, 0%, 100%, 0.15);
   --text-clr: hsla(0, 0%, 100%, 1);
   --border-clr: hsla(209, 94%, 94%, 0.139);
@@ -39,7 +41,7 @@ $small-font-size: 0.875rem;
 $medium-font-size: 1.25rem;
 $large-font-size: 1.5rem;
 
-$max-content-width: 100rem;
+// $max-content-width: 100rem;
 $main-height: 80vh;
 $main-padding: 1rem;
 

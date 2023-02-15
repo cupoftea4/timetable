@@ -8,7 +8,7 @@
     font-size: 16px;
   }
   @include large-screen {
-    $max-content-width: 120rem;
+    --max-app-width: 100rem;
   }
   
   @include auto-scroll(y, auto, transparent, var(--accent-clr), false);

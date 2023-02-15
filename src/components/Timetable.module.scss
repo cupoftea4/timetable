@@ -4,12 +4,16 @@
 
 
 .timetable {
-  max-width: $max-content-width;
+  max-width: var(--max-app-width);
   border-collapse: collapse;
   color: hsla(0, 0%, 100%, 0.8);
   
   td, th {
     border: 1px solid hsla(0, 0%, 100%, 0.2);
+    @include timetable-mobile {
+      border: none;
+    }
+
   }
   /* First row */
   thead tr:first-child th {

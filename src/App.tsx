@@ -11,7 +11,8 @@ import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 
 /* TODO:
   - update partials
-  - add exams and partial timetables to timetable-data
+  - add partial timetables to timetable-data
+  - /%D0%A2%D0%A0-22/exams - somehow fix overflow
  */
 
 const App = () => {

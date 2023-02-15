@@ -117,6 +117,12 @@
   }
 }
 
+@mixin min-timetable-mobile {
+  @media only screen and (min-width: 1000px) {
+    @content;
+  } 
+}
+
 @mixin mobile {
   @media only screen and (max-width: 480px) {
       @content;
@@ -150,5 +156,11 @@
 @mixin can-hover {
   @media (hover: hover) {
       @content;
+  }
+}
+
+@mixin dark-mode {
+  @media screen and (prefers-color-scheme: dark) {
+    @content;
   }
 }

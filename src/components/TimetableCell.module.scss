@@ -2,8 +2,10 @@
 @use '../styles/mixins' as *;
 
 $spacer-width: 0.5rem;
+$spacer-height: 1.325rem;
 $min-cell-height: 5rem;
 $max-cell-width: 17rem;
+$cell-border-radius: .625rem;
 
 .timetable-td {
   position: relative;
@@ -12,6 +14,31 @@ $max-cell-width: 17rem;
     top: 0;
     height: 100%;
     min-width: $spacer-width;
+    @include timetable-mobile {
+      width: calc(100% - 0.125rem * 2);
+      height: $spacer-height;
+      border-radius: $cell-border-radius $cell-border-radius 0 0;
+      margin: 0 .125rem;
+      z-index: 5;
+      display: block;
+      &::before, &::after {
+        color: white;
+        font-size: $small-font-size;
+        position: absolute;
+        top: 50%;
+        height: 100%;
+        transform: translateY(-50%);
+      }
+      &::before {
+        content: attr(data-time);
+        right: .5rem;
+        
+      }
+      &::after {
+        content: attr(data-number);
+        left: .5rem;;
+      }
+    }
   }
 
   &.show {
@@ -22,11 +49,38 @@ $max-cell-width: 17rem;
   }
 
   .cell {
+    margin: 0 .125rem .5rem .125rem;
+    border-radius: $cell-border-radius;
     display: flex;
     min-height: $min-cell-height;
     max-width: $max-cell-width;
     position: relative;
-  
+
+    @include min-timetable-mobile {
+      background-color: transparent;
+    }
+
+    @include timetable-mobile {
+      --bg-alpha: .5;
+      color: white;
+      @include dark-mode {
+        --bg-alpha: .3;
+        color: var(--text-clr);
+      } 
+      backdrop-filter: blur(10px);
+      &.lecture, &.lection {
+        background-color: hsla(205, 81%, 45%, calc(var(--bg-alpha) - 0.1));
+      }
+      
+      &.lab {
+        background-color: hsla(25, 78%, 56%, calc(var(--bg-alpha) - 0.1));
+      }
+      
+      &.practical {
+        background-color: hsla(277, 32%, 56%, var(--bg-alpha));
+      }
+    }
+    
     @include timetable-mobile {
       max-width: initial;
     }
@@ -38,6 +92,10 @@ $max-cell-width: 17rem;
       gap: 0.25rem;
       padding: 0 .5rem;
       margin-left: $spacer-width;
+      @include timetable-mobile {
+        margin-left: 0;
+        margin-top: $spacer-height;
+      }
       > :first-child {
         margin-top: .325rem;
       }
@@ -70,6 +128,10 @@ $max-cell-width: 17rem;
   td.active {
     background-color: rgba(255, 255, 255, 0.1);
   }
+}
+
+td.empty {
+  min-width: 12rem;
 }
 
 .lecture, .lection {

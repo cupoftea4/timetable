@@ -1,5 +1,6 @@
 import { toast } from "react-toastify"
-import { TOAST_AUTO_CLOSE_TIME } from "./constants"
+import { TOAST_AUTO_CLOSE_TIME } from "./constants";
+
 
 export function timeout<T>(ms: number, promise: Promise<T>): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -64,3 +65,11 @@ export function showErrorToast(message: string) {
   toast.error(message);
   setTimeout(() => pendingToasts.delete(message), TOAST_AUTO_CLOSE_TIME);
 }
+
+export function showWarningToast(message: string) {
+  if (pendingToasts.has(message)) return;
+  pendingToasts.add(message);
+  toast.warn(message, {theme: "dark", hideProgressBar: true});
+  setTimeout(() => pendingToasts.delete(message), TOAST_AUTO_CLOSE_TIME);
+}
+

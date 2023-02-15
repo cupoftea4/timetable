@@ -6,6 +6,11 @@ $first-layer-width: 9rem;
 $second-layer-width: 9rem;
 $lecturers-second-layer-width: 20rem;
 
+.container {
+  max-width: var(--max-app-width);
+  margin: 0 auto;
+}
+
 .selection {
   --first-layer-width: #{$first-layer-width};
   --second-layer-width: #{$second-layer-width};
@@ -13,7 +18,7 @@ $lecturers-second-layer-width: 20rem;
   grid-template-columns: var(--first-layer-width) var(--second-layer-width) auto;
   gap: 2rem;
   padding: .5rem 9rem;
-  max-width: $max-content-width;
+  
   &[data-attr=lecturer-groups]  {
     --second-layer-width: #{$lecturers-second-layer-width};
     .no-selection {

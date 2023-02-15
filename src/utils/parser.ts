@@ -1,7 +1,4 @@
-import LPNUData from "./LPNUData";
-import { ExamsTimetableItem, TimetableItem, TimetableItemType, TimetableType } from "./types";
-
-const FALLBACK_URL = "https://raw.githubusercontent.com/cupoftea4/timetable-data/data/";
+import { ExamsTimetableItem, TimetableItem, TimetableItemType } from "./types";
 
 const INSTITUTES_SELECTOR = "#edit-departmentparent-abbrname-selective";
 const GROUPS_SELECTOR = "#edit-studygroup-abbrname-selective";
@@ -12,72 +9,47 @@ const TIMETABLE_SELECTOR = ".view-content";
 
 
 class TimetableParser {
-	async getInstitutes() {
-		return LPNUData.fetchInstitutes().then(html => {
-			const select = 
-				this.parseAndGetFirstElBySelector(html, INSTITUTES_SELECTOR);
-			const institutes = Array.from(select?.children ?? [])
-									.map(child => (child as HTMLInputElement).value)
-									.filter(inst => inst !== "All")
-									.sort((a, b) => a.localeCompare(b));
-			if (institutes.length === 0) throw new Error("No institutes found");
-			return institutes;
-		}).catch(async err => {
-			return await this.fetchFromFallback("institutes.json") as string[];
-		});
-	}
-
-	async getGroups(institute?: string) {
-		return LPNUData.fetchGroups(institute).then(html => {
-			const select = this.parseAndGetFirstElBySelector(html, GROUPS_SELECTOR);
-			const groups = Array.from(select?.children ?? [])
+	async parseInstitutes(html: string) {
+		const select = this.parseAndGetFirstElBySelector(html, INSTITUTES_SELECTOR);
+		const institutes = Array.from(select?.children ?? [])
 								.map(child => (child as HTMLInputElement).value)
 								.filter(inst => inst !== "All")
 								.sort((a, b) => a.localeCompare(b));
-			if (groups.length === 0) throw new Error("No groups found");
-			return groups;
-		}).catch(async err => {
-			const fallbackPath = institute ? `institutes/${institute}.json` : `groups.json`;
-			return await this.fetchFromFallback(fallbackPath) as string[];
-		})
+		if (institutes.length === 0) throw new Error("No institutes found");
+		return institutes;
 	}
 
-	async getSelectiveGroups() {
-		return LPNUData.fetchSelectiveGroups().then(html => {
-			const select = this.parseAndGetFirstElBySelector(html, SELECTIVE_GROUPS_SELECTOR);
-			const groups = Array.from(select?.children ?? [])
+	async parseGroups(html: string) {
+		const select = this.parseAndGetFirstElBySelector(html, GROUPS_SELECTOR);
+		const groups = Array.from(select?.children ?? [])
+							.map(child => (child as HTMLInputElement).value)
+							.filter(inst => inst !== "All")
+							.sort((a, b) => a.localeCompare(b));
+		if (groups.length === 0) throw new Error("No groups found");
+		return groups;
+	}
+
+	async parseSelectiveGroups(html: string) {
+		const select = this.parseAndGetFirstElBySelector(html, SELECTIVE_GROUPS_SELECTOR);
+		const groups = Array.from(select?.children ?? [])
+							.map(child => (child as HTMLInputElement).value)
+							.filter(group => group !== "All")
+							.sort((a, b) => a.localeCompare(b));
+		if (groups.length === 0) throw new Error("No groups found");
+		return groups;
+	}
+
+	async parseLecturers(html: string) {
+		const select = this.parseAndGetFirstElBySelector(html, LECTURERS_SELECTOR);
+		const lecturers = Array.from(select?.children ?? [])
 								.map(child => (child as HTMLInputElement).value)
-								.filter(group => group !== "All")
+								.filter(inst => inst !== "All")
 								.sort((a, b) => a.localeCompare(b));
-			if (groups.length === 0) throw new Error("No groups found");
-			return groups;
-		}).catch(async err => {
-			const fallback = 'selective/groups.json';
-			return await this.fetchFromFallback(fallback) as string[];
-		})
+		if (lecturers.length === 0) throw new Error("No institutes found");
+		return lecturers;
 	}
 
-	async getLecturers(department?: string) {
-		return LPNUData.fetchLecturers(department).then(html => {
-			const select = this.parseAndGetFirstElBySelector(html, LECTURERS_SELECTOR);
-			const lecturers = Array.from(select?.children ?? [])
-									.map(child => (child as HTMLInputElement).value)
-									.filter(inst => inst !== "All")
-									.sort((a, b) => a.localeCompare(b));
-			if (lecturers.length === 0) throw new Error("No institutes found");
-			return lecturers;
-		}).catch(async err => {
-			if (department) {
-				const data: Record<string, string[]> = await this.fetchFromFallback("lecturers/grouped.json");
-				return data[department] ?? [];
-			}
-			const data: string[] = await this.fetchFromFallback("lecturers/all.json");
-			return ([...new Set(data)] ).sort((a, b) => a.localeCompare(b))
-		});
-	}
-
-	async getLecturerDepartments() {
-		return LPNUData.fetchLecturerDepartments().then(html => {;	
+	async parseLecturerDepartments(html: string) {
 			const select = this.parseAndGetFirstElBySelector(html, DEPARTMENTS_SELECTOR);
 			const departments = Array.from(select?.children ?? [])
 				.map(child => (child as HTMLInputElement).value)
@@ -85,79 +57,33 @@ class TimetableParser {
 				.sort((a, b) => a.localeCompare(b));
 			if (departments.length === 0) throw new Error("No institutes found");
 			return departments;
-		}).catch(async () => {
-			const fallback = `lecturers/departments.json`;
-			return await this.fetchFromFallback(fallback) as string[];
-		});
 	}
 
-	async getPartialGroups(half: 1 | 2) {
-		return LPNUData.fetchPartialGroups(half).then(html => {
-			const select = this.parseAndGetFirstElBySelector(html, GROUPS_SELECTOR);
-			const groups = Array.from(select?.children ?? [])
-								.map(child => (child as HTMLInputElement).value)
-								.filter(inst => inst !== "All")
-								.sort((a, b) => a.localeCompare(b));
-			return groups;
-		})
-		// .catch(async () => {
-		// 	const fallback = `partial/${half}.json`;
-		// 	return await this.fetchFromFallback(fallback) as string[];
-		// });
+	async parsePartialGroups(html: string) {
+		const select = this.parseAndGetFirstElBySelector(html, GROUPS_SELECTOR);
+		const groups = Array.from(select?.children ?? [])
+							.map(child => (child as HTMLInputElement).value)
+							.filter(inst => inst !== "All")
+							.sort((a, b) => a.localeCompare(b));
+		return groups;
 	}
 
-	async getPartialTimetable(group: string, half: 1 | 2) {
-		return LPNUData.fetchPartialTimetable(group, half)
-			.then(this.parseTimetable.bind(this));
-		// .catch(async () => {
-		// 	const fallback = `partial/timetables/${group}.json`;
-		// 	return await this.fetchFromFallback(fallback) as TimetableItem[];
-		// });
-	}
-	
-	
-	async getTimetable(type: TimetableType, timetableName?: string, timetableCategory?: string) {
-		return LPNUData.fetchTimetable(type, timetableName, timetableCategory)
-			.then(this.parseTimetable.bind(this))
-			.catch(async err => {
-				let fallbackPath = `timetables/${timetableName}.json`;
-				if (type === "lecturer") 
-					fallbackPath = `lecturers/timetables/${timetableName}.json`;
-				if (type === "selective") 
-					fallbackPath = `selective/timetables/${timetableName}.json`;
-				
-				return await this.fetchFromFallback(fallbackPath) as TimetableItem[];
-		});
+	async parseExamsTimetable(html: string) {
+		const content = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
+		const exams = Array.from(content?.children ?? [])
+							.map(this.parseExam)
+		if (exams.length === 0) throw Error("Exams timetable is empty");
+		return exams;
 	}
 
-	async getExamsTimetable(type: TimetableType, group = "All", institute = "All") {
-		return LPNUData.fetchExamsTimetable(type, group, institute)
-			.then(html => {
-				const content = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
-				const exams = Array.from(content?.children ?? [])
-									.map(this.parseExam)
-				if (exams.length === 0) throw Error("Exams timetable is empty");
-				return exams;
-			})
-			.catch(async err => {
-				throw Error(err);
-			})
-	}
 
-	private async fetchFromFallback(path: string) {
-		console.warn("Timetable fallback url", FALLBACK_URL + path);
-		const response = await fetch(FALLBACK_URL + path);
-		if (!response.ok) throw Error("Couldn't fetch or parse timetable");
-		return await response.json();
-	}
-
-	private async parseTimetable(html: string) {
-			const table = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
-			if (!table) throw Error("No table found");
-			const days = Array.from(table.children);
-			const timetable = days.map((day) => this.parseDay(day)).flat(1);
-			if (timetable.length === 0) throw Error("Timetable is empty");
-			return timetable;
+	public async parseTimetable(html: string) {
+		const table = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
+		if (!table) throw Error("No table found");
+		const days = Array.from(table.children);
+		const timetable = days.map((day) => this.parseDay(day)).flat(1);
+		if (timetable.length === 0) throw Error("Timetable is empty");
+		return timetable;
 	}
 	
 	
