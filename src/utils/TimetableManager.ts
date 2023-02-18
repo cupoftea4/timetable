@@ -47,14 +47,14 @@ class TimetableManager {
   private lecturers: string[] = [];
 
   async init() {
+    // cache only data
+    this.timetables = (await storage.getItem(TIMETABLES)) || [];
+    storage.getItem(EXAMS_TIMETABLES).then(data => this.examsTimetables = data || []);
+    
     // request data from server if needed
     this.groups = await this.getData(GROUPS, FallbackData.getGroups);
     this.selectiveGroups = await this.getData(SELECTIVE_GROUPS, FallbackData.getSelectiveGroups);
     this.lecturers = await this.getData(LECTURERS, FallbackData.getLecturers);
-
-    // cache only data
-    this.timetables = (await storage.getItem(TIMETABLES)) || [];
-    storage.getItem(EXAMS_TIMETABLES).then(data => this.examsTimetables = data || []);
   }
 
   isInited() {
@@ -151,29 +151,29 @@ class TimetableManager {
   }
 
   getTimetable(group: string, type?: TimetableType, checkCache = true) {
-    let cacheData: Promise<TimetableItem[]>, fetchData: Promise<TimetableItem[] | null>;
+    let cacheData: Promise<TimetableItem[] | undefined>, fetchData: Promise<TimetableItem[] | null>;
     group = group.trim();
     const data = this.timetables.find(el => el.group.toUpperCase() === group.toUpperCase());
     const timetableType = type ?? this.tryToGetType(group);
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${group}`);
 
-    if (checkCache && data && !Util.needsUpdate(data.time)) {
-      cacheData = storage.getItem(TIMETABLE + group);      
+    if (data && !Util.needsUpdate(data.time)) {
+      cacheData = storage.getItem(TIMETABLE + group);
     } else {
-      cacheData = FallbackData.getTimetable(timetableType, group);
+      cacheData = FallbackData.getTimetable(timetableType, group)
+        .catch(() => storage.getItem(TIMETABLE + group));
     }
 
-    this.timetables = this.timetables.filter(
-      el => el.group.toUpperCase() !== group.toUpperCase()
-    );
-    this.timetables.push({
-      group: group,
-      time: Date.now(),
-      subgroup: data?.subgroup
-    });
-
-    const setStorageData = (timetable: TimetableItem[] | null) => {
+    const setStorageData = (timetable: TimetableItem[] | null | undefined) => {
       if(!timetable) return;
+      this.timetables = this.timetables.filter(
+        el => el.group.toUpperCase() !== group.toUpperCase()
+      );
+      this.timetables.push({
+        group: group,
+        time: Date.now(),
+        subgroup: data?.subgroup
+      });
       storage.setItem(TIMETABLE + group, timetable);
       storage.setItem(TIMETABLES, this.timetables);
     }
@@ -351,16 +351,21 @@ class TimetableManager {
     if (!Array.isArray(cached) && cached) return cached;
     
     if (DEVELOP) console.log("Getting data from server", cacheKey);
-    const binding = (cacheKey.includes("partial")) ? LPNUData : FallbackData;
-    const data: T = await fn.call(binding, ...args);
+    const binding = (cacheKey.includes("partial")) ? LPNUData : FallbackData; // TODO: fix this
+    const data: T = await fn.call(binding, ...args).catch(async () => {
+      if (DEVELOP) console.log("Failed to get data from server", cacheKey);
+      const cached = await this.getFromCache<T>(cacheKey, true);
+      if (cached) return cached;
+      throw Error("Failed to get data from server");
+    });
     this.updateCache(cacheKey, data);
     return data;
   }
 
-  private async getFromCache<T>(key: string) {
+  private async getFromCache<T>(key: string, force = false) {
     const cached = await storage.getItem(key);
     const updated = await storage.getItem(key + UPDATED);
-    if (cached && !Util.needsUpdate(updated)) return cached as T;
+    if (cached && (!Util.needsUpdate(updated) || force )) return cached as T;
   }
 
   private updateCache(key: string, data: any) {

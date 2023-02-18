@@ -79,11 +79,17 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
         TimetableManager.getExamsTimetable(group, type, checkCache)
       );
 
-    setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
-    if (type === 'timetable') TimetableManager.getPartials(group).then(setPartials);
+    const renderTimetable = (timetable: TimetableItem[], optimistic: boolean) => {
+      setTimetable(t => {
+        JSON.stringify(t) !== JSON.stringify(timetable) && setTimetable(timetable); 
+        return t ?? timetable;
+      });
+      setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
+      if (!optimistic && type === 'timetable') TimetableManager.getPartials(group).then(setPartials);
+    };
     
     return optimisticRender(
-      setTimetable, onError, 
+      renderTimetable, onError, 
       TimetableManager.getTimetable(group, type, checkCache)
     );
   };

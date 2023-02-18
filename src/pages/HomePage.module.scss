@@ -9,6 +9,27 @@ $lecturers-second-layer-width: 20rem;
 .container {
   max-width: var(--max-app-width);
   margin: 0 auto;
+  @include mobile {
+    position: relative;
+    min-height: calc(100% - 5rem);
+  }
+}
+
+.feedback {
+  position: absolute;
+  bottom: 1rem;
+  right: 50%;
+  transform: translateX(50%);
+  color: var(--accent-clr);
+  font-size: $small-font-size;
+  a {
+    text-decoration: underline;
+  }
+  @include mobile {
+    bottom: 0.5rem;
+    font-size: $small-font-size;
+    white-space: nowrap;
+  }
 }
 
 .selection {

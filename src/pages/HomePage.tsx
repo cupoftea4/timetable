@@ -112,6 +112,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
               </div>
           }
         </section>
+        <p className={styles.feedback}>Bug report: <a href="https://t.me/lpnu_timetable">@lpnu_timetable</a></p>
       </main>
     </>
   );
