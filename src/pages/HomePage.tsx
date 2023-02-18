@@ -92,8 +92,8 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   };
 
   return (
-    <>
-      <HeaderPanel timetableType={timetableType}/>
+    <div className={styles.wrapper}>
+      <HeaderPanel timetableType={timetableType} className={styles.header}/>
       <main className={styles.container}>
         <section className={`${styles.selection} ${isTablet && selectedSecond && styles["one-column"]}`} 
           data-attr={timetableType + "-groups"}>
@@ -114,7 +114,7 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
         </section>
         <p className={styles.feedback}>Bug report: <a href="https://t.me/lpnu_timetable">@lpnu_timetable</a></p>
       </main>
-    </>
+    </div>
   );
 };
 

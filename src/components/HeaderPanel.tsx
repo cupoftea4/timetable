@@ -10,9 +10,10 @@ import Navigation from './Navigation';
 
 type OwnProps = {
   timetableType: TimetableType;
+  className?: string;
 };
 
-const HeaderPanel : FC<OwnProps> = ({timetableType}) => {
+const HeaderPanel : FC<OwnProps> = ({timetableType, className}) => {
   const { width } = useWindowDimensions();
   const shouldShrinkSearchBar = useMemo(() => width < TABLET_SCREEN_BREAKPOINT && width > NARROW_SCREEN_BREAKPOINT, [width]);
   const [showSearchBar, setShowSearchBar] = useState(!shouldShrinkSearchBar);
@@ -24,7 +25,7 @@ const HeaderPanel : FC<OwnProps> = ({timetableType}) => {
   };
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${className}`} >
       <SearchBar toggleSearchBar={toggleSearchBar} show={showSearchBar} /> 
       {showSearchBar && shouldShrinkSearchBar ?
         null 

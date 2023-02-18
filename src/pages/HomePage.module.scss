@@ -6,33 +6,36 @@ $first-layer-width: 9rem;
 $second-layer-width: 9rem;
 $lecturers-second-layer-width: 20rem;
 
-.container {
-  max-width: var(--max-app-width);
-  margin: 0 auto;
-  @include mobile {
-    position: relative;
-    min-height: calc(100% - 5rem);
+.wrapper {
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  .header {
+    width: 100%;
   }
-}
-
-.feedback {
-  position: absolute;
-  bottom: 1rem;
-  right: 50%;
-  transform: translateX(50%);
-  color: var(--accent-clr);
-  font-size: $small-font-size;
-  a {
-    text-decoration: underline;
-  }
-  @include mobile {
-    bottom: 0.5rem;
-    font-size: $small-font-size;
-    white-space: nowrap;
+  .container {
+    width: 100%;
+    max-width: var(--max-app-width);
+    margin: 0 auto;
+    flex: 1;
+    display: flex;
+    flex-flow: column;
+    .feedback {
+      position: relative;
+      align-self: center;
+      width: fit-content;
+      color: var(--accent-clr);
+      white-space: nowrap;
+      font-size: $small-font-size;
+      > a {
+        text-decoration: underline;
+      }
+    }
   }
 }
 
 .selection {
+  flex: 1;
   --first-layer-width: #{$first-layer-width};
   --second-layer-width: #{$second-layer-width};
   display: grid;

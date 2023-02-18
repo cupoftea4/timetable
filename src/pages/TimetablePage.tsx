@@ -118,8 +118,8 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     <>
       {timetableGroup !== null ? 
         !isLoading ?
-          <>
-            <header className={headerStyles.header}>
+          <div className={styles.wrapper}>
+            <header className={`${headerStyles.header} ${styles.header}`}>
               <nav className={headerStyles['right-buttons']}> 
                 <Link to="/"><HomeIcon /></Link>
                 <SavedMenu />
@@ -172,7 +172,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
               <button onClick={() => updateTimetable()}>Оновити</button>
               {time && <p>Востаннє {new Date(time).toLocaleString()}</p>}
             </footer>
-          </>       
+          </div>       
         : <LoadingPage/>
       : <Navigate to="/"/>}
     </>
