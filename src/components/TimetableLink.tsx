@@ -34,7 +34,7 @@ const TimetableLink: FC<OwnProps>  = ({ urls, type }) => {
     <>
       {urls.length === 1 ? 
         <a href={urls[0]} target="_blank" rel="noreferrer"
-          className={`${styles.link} ${styles[type]}`}
+          className={`${styles.link} ${type}`}
         >
           {getLinkIcon(urls[0])}
           Join
@@ -44,7 +44,7 @@ const TimetableLink: FC<OwnProps>  = ({ urls, type }) => {
           onMouseEnter={openDropdown}  onMouseLeave={closeDropdown} 
           onFocusCapture={openDropdown}
           >
-            <button className={`${styles[type]} ${showDropdown && styles.active}`} tabIndex={-1}>
+            <button className={`${type} ${showDropdown && styles.active}`} tabIndex={-1}>
               Links {showDropdown ? "▴" : "▾"}
             </button>
               {showDropdown &&

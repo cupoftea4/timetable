@@ -2,7 +2,9 @@
 
 .links {
   position: relative;
+  
   button {
+    --bg-alpha: 1;
     color: var(--text-clr);
     padding: 0.25em 0.5em;
     border-radius: .5rem;
@@ -35,6 +37,7 @@
 }
 
 .link {
+  --bg-alpha: 1;
   display: flex;
   align-items: center;
   gap: .25rem;
@@ -46,30 +49,6 @@
   svg {
     width: 1rem;
     height: auto;
-  }
-}
-
-.lecture, .lection {
-  background-color: $timetable-lect-clr;
-}
-
-.lab {
-  background-color: $timetable-lab-clr;
-}
-
-.practical {
-  background-color: $timetable-pract-clr;
-}
-
-a, button {
-  &.lection:hover, &.lecture:hover {
-    background-color: $timetable-lect-hover-clr;
-  }
-  &.lab:hover {
-    background-color: $timetable-lab-hover-clr;
-  }
-  &.practical:hover {
-    background-color: $timetable-pract-hover-clr;
   }
 }
 

@@ -9,7 +9,14 @@ $cell-border-radius: .625rem;
 
 .timetable-td {
   position: relative;
+  --bg-alpha: 0.05;
+
+  @include timetable-mobile {
+    --bg-alpha: 0;
+  }
+  
   .spacer {
+    --bg-alpha: 1;
     position: absolute;
     top: 0;
     height: 100%;
@@ -50,7 +57,6 @@ $cell-border-radius: .625rem;
 
   .cell {
     margin: 0 .125rem .5rem .125rem;
-    border-radius: $cell-border-radius;
     display: flex;
     min-height: $min-cell-height;
     max-width: $max-cell-width;
@@ -61,6 +67,7 @@ $cell-border-radius: .625rem;
     }
 
     @include timetable-mobile {
+      border-radius: $cell-border-radius;
       --bg-alpha: .5;
       color: white;
       @include dark-mode {
@@ -68,17 +75,6 @@ $cell-border-radius: .625rem;
         color: var(--text-clr);
       } 
       backdrop-filter: blur(10px);
-      &.lecture, &.lection {
-        background-color: hsla(205, 81%, 45%, calc(var(--bg-alpha) - 0.1));
-      }
-      
-      &.lab {
-        background-color: hsla(25, 78%, 56%, calc(var(--bg-alpha) - 0.1));
-      }
-      
-      &.practical {
-        background-color: hsla(277, 32%, 56%, var(--bg-alpha));
-      }
     }
     
     @include timetable-mobile {
@@ -132,18 +128,6 @@ $cell-border-radius: .625rem;
 
 td.empty {
   min-width: 12rem;
-}
-
-.lecture, .lection {
-  background-color: $timetable-lect-clr;
-}
-
-.lab {
-  background-color: $timetable-lab-clr;
-}
-
-.practical {
-  background-color: $timetable-pract-clr;
 }
 
 

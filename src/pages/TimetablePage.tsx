@@ -1,21 +1,24 @@
 import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
-import LoadingPage from './LoadingPage';
-import headerStyles from '../components/HeaderPanel.module.scss';
-import Timetable from '../components/Timetable';
-import SavedMenu from '../components/SavedMenu';
-import Toggle from '../components/Toggle';
-import TimetableManager from '../utils/TimetableManager';
-import { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from '../utils/types';
+import DownloadIcon from '../assets/DownloadIcon';
 import HomeIcon from '../assets/HomeIcon';
-import styles from './TimetablePage.module.scss';
-import { getCurrentUADate, getNULPWeek } from '../utils/date';
-import * as handler from '../utils/requestHandler';
+import LoadingIcon from '../assets/LoadingIcon';
 import ExamsTimetable from '../components/ExamsTimetable';
+import headerStyles from '../components/HeaderPanel.module.scss';
+import SavedMenu from '../components/SavedMenu';
+import Timetable from '../components/Timetable';
 import TimetablePartials from '../components/TimetablePartials';
-import { optimisticRender } from '../utils/utils';
+import Toggle from '../components/Toggle';
 import useWindowDimensions from '../hooks/useWindowDimensions';
 import { MOBILE_SCREEN_BREAKPOINT } from '../utils/constants';
+import { getCurrentUADate, getNULPWeek } from '../utils/date';
+import ISCFile from '../utils/ICSFile';
+import * as handler from '../utils/requestHandler';
+import TimetableManager from '../utils/TimetableManager';
+import { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from '../utils/types';
+import { optimisticRender } from '../utils/utils';
+import LoadingPage from './LoadingPage';
+import styles from './TimetablePage.module.scss';
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => { // yeah, naming! :)
   const width = el.getBoundingClientRect().width;
@@ -42,6 +45,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup); 
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
   const [partials, setPartials] = useState<HalfTerm[]>([]);
+  const [loading, setLoading] = useState(false);
   const { width } = useWindowDimensions();
   const navigate = useNavigate();
   const timetableRef = useRef<HTMLElement>(null);
@@ -102,7 +106,9 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   };
 
   const updateTimetable = (checkCache = false) => {
-    handler.promise(getTimetable(group, isExamsTimetable, undefined, checkCache));
+    setLoading(true);
+    getTimetable(group, isExamsTimetable, undefined, checkCache)
+      .finally(() => setLoading(false));
   };
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
@@ -113,6 +119,18 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     if (partial === 0) return updateTimetable(true);
     handler.promise(TimetableManager.getPartialTimetable(group, partial).then(setTimetable));
   };
+
+  const icsFILE = useMemo(() => {
+    let fileContent;
+    if (!isExamsTimetable && timetable) {
+      fileContent= ISCFile.fromTimetable(timetable, isSecondSubgroup ? 2 : 1, isSecondWeek ? 2 : 1);     
+    } else if (isExamsTimetable && examsTimetable) {
+      fileContent = ISCFile.fromExamsTimetable(examsTimetable);
+    } else return;
+    const blob = new Blob([fileContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    return url; 
+  }, [isSecondSubgroup, isSecondWeek, timetable, examsTimetable, isExamsTimetable]);
 
   return (
     <>
@@ -168,9 +186,19 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                 }
               </section>
             </main> 
-            <footer className={styles.update}>
-              <button onClick={() => updateTimetable()}>Оновити</button>
-              {time && <p>Востаннє {new Date(time).toLocaleString()}</p>}
+            <footer className={styles.bottom}>
+              <span>
+                <button 
+                  className={`${styles.update} ${loading && styles.loading}`} title='Оновити дані' 
+                  onClick={() => updateTimetable()}
+                >
+                  <LoadingIcon/>
+                </button>
+                <a className={styles.download} title='Експортувати розклад для Google Calendar' href={icsFILE} 
+                  download={isExamsTimetable ? `${group}-exams.ics` : `${group}-${isSecondSubgroup ? 2 : 1}.ics`}
+                ><DownloadIcon/></a> 
+              </span>
+              {time && <p>Last updated {new Date(time).toLocaleString()}</p>}
             </footer>
           </div>       
         : <LoadingPage/>

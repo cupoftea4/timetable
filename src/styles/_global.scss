@@ -71,3 +71,32 @@ body {
   }
 }
 
+@function hsla-from-hsl($hsl, $alpha) {
+  $hsl-list: $hsl;
+  @return hsla(nth($hsl-list, 1), nth($hsl-list, 2), nth($hsl-list, 3), $alpha);
+}
+
+
+.lecture, .lection {
+  background-color: hsla-from-hsl($timetable-lect-hsl, var(--bg-alpha, 1));
+}
+
+.lab {
+  background-color: hsla-from-hsl($timetable-lab-hsl, var(--bg-alpha, 1));
+}
+
+.practical {  
+  background-color: hsla-from-hsl($timetable-pract-hsl, var(--bg-alpha, 1));
+}
+
+a, button {
+  &.lection:hover, &.lecture:hover {
+    background-color: $timetable-lect-hover-clr;
+  }
+  &.lab:hover {
+    background-color: $timetable-lab-hover-clr;
+  }
+  &.practical:hover {
+    background-color: $timetable-pract-hover-clr;
+  }
+}

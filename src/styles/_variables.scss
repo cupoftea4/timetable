@@ -1,22 +1,20 @@
 
 :root {
-
   --max-app-width: 90rem;
   --accent-clr: hsla(0, 0%, 100%, 0.15);
   --text-clr: hsla(0, 0%, 100%, 1);
   --border-clr: hsla(209, 94%, 94%, 0.139);
-
   @media screen and (prefers-color-scheme: dark) {
     --accent-clr: hsla(0, 0%, 100%, 0.15);
     --text-clr: hsla(0, 0%, 100%, 0.9);
   }
 }
 
-$timetable-lect-clr: hsl(205, 81%, 45%);
+$timetable-lect-hsl: (205 81% 45%);
 $timetable-lect-hover-clr: hsl(205, 100%, 50%);
-$timetable-lab-clr: hsl(25, 78%, 56%);
+$timetable-lab-hsl: (25, 78%, 56%);
 $timetable-lab-hover-clr: hsl(25, 100%, 64%);
-$timetable-pract-clr: hsl(277, 32%, 56%);
+$timetable-pract-hsl: (277 32% 56%);
 $timetable-pract-hover-clr: hsl(277, 32%, 64%);
 
 $extra-text-clr: hsla(0, 0%, 100%, 0.8);
@@ -45,7 +43,7 @@ $main-padding: 1rem;
 
 $header-icon-size: 2.325rem;
 
-$spin-animation: spin 2s ease-in-out infinite reverse;
+$spin-animation: spin 1s ease-in-out infinite reverse;
 
 @keyframes spin {
   0% {

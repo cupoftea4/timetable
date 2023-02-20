@@ -21,10 +21,10 @@ const TimetableCell: FC<OwnProps> = ({lesson, active, cellSubgroup}) => {
   return ( 
     <>
       {innerLesson !== null ? (
-          <td className={`${styles['timetable-td']} ${!shouldAppear ? styles.hide : styles.show} ${active && styles.active}`}>
-            <div className={`${styles.spacer} ${styles[innerLesson.type]}`} 
+          <td className={`${styles['timetable-td']} ${innerLesson.type} ${!shouldAppear ? styles.hide : styles.show} ${active && styles.active}`}>
+            <div className={`${styles.spacer} ${innerLesson.type}`} 
               data-time={`${times?.start}-${times?.end}`} data-number={innerLesson.number}/>
-            <div className={`${styles.cell} ${styles[innerLesson.type]}`} >
+            <div className={`${styles.cell} ${innerLesson.type}`} >
               <div className={styles.info}>
                 {cellSubgroup && !isForBothSubgroups  && 
                   <span className={styles.subgroup}>

@@ -44,13 +44,34 @@
   }
 }
 
-.update {
+.bottom {
   @include flex-center;
   flex-direction: column;
   font-size: $small-font-size;
   padding: 1rem 0;
   gap: .125rem;
-  button {
-    @include light-pillow-button;
+  span {
+    display: flex;
+    align-items: center;
+    gap: .625rem;
+    .download {
+      --icon-size: 1.325rem;
+    }
+    .update {
+      --icon-size: 1.625rem;
+      &.loading {
+        svg {
+          animation: $spin-animation;
+        }
+      }
+    }
+  }
+  svg {
+    transition: all .2s ease-in-out;
+    &:hover {
+      transform: scale(1.1);
+    }
+    width: var(--icon-size);
+    height: var(--icon-size);
   }
 }

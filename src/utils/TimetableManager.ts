@@ -374,4 +374,6 @@ class TimetableManager {
   }
 }
 
-export default new TimetableManager();
+const manager = new TimetableManager();
+
+export default manager;
