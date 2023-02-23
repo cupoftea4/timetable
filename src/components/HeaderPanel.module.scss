@@ -2,7 +2,7 @@
 @use '../styles/mixins' as *;
 
 .header {
-  max-width: 90rem;
+  max-width: var(--max-app-width);
   margin: 0 auto;
   padding: 2rem 4rem .75rem 4rem;
   @include tablet {

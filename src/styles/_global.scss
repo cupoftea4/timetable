@@ -8,9 +8,18 @@
     font-size: 16px;
   }
   @include large-screen {
-    --max-app-width: 100rem;
+    font-size: 18px;
   }
-  
+  @include screen-2k {
+    font-size: 22px;
+    .toast {
+      font-size: 18px;
+    }
+  }
+  @include screen-4k {
+    font-size: 24px;
+  }
+
   @include auto-scroll(y, auto, transparent, var(--accent-clr), false);
   overflow: overlay; // deprecated :(
 }
@@ -69,6 +78,10 @@ body {
     }
    
   }
+}
+
+.toast {
+  font-size: 16px;
 }
 
 @function hsla-from-hsl($hsl, $alpha) {

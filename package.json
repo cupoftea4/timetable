@@ -15,7 +15,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "start:dev": "env-cmd -f dev.env npm start",
+    "dev": "env-cmd -f dev.env npm start",
     "build:prod": "env-cmd -f .env yarn run build",
     "build:hope": "env-cmd -f hope.env yarn run build"
   },

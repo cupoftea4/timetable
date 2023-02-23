@@ -43,14 +43,14 @@ $main-padding: 1rem;
 
 $header-icon-size: 2.325rem;
 
-$spin-animation: spin 1s ease-in-out infinite reverse;
+$spin-animation: spin 1s ease-in-out infinite;
 
 @keyframes spin {
   0% {
-    transform: rotate(0deg);
+    transform: rotate(0deg) scaleX(-1);
   }
   100% {
-    transform: rotate(360deg);
+    transform: rotate(360deg) scaleX(-1);
   }
 }
 

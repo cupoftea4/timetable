@@ -16,12 +16,17 @@ const ANIMATION_DURATION = 300;
 const TimetableCell: FC<OwnProps> = ({lesson, active, cellSubgroup}) => {
   const [innerLesson, shouldAppear] = useDelayedProp(lesson, ANIMATION_DURATION);
   const isForBothSubgroups = innerLesson?.isFirstSubgroup && innerLesson?.isSecondSubgroup;
-  const times = innerLesson && TimetableUtil.lessonsTimes[innerLesson.number]
+  const times = innerLesson && TimetableUtil.lessonsTimes[innerLesson.number - 1]
 
   return ( 
     <>
       {innerLesson !== null ? (
-          <td className={`${styles['timetable-td']} ${innerLesson.type} ${!shouldAppear ? styles.hide : styles.show} ${active && styles.active}`}>
+          <td className={`
+              ${styles['timetable-td']} 
+              ${innerLesson.type} 
+              ${!shouldAppear ? styles.hide : styles.show} 
+              ${active && styles.active}`
+            }>
             <div className={`${styles.spacer} ${innerLesson.type}`} 
               data-time={`${times?.start}-${times?.end}`} data-number={innerLesson.number}/>
             <div className={`${styles.cell} ${innerLesson.type}`} >

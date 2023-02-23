@@ -142,7 +142,19 @@
 }
 
 @mixin large-screen {
-  @media (min-width: 1600px) {
+  @media (min-width: 1860px) {
+      @content;
+  }
+}
+
+@mixin screen-2k {
+  @media (min-width: 2500px) {
+      @content;
+  }
+}
+
+@mixin screen-4k {
+  @media (min-width: 3600px) {
       @content;
   }
 }
