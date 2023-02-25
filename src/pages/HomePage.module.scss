@@ -11,6 +11,7 @@ $lecturers-second-layer-width: 20rem;
   display: flex;
   flex-flow: column;
   .header {
+    min-height: 5.625rem; // to make height more consistent when search bar shrinks
     width: 100%;
   }
   .container {
@@ -24,7 +25,7 @@ $lecturers-second-layer-width: 20rem;
       position: relative;
       align-self: center;
       width: fit-content;
-      color: var(--accent-clr);
+      color: hsla(0, 0%, 100%, 0.5);
       white-space: nowrap;
       font-size: $small-font-size;
       > a {

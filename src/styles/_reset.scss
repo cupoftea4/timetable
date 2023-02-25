@@ -22,6 +22,16 @@ button {
   cursor: pointer;
 }
 
+input,
+textarea,
+button,
+select,
+svg,
+div,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
 html:focus-within {
   scroll-behavior: smooth;
 }

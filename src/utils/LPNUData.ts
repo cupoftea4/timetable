@@ -7,7 +7,7 @@ const NULP_STAFF = "https://staff.lpnu.ua/";
 
 const PROXY = process.env.REACT_APP_PROXY;
 
-const TIMEOUT = 10000; // 10s
+const TIMEOUT = 35000; // 35s
 
 const TIMETABLE_SUFFIX = "students_schedule";
 const SELECTIVE_SUFFIX = "schedule_selective";

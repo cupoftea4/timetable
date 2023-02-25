@@ -64,7 +64,8 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     } 
     if (timetableType === 'selective' && isExamsTimetable) navigate('/' + group);
     setTimetableGroup(group);
-    handler.promise(getTimetable(group, isExamsTimetable, timetableType));
+    setLoading(true);
+    getTimetable(group, isExamsTimetable, timetableType).finally(() => setLoading(false));
   }, [group, isExamsTimetable, navigate, timetableType]);
   
   useEffect(() => {
@@ -106,6 +107,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   };
 
   const updateTimetable = (checkCache = false) => {
+    if (loading) return;
     setLoading(true);
     getTimetable(group, isExamsTimetable, undefined, checkCache)
       .finally(() => setLoading(false));
@@ -189,6 +191,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
             <footer className={styles.bottom}>
               <span>
                 <button 
+                  disabled={loading}
                   className={`${styles.update} ${loading && styles.loading}`} title='Оновити дані' 
                   onClick={() => updateTimetable()}
                 >

@@ -3,9 +3,9 @@
   "name": "NULP Timetable",
   "icons": [
     {
-      "src": "images/favicon.ico",
-      "sizes": "200x210",
-      "type": "image/x-icon"
+      "src": "images/favicon.png",
+      "sizes": "200x200",
+      "type": "image/png"
     }    
   ],
   "start_url": ".",
