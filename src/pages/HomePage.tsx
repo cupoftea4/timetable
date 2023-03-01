@@ -107,8 +107,8 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
             <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"}/>
             : 
               <div className={styles['no-selection']}>
-                <img src={catImage} draggable="false" alt="cat" width="800" height="800"/>
-                <p>Оберіть спецільність, щоб продовжити</p>
+                <img className={styles.cat} src={catImage} draggable="false" alt="cat" width="800" height="800"/>
+                <p className={styles['cat-text']}>Оберіть спецільність, щоб продовжити</p>
               </div>
           }
         </section>

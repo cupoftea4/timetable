@@ -1,6 +1,8 @@
 import { toast } from "react-toastify"
 import { TOAST_AUTO_CLOSE_TIME } from "./constants";
 
+const DEBOUNCE_TOAST_TIME = 500;
+
 
 export function timeout<T>(ms: number, promise: Promise<T>): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -56,7 +58,7 @@ export function showPromiseToast(promise: Promise<any>, params: PromiseToastPara
     if (pendingToasts.has(params.pending) || isPromiseResolved) return;
     pendingToasts.add(params.pending);
     toast.promise(promise, params).finally(() => pendingToasts.delete(params.pending));
-  }, 500);
+  }, DEBOUNCE_TOAST_TIME);
 }
 
 export function showErrorToast(message: string) {

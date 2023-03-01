@@ -7,7 +7,8 @@ $second-layer-width: 9rem;
 $lecturers-second-layer-width: 20rem;
 
 .wrapper {
-  height: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-flow: column;
   .header {
@@ -78,12 +79,12 @@ $lecturers-second-layer-width: 20rem;
       max-width: calc(var(--second-layer-width) - var(--scrollbar-width, 0)); 
     }
     
-    li {
+    > li {
       @include fade-in-animation(0.3s);
       font-size: $medium-font-size;  
       margin: 0.1rem 0;
 
-      button {
+      > button {
         word-wrap: break-word;
         width: 100%;
         padding: .1em .5em;  
@@ -128,13 +129,12 @@ $lecturers-second-layer-width: 20rem;
     height: 65dvh;
     @include flex-center;
     flex-direction: column;
-    img {
+    .cat {
       width: 20rem;
       height: auto;
       filter: invert(75%);
     }
-    p {
-      font-size: $medium-font-size;
+    .cat-text {
       text-align: center;
       color: $extra-text-clr;
     }

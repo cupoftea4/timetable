@@ -15,14 +15,14 @@
   z-index: 101;
   display: flex;
   align-items: flex-end;
-  ul {
+  > ul {
     flex: 1;
     background: var(--accent-clr);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: $border-radius $border-radius 0 0;
     padding: .5rem 0;
-    li {
+    > li {
       font-size: $medium-font-size;
       &:not(:last-child) {
         &:after {
@@ -36,7 +36,7 @@
           background: var(--accent-clr);
         }
       }
-      button {
+      > button {
         width: 100%;
         padding: .75rem 2rem;
       }

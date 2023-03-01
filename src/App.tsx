@@ -12,7 +12,13 @@ import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 /* TODO:
   - update partials
   - add partial timetables to timetable-data
-  - /%D0%A2%D0%A0-22/exams - somehow fix overflow
+  - add Merged timetables
+  - fix light theme
+  - pwa opens last saved timetable automatically
+  - add lines between lectures on mobile
+  - fix timetable-data to work even if something goes wrong (like institutes fetching)
+  - github actions to commit only diff
+  - probably fix different horizontal spacing between lectures
  */
 
 const App = () => {
@@ -46,7 +52,7 @@ const App = () => {
         :
         <LoadingPage/>
       }
-      <MessageToast position="bottom-right" theme="colored" autoClose={TOAST_AUTO_CLOSE_TIME} /> 
+      <MessageToast position="bottom-right" theme="colored" pauseOnFocusLoss={false} autoClose={TOAST_AUTO_CLOSE_TIME} /> 
     </>
   );
 };

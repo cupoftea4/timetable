@@ -55,12 +55,14 @@ const SavedMenu = () => {
     <div className={styles.saved} tabIndex={0}
       onMouseEnter={openMenu}  onMouseLeave={closeMenu} 
       onFocusCapture={openMenu} onKeyDown={arrowNavigation}
-      aria-expanded={isMenuOpen}
+      aria-expanded={isMenuOpen ? "true" : "false"}
+      aria-controls="saved-menu"
       aria-label="Saved groups menu"
+      role="button"
     >
       <HistoryIcon />
       {isMenuOpen &&
-        <div className={`${styles['saved-menu']} ${groupParam && styles.home}`} >
+        <div className={`${styles['saved-menu']} ${groupParam && styles.home}`} id="saved-menu" aria-hidden={!isMenuOpen ? "true" : "false"}>
           <span>
             {savedGroups.length !== 0 ? "Збережені" : "Немає збережених. Відкрийте будь-який розклад, щоб автоматично зберегти."}
           </span>

@@ -36,10 +36,10 @@ const TimetableCell: FC<OwnProps> = ({lesson, active, cellSubgroup}) => {
                     {innerLesson.isSecondSubgroup ? "II" : "I"} підгрупа
                   </span>}
                 <span className={styles.title}>
-                  <h4>{innerLesson.subject.replace('`', '’')}</h4> 
+                  <h2 className={styles.name}>{innerLesson.subject.replace('`', '’')}</h2> 
                   {innerLesson.lecturer.trim().replace(/,$/, '')}
                 </span> 
-                <span>  
+                <span className={styles.extra}>  
                   {innerLesson.location.replaceAll(/,./g, '').trim()} 
                   <TimetableLink urls={innerLesson.urls} type={innerLesson.type} />
                 </span>
