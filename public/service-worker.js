@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 const DYNAMIC_CACHE_NAME_PREFIX  = 'd-app-v';
-const CURRENT_CACHE_VERSION = "1.3";
+const CURRENT_CACHE_VERSION = "1.4";
 const DYNAMIC_CACHE_NAME  = `${DYNAMIC_CACHE_NAME_PREFIX}${CURRENT_CACHE_VERSION}`;
 
 self.addEventListener('activate', event => {

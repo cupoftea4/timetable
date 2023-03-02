@@ -66,6 +66,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     setTimetableGroup(group);
     setLoading(true);
     getTimetable(group, isExamsTimetable, timetableType).finally(() => setLoading(false));
+    TimetableManager.updateLastOpenedTimetable(group);
   }, [group, isExamsTimetable, navigate, timetableType]);
   
   useEffect(() => {
@@ -141,7 +142,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
           <div className={styles.wrapper}>
             <header className={`${headerStyles.header} ${styles.header}`}>
               <nav className={headerStyles['right-buttons']}> 
-                <Link to="/" aria-label="Home"><HomeIcon /></Link>
+                <Link state={{force: true}} to="/" aria-label="Home"><HomeIcon /></Link>
                 <SavedMenu />
                 <h1 className={styles.title}>{timetableGroup}</h1>
                 {

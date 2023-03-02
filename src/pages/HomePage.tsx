@@ -9,6 +9,7 @@ import List from "../components/List";
 import * as handler from '../utils/requestHandler'
 import { TABLET_SCREEN_BREAKPOINT } from "../utils/constants";
 import catImage from '../assets/cat.svg';
+import { useLocation, useNavigate } from "react-router-dom";
 
 type OwnProps = {
   timetableType: TimetableType;
@@ -21,14 +22,18 @@ const handleHashChange = (newHash: string) => {
   if (hash !== newHash) window.history.replaceState(newHash, 'custom', `#${newHash}` ); 
 }
 
-const HomePage: FC<OwnProps>  = ({timetableType}) => {
+const HomePage: FC<OwnProps>  = ({timetableType }) => {
   const [firstLayer, setFirstLayer] = useState<string[]>([]); // institutes/alphabet
   const [secondLayer, setSecondLayer] = useState<string[]>([]); // majors/departments/selective
   const [thirdLayer, setThirdLayer] = useState<string[]>([]); // groups/lecturers
   const [selectedFirst, setSelectedFirst] = useState<string | null>(null);
   const [selectedSecond, setSelectedSecond] = useState<string | null>(null);
+  
+  const { state }: {state: {force: boolean} | null} = useLocation();
+  const { force } = state || {};
 
   const { width } = useWindowDimensions();
+  const navigate = useNavigate();
   const isTablet = width < TABLET_SCREEN_BREAKPOINT;
   const showFirstLayer = (!isTablet || !selectedSecond);
   const showSecondLayer = showFirstLayer && secondLayer.length > 0;
@@ -45,15 +50,19 @@ const HomePage: FC<OwnProps>  = ({timetableType}) => {
   }, [timetableType]);
 
   useEffect(() => {
+    if (!force && window.matchMedia('(display-mode: standalone)').matches) {
+      TimetableManager.getLastOpenedTimetable()
+        .then(t => t && navigate(t));
+    }
+    window.onpopstate = () => {setSelectedSecond(null)}
+    return () => {window.onpopstate = null}
+  }, [force, navigate]);
+
+  useEffect(() => {
     if (secondLayer.includes(getHash())) {
       handleSecondSelect(getHash());
     }
   }, [secondLayer, handleSecondSelect]);
-
-  useEffect(() => {
-      window.onpopstate = () => {setSelectedSecond(null)}
-      return () => {window.onpopstate = null}
-  }, []);
   
   useEffect(() => {
     setThirdLayer([]);

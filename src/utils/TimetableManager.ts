@@ -16,6 +16,8 @@ import * as handler from '../utils/requestHandler';
 
 // storage keys
 const LAST_OPENED_INSTITUTE = "last_opened_institute";
+const LAST_OPENED_TIMETABLE = "last_opened_timetable";
+
 const INSTITUTES = "institutes";
 const GROUPS = "groups";
 const LECTURERS = "lecturers";
@@ -39,6 +41,7 @@ class TimetableManager {
   private examsTimetables: CachedTimetable[] = [];
   
   private lastOpenedInstitute: string | null = null;
+  private lastOpenedTimetable: string | null = null;
 
   private firstHalfTermGroups: string[] = [];
   private secondHalfTermGroups: string[] = [];
@@ -117,14 +120,24 @@ class TimetableManager {
     }
   }
 
-  async getLastOpenedInstitute() {
+  async getLastOpenedInstitute() : Promise<string | undefined> {
     if (this.lastOpenedInstitute) return this.lastOpenedInstitute;
     return storage.getItem(LAST_OPENED_INSTITUTE) as Promise<string | undefined>;
+  }
+
+  async getLastOpenedTimetable() : Promise<string | undefined> {
+    if (this.lastOpenedTimetable) return this.lastOpenedTimetable;
+    return storage.getItem(LAST_OPENED_TIMETABLE) as Promise<string | undefined>;
   }
 
   async updateLastOpenedInstitute(institute: string) {
     this.lastOpenedInstitute = institute;
     return storage.setItem(LAST_OPENED_INSTITUTE, institute);
+  }
+
+  async updateLastOpenedTimetable(timetable: string) {
+    this.lastOpenedTimetable = timetable;
+    return storage.setItem(LAST_OPENED_TIMETABLE, timetable);
   }
 
   async getPartialTimetable(group: string, halfTerm: 1 | 2, checkCache = true) {
