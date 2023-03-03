@@ -69,7 +69,7 @@ const SavedMenu = () => {
           <ul>
             {savedGroups.map((group, index) => (
               <li key={index} className={selectedItem === index ? styles.selected : ""}>
-                <Link to={`/${group}`} onFocus={() => setSelectedItem(index)}> 
+                <Link to={`/${group}`} onFocus={() => setSelectedItem(index)} onClick={() => closeMenu()}> 
                   <span>
                     {group} 
                     {groupParam === group ? <CheckMarkIcon className={styles['check-mark']}/> : null}

@@ -50,7 +50,7 @@ const HomePage: FC<OwnProps>  = ({timetableType }) => {
   }, [timetableType]);
 
   useEffect(() => {
-    if (!force && window.matchMedia('(display-mode: standalone)').matches) {
+    if (!force && (window.matchMedia('(display-mode: standalone)').matches || 'ontouchstart' in window)) {
       TimetableManager.getLastOpenedTimetable()
         .then(t => t && navigate(t));
     }

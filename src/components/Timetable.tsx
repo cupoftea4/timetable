@@ -48,7 +48,7 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
   const forBothSubgroups = (item: TimetableItem) => item.isFirstSubgroup && item.isSecondSubgroup;
   const forAllWeeks = (item: TimetableItem) => item.isFirstWeek && item.isSecondWeek;
 
-  const getLessonByDayAndTime = (number: number, day: number) => {
+  const getLessonByDayAndTime = useCallback((number: number, day: number) => {
     if (!timetable) return null;
     return timetable.find(item => 
       item.day === day &&
@@ -56,7 +56,31 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
       (cellSubgroup || item.isSecondSubgroup === isSecondSubgroup || forBothSubgroups(item)) &&
       (item.isSecondWeek === isSecondWeek || forAllWeeks(item))
     ) ?? null;
-  };
+  }, [timetable, isSecondSubgroup, isSecondWeek, cellSubgroup]);
+
+  const tableContent = useMemo(() => {
+    const table = lessonsTimes.map((time, i) => 
+      <tr key={time.start}>{
+        days.map((day, j) =>
+          day === null 
+            ? <th key={time.start + day} style={{height: "5rem"}}>
+                <span>{time.start}</span>
+                <span>{i + 1}</span> 
+                <span>{time.end}</span>
+              </th> 
+            : <TimetableCell
+                isAfterEmpty={i !== 0 && getLessonByDayAndTime(i, j) === null} 
+                lesson={getLessonByDayAndTime(i + 1, j)} 
+                active={currentLessonNumber === i && currentDay === j} 
+                key={time.start + day}
+                cellSubgroup={cellSubgroup}
+            />
+        )
+      }</tr> 
+    );
+    return table;
+  }, [lessonsTimes, days, getLessonByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
+
 
   return (
       <table className={styles.timetable}>
@@ -66,26 +90,7 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
           </tr>
         </thead>
         <tbody>
-          {
-            lessonsTimes.map((time, i) => 
-              <tr key={time.start}>{
-                days.map((day, j) =>
-                  day === null 
-                    ? <th key={time.start + day} style={{height: "5rem"}}>
-                        <span>{time.start}</span>
-                        <span>{i + 1}</span> 
-                        <span>{time.end}</span>
-                      </th> 
-                    : <TimetableCell 
-                          lesson={getLessonByDayAndTime(i + 1, j)} 
-                          active={currentLessonNumber === i && currentDay === j} 
-                          key={time.start + day}
-                          cellSubgroup={cellSubgroup}
-                    />
-                )
-              }</tr>  
-            )
-          }
+          {tableContent}
         </tbody>
      </table>
   )

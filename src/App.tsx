@@ -14,7 +14,6 @@ import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
   - add partial timetables to timetable-data
   - add Merged timetables
   - fix light theme
-  - add lines between lectures on mobile
   - fix timetable-data to work even if something goes wrong (like institutes fetching)
   - github actions to commit only diff
   - probably fix different horizontal spacing between lectures

@@ -123,6 +123,20 @@ $cell-border-radius: .625rem;
 
 td.empty {
   min-width: 12rem;
+  &.border {
+    position: relative;
+    &::before {
+      $border-padding: .75rem;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: $border-padding;
+      width: calc(100% - #{$border-padding} * 2);
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+  }
 }
 
 

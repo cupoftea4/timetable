@@ -9,11 +9,12 @@ type OwnProps = {
   lesson: null | TimetableItem;
   active: boolean;
   cellSubgroup?: boolean;
+  isAfterEmpty?:boolean;
 };
 
 const ANIMATION_DURATION = 300;
 
-const TimetableCell: FC<OwnProps> = ({lesson, active, cellSubgroup}) => {
+const TimetableCell: FC<OwnProps> = ({lesson, active, cellSubgroup, isAfterEmpty}) => {
   const [innerLesson, shouldAppear] = useDelayedProp(lesson, ANIMATION_DURATION);
   const isForBothSubgroups = innerLesson?.isFirstSubgroup && innerLesson?.isSecondSubgroup;
   const times = innerLesson && TimetableUtil.lessonsTimes[innerLesson.number - 1]
@@ -46,7 +47,7 @@ const TimetableCell: FC<OwnProps> = ({lesson, active, cellSubgroup}) => {
               </div>      
             </div>
           </td>
-        ) : <td className={`${styles.empty} ${active && styles.active}`}><div></div></td>
+        ) : <td className={`${styles.empty} ${active && styles.active} ${isAfterEmpty && styles.border}`}><div></div></td>
       }    
     </>
 
