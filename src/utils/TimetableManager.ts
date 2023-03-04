@@ -5,6 +5,7 @@ import {
   CachedTimetable,
   ExamsTimetableItem,
   HalfTerm,
+  MergedTimetable,
   TimetableItem,
   TimetableType
 } from "./types";
@@ -41,6 +42,7 @@ class TimetableManager {
 
   private timetables: CachedTimetable[] = [];
   private examsTimetables: CachedTimetable[] = [];
+  private mergedTimetable: MergedTimetable | null = null;
   
   private lastOpenedInstitute: string | null = null;
   private lastOpenedTimetable: string | null = null;
@@ -54,6 +56,7 @@ class TimetableManager {
   async init() {
     // cache only data
     this.timetables = (await storage.getItem(TIMETABLES)) || [];
+    this.mergedTimetable = (await storage.getItem(MERGED_TIMETABLE)) || null;
     storage.getItem(EXAMS_TIMETABLES).then(data => this.examsTimetables = data || []);
     
     // request data from server if needed
@@ -165,13 +168,14 @@ class TimetableManager {
       .filter(el => el) as HalfTerm[];
   }
 
-  getTimetable(group: string, type?: TimetableType, checkCache = true, cacheOnly = false) {
+  getTimetable(group: string, type?: TimetableType, checkCache = true) {
+    const timetableType = type ?? this.tryToGetType(group);
+    if (!timetableType) throw Error(`Couldn't define a type! Group: ${group}`);
+    if (timetableType === 'merged') return this.getMergedTimetable();
+
     let cacheData: Promise<TimetableItem[] | undefined>, fetchData: Promise<TimetableItem[] | null>;
     group = group.trim();
     const data = this.timetables.find(el => el.group.toUpperCase() === group.toUpperCase());
-    const timetableType = type ?? this.tryToGetType(group);
-    if (!timetableType) throw Error(`Couldn't define a type! Group: ${group}`);
-    if (timetableType === 'merged') throw Error(`Merged timetable is not supported! Group: ${group}`);
 
     if (data && !Util.needsUpdate(data.time)) {
       cacheData = storage.getItem(TIMETABLE + group);
@@ -205,8 +209,24 @@ class TimetableManager {
     return [cacheData, fetchData] as const;
   }
 
-  getMergedTimetable(): Promise<TimetableItem[] | undefined> {
-    return storage.getItem(TIMETABLE + MERGED_TIMETABLE) as Promise<TimetableItem[] | undefined>;
+  getMergedTimetable() {
+    if (!this.mergedTimetable) throw Error("Merge doesn't exist!");
+    let cacheData: Promise<TimetableItem[] | undefined>, fetchData: Promise<TimetableItem[] | null>;
+    const timetables = this.mergedTimetable.timetables.map(el => this.getTimetable(el));
+    const cachePromises = timetables.map(([cache]) => cache);
+    const fetchPromises = timetables.map(([_, fetch]) => fetch);
+    cacheData = Promise.all(cachePromises).then(timetables => {
+      const merged = Util.mergeTimetables(timetables);
+      return merged;
+    });
+    fetchData = Promise.all(fetchPromises).then(timetables => {
+      const merged = Util.mergeTimetables(timetables)
+      return merged;
+    }).catch(() => {
+      handler.warn("Data is possibly outdated!");
+      return null;
+    });
+    return [cacheData, fetchData] as const;
   }
 
 
@@ -249,6 +269,15 @@ class TimetableManager {
     if (!group) return;
     group = group.trim();
 
+    if (Util.isMerged(group)) {
+      if (!this.mergedTimetable) throw Error("Merge doesn't exist!");
+      this.mergedTimetable = {
+        ...this.mergedTimetable,
+        subgroup: subgroup
+      }
+      return storage.setItem(MERGED_TIMETABLE, this.mergedTimetable);
+    }
+
     const data = this.timetables.find(el => el.group === group);
     if (!data) throw Error(`Failed to update subgroup! Group: ${group}`);
     if (data.subgroup === subgroup) return;
@@ -271,20 +300,24 @@ class TimetableManager {
   }
 
   deleteTimetable(group: string) {
+    if (Util.isMerged(group)) {
+      this.mergedTimetable = null;
+      return storage.deleteItem(MERGED_TIMETABLE);
+    }
     group = group.trim();
     this.timetables = this.timetables.filter(el => el.group !== group);
     storage.deleteItem(TIMETABLE + group);
     return storage.setItem(TIMETABLES, this.timetables);
   }
 
-  saveCustomTimetable(timetable: TimetableItem[]) {
-    this.timetables = this.timetables.filter(el => el.group !== MERGED_TIMETABLE);
-    this.timetables.push({
-      group: MERGED_TIMETABLE,
-      time: Date.now()
-    });
-    storage.setItem(TIMETABLE + MERGED_TIMETABLE, timetable);
-    return storage.setItem(TIMETABLES, this.timetables);
+  saveMergedTimetable(timetable: TimetableItem[], timetablesToMerge: string[]) {
+    this.mergedTimetable = {
+      group: "Мій розклад",
+      time: Date.now(),
+      subgroup: 1,
+      timetables: timetablesToMerge,
+    }
+    return storage.setItem(MERGED_TIMETABLE,  this.mergedTimetable);
   }
 
   tryToGetType(timetable: string): TimetableType | undefined {
@@ -320,6 +353,10 @@ class TimetableManager {
 
   get cachedLecturers() {
     return this.lecturers;
+  }
+
+  get cachedMergedTimetable() {
+    return this.mergedTimetable;
   }
 
   private async getInstitutes(): Promise<CachedInstitute[]> {

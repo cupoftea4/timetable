@@ -27,6 +27,7 @@ export type LPNUTimetableType = 'timetable' | 'selective' | 'lecturer';
 export type TimetableType = LPNUTimetableType | 'merged';
 
 export type CachedTimetable = {group: string, time: number, subgroup?: 1 | 2};
+export interface MergedTimetable extends CachedTimetable { timetables: string[]; }
 export type CachedGroup = string;
 export type CachedInstitute = string;
 

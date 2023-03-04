@@ -1,5 +1,5 @@
 import TimetableManager from "./TimetableManager";
-import { TimetableItem, TimetableType } from "./types";
+import { CachedTimetable, TimetableItem, TimetableType } from "./types";
 
 const UPDATE_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 
@@ -15,7 +15,7 @@ export default class TimetableUtil {
     {start: "21:00", end: "22:35"}
   ];
 
-  static mergeTimetables(timetables: (TimetableItem[] | undefined)[]) {
+  static mergeTimetables(timetables: (TimetableItem[] | undefined | null)[]) {
     const mergedTimetable = timetables.reduce((acc, timetable) => {
       timetable?.forEach(item => {
         // if (!acc || acc.some(i => i?.day === item.day && i.number === item.number)) 
@@ -24,8 +24,18 @@ export default class TimetableUtil {
       });
       return acc;
     }, [] as TimetableItem[]);
-    if (!mergedTimetable) throw new Error("Something went wrong");
+    if (!mergedTimetable || !mergedTimetable.length) throw new Error("Something went wrong");
     return mergedTimetable;
+  }
+
+  static isMerged(timetable: string) {
+    return timetable.includes("my") || timetable.includes("Мій розклад");
+  }
+
+  static getTimetableName(timetable: CachedTimetable | string) {
+    const name = typeof timetable === "string" ? timetable : timetable.group;
+    if (TimetableUtil.isMerged(name)) return "Мій розклад";
+    return name;
   }
 
   

@@ -1,12 +1,12 @@
 import { FC } from 'react';
 import SearchIcon from '../assets/SearchIcon';
 import styles from './SearchBar.module.scss';
-import DatalistInput from 'react-datalist-input';
 import 'react-datalist-input/dist/styles.scss';
 import { useNavigate } from 'react-router-dom';
 import { TimetableType } from '../utils/types';
 import useOnClickOutside from '../hooks/useOnOutsideClick';
 import TimetableUtil from '../utils/TimetableUtil';
+import VirtualizedDataList from './VirtualizedDataList';
 
 const getSearchBarOptions = () => {
   return TimetableUtil.getAllTimetables().map(group => ({id: group, value: group}));
@@ -27,12 +27,11 @@ const SearchBar: FC<OwnProps> = ({toggleSearchBar, show}) => {
     <span className={`${styles.bar} ${!show && styles['hidden-search']}`} ref={ref}>
       <SearchIcon onClick={() => toggleSearchBar()}/>
       <span className={styles.search}>
-        <DatalistInput
-          placeholder={"Розклад..."}
-          label=""
+        <VirtualizedDataList
+          options={options}
           onSelect={item => navigate(`/${item.value}`)}
-          items={options}
-        />
+          placeholder="Розклад..."
+         />
       </span>
     </span>
   )

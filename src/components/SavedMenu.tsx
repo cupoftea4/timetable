@@ -6,6 +6,7 @@ import RemoveIcon from '../assets/RemoveIcon';
 import TimetableManager from '../utils/TimetableManager'; 
 import styles from './SavedMenu.module.scss';
 import * as handler from '../utils/requestHandler';
+import TimetableUtil from '../utils/TimetableUtil';
 
 const MAX_SAVED_ITEMS = 5;
 
@@ -18,8 +19,11 @@ const SavedMenu = () => {
     
   function getCachedGroups(): string[] {
     const cachedGroups = TimetableManager.getCachedTimetables()
-    const groups = cachedGroups.slice(Math.max(cachedGroups.length - MAX_SAVED_ITEMS, 0))
-                       .map(item => item.group)
+    const groups = cachedGroups
+      .slice(Math.max(cachedGroups.length - MAX_SAVED_ITEMS, 0))
+      .map(item => item.group);
+    const merged = TimetableManager.cachedMergedTimetable;
+    if (merged) groups.push("my");
     return groups.reverse();
   }
 
@@ -74,8 +78,12 @@ const SavedMenu = () => {
             {savedGroups.map((group, index) => (
               <li key={index} className={selectedItem === index ? styles.selected : ""}>
                 <Link to={`/${group}`} onFocus={() => setSelectedItem(index)} onClick={() => closeMenu()}> 
-                  <span>
-                    {group} 
+                  <span 
+                    title={TimetableUtil.isMerged(group) 
+                      ? TimetableManager.cachedMergedTimetable?.timetables.join("+")
+                      : group
+                    }>
+                    {TimetableUtil.getTimetableName(group)} 
                     {groupParam === group ? <CheckMarkIcon className={styles['check-mark']}/> : null}
                   </span> 
                 </Link>

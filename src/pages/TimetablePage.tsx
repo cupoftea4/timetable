@@ -17,6 +17,7 @@ import { getCurrentUADate, getNULPWeek } from '../utils/date';
 import ISCFile from '../utils/ICSFile';
 import * as handler from '../utils/requestHandler';
 import TimetableManager from '../utils/TimetableManager';
+import TimetableUtil from '../utils/TimetableUtil';
 import { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from '../utils/types';
 import { optimisticRender } from '../utils/utils';
 import LoadingPage from './LoadingPage';
@@ -83,8 +84,6 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
       setTimetableGroup(null);
     };
 
-    if (type === 'merged') return TimetableManager.getMergedTimetable().then(setTimetable);
-
     if (exams) 
       return optimisticRender(
         setExamsTimetable, onError, 
@@ -121,7 +120,15 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   };
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
-    navigate('/' + group + (isExams ? '/exams' : ''));
+    const path = TimetableUtil.isMerged(group) && TimetableManager.cachedMergedTimetable
+      ? TimetableManager.cachedMergedTimetable.timetables.find(
+          t => {
+            const type = TimetableManager.tryToGetType(t);
+            return type === 'timetable' || type === 'lecturer';
+          }
+        ) ?? group
+      : group;
+    navigate('/' + path + (isExams ? '/exams' : ''));
   };
 
   const getPartialTimetable = (partial: HalfTerm | 0) => {
@@ -221,7 +228,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
             }
           </div>       
         : <LoadingPage/>
-      : <Navigate to="/"/>}
+      : <Navigate to="/" state={{force: true}}/>}
     </>
   )
 };

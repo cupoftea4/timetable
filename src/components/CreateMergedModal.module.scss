@@ -10,14 +10,15 @@
   z-index: 100;
   @include flex-center;
   .modal {
-    max-width: 30rem;
+    margin: 1rem;
+    width: clamp(20rem, 40vw, 32rem);
     background-color: hsla(0, 0%, 100%, 0.15);
     box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.7);
     @include blur(2rem);
     padding: 1.625rem;
     border-radius: .625rem;
     .fieldset {
-      padding: 0 .5rem;
+      padding: 0 .5rem .5rem;
       border-radius: .625rem;
       .choice {
         display: flex;
