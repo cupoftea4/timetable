@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CheckMarkIcon from '../assets/CheckMarkIcon';
 import HistoryIcon from '../assets/HistoryIcon';
@@ -22,6 +22,10 @@ const SavedMenu = () => {
                        .map(item => item.group)
     return groups.reverse();
   }
+
+  useEffect(() => {
+    setSavedGroups(getCachedGroups());
+  }, [groupParam]);
 
   const openMenu = () => setIsMenuOpen(true);
 

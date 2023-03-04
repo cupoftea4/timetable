@@ -32,6 +32,8 @@ const PARTIAL_TIMETABLE = "partial_timetable_";
 const EXAMS_TIMETABLE = "exams_timetable_";
 const UPDATED = "_updated";
 
+const MERGED_TIMETABLE = "my";
+
 class TimetableManager {
   private institutes: CachedInstitute[] = [];
   private groups: CachedGroup[] = [];
@@ -163,12 +165,13 @@ class TimetableManager {
       .filter(el => el) as HalfTerm[];
   }
 
-  getTimetable(group: string, type?: TimetableType, checkCache = true) {
+  getTimetable(group: string, type?: TimetableType, checkCache = true, cacheOnly = false) {
     let cacheData: Promise<TimetableItem[] | undefined>, fetchData: Promise<TimetableItem[] | null>;
     group = group.trim();
     const data = this.timetables.find(el => el.group.toUpperCase() === group.toUpperCase());
     const timetableType = type ?? this.tryToGetType(group);
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${group}`);
+    if (timetableType === 'merged') throw Error(`Merged timetable is not supported! Group: ${group}`);
 
     if (data && !Util.needsUpdate(data.time)) {
       cacheData = storage.getItem(TIMETABLE + group);
@@ -201,6 +204,11 @@ class TimetableManager {
     
     return [cacheData, fetchData] as const;
   }
+
+  getMergedTimetable(): Promise<TimetableItem[] | undefined> {
+    return storage.getItem(TIMETABLE + MERGED_TIMETABLE) as Promise<TimetableItem[] | undefined>;
+  }
+
 
   getExamsTimetable(group: string, type?: TimetableType, checkCache = true) {
     let cacheData: Promise<ExamsTimetableItem[]>, fetchData: Promise<ExamsTimetableItem[] | null>;
@@ -269,12 +277,23 @@ class TimetableManager {
     return storage.setItem(TIMETABLES, this.timetables);
   }
 
+  saveCustomTimetable(timetable: TimetableItem[]) {
+    this.timetables = this.timetables.filter(el => el.group !== MERGED_TIMETABLE);
+    this.timetables.push({
+      group: MERGED_TIMETABLE,
+      time: Date.now()
+    });
+    storage.setItem(TIMETABLE + MERGED_TIMETABLE, timetable);
+    return storage.setItem(TIMETABLES, this.timetables);
+  }
+
   tryToGetType(timetable: string): TimetableType | undefined {
     timetable = timetable.trim();
     const compare = (el: string) => el.toUpperCase() === timetable.toUpperCase();
     if (this.groups.some(compare)) return 'timetable';
     if (this.selectiveGroups.some(compare)) return 'selective';
     if (this.lecturers.some(compare)) return 'lecturer';
+    if (timetable === MERGED_TIMETABLE) return 'merged';
   }
 
   getCachedTimetables() {

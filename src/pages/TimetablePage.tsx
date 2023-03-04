@@ -3,6 +3,8 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import DownloadIcon from '../assets/DownloadIcon';
 import HomeIcon from '../assets/HomeIcon';
 import LoadingIcon from '../assets/LoadingIcon';
+import MergeIcon from '../assets/MergeIcon';
+import CreateMergedModal from '../components/CreateMergedModal';
 import ExamsTimetable from '../components/ExamsTimetable';
 import headerStyles from '../components/HeaderPanel.module.scss';
 import SavedMenu from '../components/SavedMenu';
@@ -46,6 +48,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
   const [partials, setPartials] = useState<HalfTerm[]>([]);
   const [loading, setLoading] = useState(false);
+  const [showCreateMergedModal, setShowCreateMergedModal] = useState(false);
   const { width } = useWindowDimensions();
   const navigate = useNavigate();
   const timetableRef = useRef<HTMLElement>(null);
@@ -79,6 +82,9 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
       handler.error(e);
       setTimetableGroup(null);
     };
+
+    if (type === 'merged') return TimetableManager.getMergedTimetable().then(setTimetable);
+
     if (exams) 
       return optimisticRender(
         setExamsTimetable, onError, 
@@ -110,7 +116,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   const updateTimetable = (checkCache = false) => {
     if (loading) return;
     setLoading(true);
-    getTimetable(group, isExamsTimetable, undefined, checkCache)
+    getTimetable(group, isExamsTimetable, timetableType, checkCache)
       .finally(() => setLoading(false));
   };
 
@@ -144,7 +150,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
               <nav className={headerStyles['right-buttons']}> 
                 <Link state={{force: true}} to="/" aria-label="Home"><HomeIcon /></Link>
                 <SavedMenu />
-                <h1 className={styles.title}>{timetableGroup}</h1>
+                <h1 className={styles.title}>{timetableType === 'merged' ? "Мій розклад" : timetableGroup}</h1>
                 {
                   timetableType !== 'selective' &&
                     <button
@@ -191,6 +197,9 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
             </main> 
             <footer className={styles.bottom}>
               <span>
+                <button onClick={() => setShowCreateMergedModal(true)}>
+                  <MergeIcon/>
+                </button>
                 <button 
                   disabled={loading}
                   className={`${styles.update} ${loading && styles.loading}`} title='Оновити дані' 
@@ -204,6 +213,12 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
               </span>
               {time && <p>Last updated {new Date(time).toLocaleString()}</p>}
             </footer>
+            {showCreateMergedModal &&
+              <CreateMergedModal 
+                defaultTimetable={group} 
+                onClose={() => setShowCreateMergedModal(false)}
+              />
+            }
           </div>       
         : <LoadingPage/>
       : <Navigate to="/"/>}

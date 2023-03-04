@@ -1,5 +1,5 @@
 import { timeout } from "./promiseHandling";
-import { TimetableType } from "./types";
+import { LPNUTimetableType, TimetableType } from "./types";
 import Parser  from "./Parser";
 
 const NULP_STUDENTS = "https://student.lpnu.ua/";
@@ -22,7 +22,7 @@ type LPNURequestSuffix =
 		| typeof TIMETABLE_EXAMS_SUFFIX
 		| typeof LECTURER_EXAMS_SUFFIX;
 
-const timetableSuffixes: Record<TimetableType, LPNURequestSuffix> = {
+const timetableSuffixes: Record<LPNUTimetableType, LPNURequestSuffix> = {
 	timetable:  "students_schedule" ,
 	selective: "schedule_selective",
 	lecturer: "lecturer_schedule"
@@ -120,7 +120,7 @@ export default class LPNUData {
 		}, TIMETABLE_SUFFIX).then(Parser.parsePartialGroups.bind(Parser));
 	}
 
-	static async getTimetable(type: TimetableType, timetableName = "All", timetableCategory = "All") {
+	static async getTimetable(type: LPNUTimetableType, timetableName = "All", timetableCategory = "All") {
 		const suffix = timetableSuffixes[type];
 		if (suffix === LECTURER_SUFFIX) {
 			return this.fetchHTML({

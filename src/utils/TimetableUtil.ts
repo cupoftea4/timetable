@@ -1,4 +1,5 @@
-import { TimetableType } from "./types";
+import TimetableManager from "./TimetableManager";
+import { TimetableItem, TimetableType } from "./types";
 
 const UPDATE_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 
@@ -13,6 +14,20 @@ export default class TimetableUtil {
     {start: "19:20", end: "20:55"},
     {start: "21:00", end: "22:35"}
   ];
+
+  static mergeTimetables(timetables: (TimetableItem[] | undefined)[]) {
+    const mergedTimetable = timetables.reduce((acc, timetable) => {
+      timetable?.forEach(item => {
+        // if (!acc || acc.some(i => i?.day === item.day && i.number === item.number)) 
+        //   throw new Error("Conflicting timetables" + JSON.stringify(item));
+        acc!.push(item);
+      });
+      return acc;
+    }, [] as TimetableItem[]);
+    if (!mergedTimetable) throw new Error("Something went wrong");
+    return mergedTimetable;
+  }
+
   
   static getGroupName(group: string, timetableType: TimetableType) {
     if (timetableType === "selective") return group.split("-")[0] + "-" + group.split("-")[1];
@@ -48,5 +63,15 @@ export default class TimetableUtil {
   static needsUpdate(timestamp: number) {
     if (!timestamp) return true;
     return navigator.onLine && (Date.now() - UPDATE_PERIOD > timestamp);
+  }
+
+  static getAllTimetables() {
+    return (
+      TimetableManager.cachedGroups
+    ).concat(
+      TimetableManager.cachedSelectiveGroups
+    ).concat(
+      TimetableManager.cachedLecturers
+    )
   }
 }

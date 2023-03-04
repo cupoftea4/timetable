@@ -47,6 +47,11 @@
       }
 }
 
+@mixin blur($radius: 1rem) {
+  backdrop-filter: blur($radius);
+  -webkit-backdrop-filter: blur($radius);
+}
+
 
 @mixin auto-scroll (
   $direction: y, 

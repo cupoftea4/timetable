@@ -3,19 +3,13 @@ import SearchIcon from '../assets/SearchIcon';
 import styles from './SearchBar.module.scss';
 import DatalistInput from 'react-datalist-input';
 import 'react-datalist-input/dist/styles.scss';
-import TimetableManager from '../utils/TimetableManager';
 import { useNavigate } from 'react-router-dom';
 import { TimetableType } from '../utils/types';
 import useOnClickOutside from '../hooks/useOnOutsideClick';
+import TimetableUtil from '../utils/TimetableUtil';
 
 const getSearchBarOptions = () => {
-  return (
-    TimetableManager.cachedGroups.map(group => ({id: group + '-student', value: group}))
-  ).concat(
-    TimetableManager.cachedSelectiveGroups.map(selective => ({id: selective + '-selective', value: selective}))
-  ).concat(
-    TimetableManager.cachedLecturers.map(lecturer => ({id: lecturer + '-lecturer', value: lecturer}))
-  )
+  return TimetableUtil.getAllTimetables().map(group => ({id: group, value: group}));
 }
 
 type OwnProps = {
@@ -25,7 +19,7 @@ type OwnProps = {
 }
 
 const SearchBar: FC<OwnProps> = ({toggleSearchBar, show}) => {
-  const options = getSearchBarOptions();;
+  const options = getSearchBarOptions();
   const navigate = useNavigate();
   const ref = useOnClickOutside(() => toggleSearchBar(false));
 

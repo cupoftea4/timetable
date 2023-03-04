@@ -1,0 +1,95 @@
+@use '../styles/mixins' as *;
+
+.wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 100;
+  @include flex-center;
+  .modal {
+    max-width: 30rem;
+    background-color: hsla(0, 0%, 100%, 0.15);
+    box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.7);
+    @include blur(2rem);
+    padding: 1.625rem;
+    border-radius: .625rem;
+    .fieldset {
+      padding: 0 .5rem;
+      border-radius: .625rem;
+      .choice {
+        display: flex;
+        flex-wrap: wrap;
+        .selected {
+          display: flex;
+          flex-wrap: wrap;
+          gap: .5rem;
+          .selectedItem {
+            background-color: cadetblue;
+            padding: .25em .5em;
+            border-radius: .325em;
+            position: relative;
+            transition: all .2s ease-in-out;
+            &::before {
+              content: attr(data-content);
+              transition: all .2s ease-in-out;
+            }
+            &::after {
+              content: url(../assets/close.svg);
+              width: .875rem;
+              height: auto;
+              position: absolute;
+              top: 50%;
+              right: 50%;
+              transform: translateX(50%) translateY(-40%);
+              transition: all .2s ease-in-out;
+              opacity: 0;
+            }
+            &:hover {
+              cursor: pointer;
+              &::before {
+                color: transparent;
+              }
+              &::after {
+                opacity: 1;
+              }
+            }
+    
+          }
+          
+        }
+        .search-bar {
+          display: inline;
+          color:rgba(0, 0, 0, 0.7);
+          max-width: 10rem;
+          input {
+            background-color: transparent;
+            border: none;
+            outline: none;
+            color: white;
+          }
+          ul {
+            left: 0;
+            max-height: 10rem;
+            overflow-y: scroll;
+          }
+        }
+      }
+    }
+    .button {
+      background-color: rgba(255, 255, 255, 0.9);
+      margin: 0 auto;
+      display: block;
+      margin-top: 1em;
+      padding: .325em .75em;
+      border-radius: .5em;
+      color:hsla(0, 0%, 0%, 0.8);
+      transition: all .2s;
+      &:hover {
+        background-color: rgba(231, 235, 248, 0.9);
+      }
+    }
+  }
+}

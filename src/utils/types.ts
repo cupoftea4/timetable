@@ -23,7 +23,8 @@ export type ExamsTimetableItem = {
 }
 
 export type TimetableItemType = 'lecture' | 'practical' | 'lab' | 'consultation';
-export type TimetableType = 'timetable' | 'selective' | 'lecturer';
+export type LPNUTimetableType = 'timetable' | 'selective' | 'lecturer';
+export type TimetableType = LPNUTimetableType | 'merged';
 
 export type CachedTimetable = {group: string, time: number, subgroup?: 1 | 2};
 export type CachedGroup = string;
