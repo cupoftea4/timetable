@@ -204,7 +204,9 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
             </main> 
             <footer className={styles.bottom}>
               <span>
-                <button onClick={() => setShowCreateMergedModal(true)}>
+                <button 
+                  title='Об`єднати кілька розкладів в одну таблицю' 
+                  onClick={() => setShowCreateMergedModal(true)} className={styles.merge}>
                   <MergeIcon/>
                 </button>
                 <button 
@@ -216,7 +218,9 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                 </button>
                 <a className={styles.download} title='Експортувати розклад для Google Calendar' href={icsFILE} 
                   download={isExamsTimetable ? `${group}-exams.ics` : `${group}-${isSecondSubgroup ? 2 : 1}.ics`}
-                ><DownloadIcon/></a> 
+                >
+                  <DownloadIcon/>
+                </a> 
               </span>
               {time && <p>Last updated {new Date(time).toLocaleString()}</p>}
             </footer>

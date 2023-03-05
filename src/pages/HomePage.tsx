@@ -50,13 +50,13 @@ const HomePage: FC<OwnProps>  = ({timetableType }) => {
   }, [timetableType]);
 
   useEffect(() => {
-    if (!force) {
+    if (!force && timetableType === "timetable") {
       TimetableManager.getLastOpenedTimetable()
         .then(t => t && navigate(t));
     }
     window.onpopstate = () => {setSelectedSecond(null)}
     return () => {window.onpopstate = null}
-  }, [force, navigate]);
+  }, [force, navigate, timetableType]); 
 
   useEffect(() => {
     if (secondLayer.includes(getHash())) {

@@ -293,6 +293,12 @@ class TimetableManager {
 
   getSubgroup(group?: string) {
     if (!group) return;
+    
+    if (Util.isMerged(group)) {
+      if (!this.mergedTimetable) throw Error("Merge doesn't exist!");
+      return this.mergedTimetable.subgroup;
+    }
+    
     group = group.trim();
     const data = this.timetables.find(el => el.group === group);
     if (!data) return;

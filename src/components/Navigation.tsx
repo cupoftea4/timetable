@@ -31,6 +31,7 @@ const Navigation: FC<OwnProps> = ({timetableType}) => {
           !isMobile ? 
               navigationItems.map(type =>
                 <Link 
+                  state={{force: true}}
                   to={"/" + (type.value === "timetable" ? "" : type.value)}
                   key={type.value}
                   className={timetableType === type.value ? styles.active : ""}

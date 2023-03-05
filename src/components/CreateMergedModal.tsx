@@ -35,7 +35,9 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose}) => {
         !timetablesToMerge.includes(value) && 
         !savedTimetables.includes(value) 
       );
-    timetables.unshift(...savedTimetables.map(group => ({id: group, value: group})));
+    timetables.unshift(...savedTimetables
+      .filter(group => !timetablesToMerge.includes(group))
+      .map(group => ({id: group, value: group})));
     return timetables;
   }, [timetablesToMerge]);
 
@@ -45,7 +47,7 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose}) => {
 
 
   function addTimetableToMerge(timetable: string) {
-    if (timetablesToMerge.includes(timetable)) return;
+    if (timetablesToMerge.includes(timetable) || timetablesToMerge.length >= 4) return;
     setTimetablesToMerge([...timetablesToMerge, timetable]);
   }
 
@@ -60,8 +62,8 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose}) => {
   }
 
   function onCreateClick() {
-    if (timetablesToMerge.length < 2 || timetablesToMerge.length > 4) {
-      handler.warn("Виберіть від 2 до 4 груп");
+    if (timetablesToMerge.length < 2 || timetablesToMerge.length > 5) {
+      handler.warn("Виберіть від 2 до 5 груп");
       return;
     }
     resolveTimetables()
@@ -97,16 +99,18 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose}) => {
                   </span>
                 ))}
               </span>
-              <VirtualizedDataList
-                autoFocus
-                clearOnSelect
-                containerRef={datalistRef}
-                className={styles["search-bar"]}
-                onSelect={item => {
-                  addTimetableToMerge(item.value);
-                }}
-                options={options}
-              />
+              {timetablesToMerge.length < 5 &&
+                  <VirtualizedDataList
+                    autoFocus
+                    clearOnSelect
+                    containerRef={datalistRef}
+                    className={styles["search-bar"]}
+                    onSelect={item => {
+                      addTimetableToMerge(item.value);
+                    }}
+                    options={options}
+                  />
+                }
             </div>
           </fieldset>
         <button className={styles.button} onClick={onCreateClick}>Створити</button>
