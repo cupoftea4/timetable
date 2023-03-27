@@ -16,3 +16,39 @@ export async function optimisticRender<T>(
     error("Unknown error");
   }
 }
+
+function romanToArabic(roman: string): number {
+  const romanNumeralMap: Record<string, number> = {
+      I: 1,
+      V: 5,
+      X: 10,
+      L: 40,
+  };
+
+  let arabicValue = 0;
+  let previousValue = 0;
+  for (let i = 0; i < roman.length; i++) {
+      const currentValue = romanNumeralMap[roman[i]];
+      if (!currentValue) return -1;
+      arabicValue += currentValue;
+
+      if (currentValue > previousValue) {
+          arabicValue -= 2 * previousValue;
+      }
+      previousValue = currentValue;
+  }
+  return arabicValue <= 40 ? arabicValue : -1;
+}
+
+export function findAndConvertRomanNumeral(input: string): number {
+  const romanNumeralRegex = /(?<=\b)[IVXL]+(?=\b)/;
+  const romanNumeral = input.match(romanNumeralRegex);
+
+  if (romanNumeral) {
+    const arabicValue = romanToArabic(romanNumeral.toString());
+    if (arabicValue !== -1) {
+        return arabicValue;
+    }
+  }
+  return -1;
+}

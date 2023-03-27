@@ -1,5 +1,14 @@
 import TimetableUtil from "./TimetableUtil";
 import { ExamsTimetableItem, TimetableItem } from "./types";
+import { findAndConvertRomanNumeral } from "./utils";
+
+
+function toTFormattedString(date: Date, time: string) {
+  const [hours, minutes] = time.split(':');
+  const dateOnly = date.toISOString().substring(0, 10).replace(/-/g, '');
+  const formattedTime = `${dateOnly}T${hours.padStart(2, '0')}${minutes}00`;
+  return formattedTime;
+}
 
 function weeksLeftToDate(date: Date) {
   const timeDiff = date.getTime() - new Date().getTime();
@@ -36,12 +45,15 @@ export default class ISCFile {
         date.setDate(date.getDate() + daysUntilNextDayOfWeek + ((isSecondWeek === (curWeek === 2) && (isFirstSubgroup && isSecondSubgroup))? 7 : 0));
         const [start, end] = this.lessonNumberToICSTime(date, number);
         const rrule = this.getRRULE(isFirstWeek, isSecondWeek, curWeek);
-        const [lecturerName, lecturerRoom] = lecturer.split(',');
+        const lectureRoom = lecturer.split(',').at(1);
+        const buildingNumber = lectureRoom ? findAndConvertRomanNumeral(lectureRoom) : -1;
         return this.createEvent({
           start, end,
           summary: subject,
-          description: lecturerName + ',' + location,
-          location: (lecturerRoom ?? "") + " " + (urls[0] ?? ''),
+          description: location.replaceAll(/,./g, '').trim() + ", " + lecturer.trim().replace(/,$/, '') + " " + (urls[0] ?? ''),
+          location: "НУ «Львівська політехніка»" + (
+            buildingNumber !== -1 ? `, ${buildingNumber}-й корпус` : ""
+          ),
           rrule,
         });
     }).filter(Boolean).join(''));
@@ -72,13 +84,9 @@ export default class ISCFile {
   }
 
   private static lessonNumberToICSTime(date: Date, number: number) {
-    const {start, end} = TimetableUtil.lessonsTimes[number - 1];
-    const [startHours, startMinutes] = start.split(':');
-    const [endHours, endMinutes] = end.split(':');
-    date.setHours(+startHours, +startMinutes, 0, 0);
-    const startTime = date.toISOString().replace(/[-:]|(\.000)/g, '');
-    date.setHours(+endHours, +endMinutes, 0, 0);
-    const endTime = date.toISOString().replace(/[-:]|\.000/g, '');
+    const {start, end} = TimetableUtil.lessonsTimes[number - 1];;
+    const startTime = toTFormattedString(date, start);
+    const endTime = toTFormattedString(date, end);;
     return [startTime, endTime];
   }
 
@@ -86,6 +94,22 @@ export default class ISCFile {
     return  `BEGIN:VCALENDAR
 PRODID:Calendar
 VERSION:2.0
+BEGIN:VTIMEZONE
+TZID:Europe/Kiev
+LAST-MODIFIED:20050809T050000Z
+BEGIN:STANDARD
+DTSTART:20071104T040000
+TZOFFSETFROM:+0300
+TZOFFSETTO:+0200
+TZNAME:EET
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:20070311T030000
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0300
+TZNAME:EEST
+END:DAYLIGHT
+END:VTIMEZONE
 ${content}
 END:VCALENDAR`;
   }
