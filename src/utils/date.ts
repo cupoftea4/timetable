@@ -1,4 +1,4 @@
-const LVIV_TIMEZONE = "Europe/Uzhgorod";
+export const LVIV_TIMEZONE = "Europe/Uzhgorod";
 
 export const getCurrentUADate = () => {
     const offset = new Date().getTimezoneOffset() * 60000;

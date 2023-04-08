@@ -13,7 +13,7 @@ import Util from "./TimetableUtil";
 import { DEVELOP } from "./constants";
 import LPNUData from "./LPNUData";
 import FallbackData from "./CachedData";
-import * as handler from '../utils/requestHandler';
+import * as handler from "../utils/requestHandler";
 
 // storage keys
 const LAST_OPENED_INSTITUTE = "last_opened_institute";
@@ -254,7 +254,7 @@ class TimetableManager {
       storage.setItem(EXAMS_TIMETABLES, this.examsTimetables);
     }
 
-    fetchData = LPNUData.getExamsTimetable(timetableType, group).then(() => null).catch(() => {
+    fetchData = LPNUData.getExamsTimetable(timetableType, group).catch(() => {
       cacheData.then(setStorageData);
       handler.warn("Data is possibly outdated!");
       return null;

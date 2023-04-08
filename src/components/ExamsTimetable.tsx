@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { LVIV_TIMEZONE } from '../utils/date';
 import { ExamsTimetableItem } from '../utils/types';
 import styles from './ExamsTimetable.module.scss';
 import TimetableLink from './TimetableLink';
@@ -20,7 +21,7 @@ const ExamsTimetable: FC<OwnProps> = ({exams}) => {
       {exams?.sort(compareDates).map((exam, index) => (
         <div key={index} className={`${isSameDay(exam.date, new Date()) && styles.active}`}>
           <div>
-            <p>{exam.date.toLocaleString("uk-UA", {weekday: "long", day: "numeric", month: "long"})}</p>
+            <p>{exam.date.toLocaleString("uk-UA", {timeZone: LVIV_TIMEZONE, weekday: "long", day: "numeric", month: "long"})}</p>
             <p>{exam.number} пара</p>
           </div>
           <h3>{exam.subject}</h3>

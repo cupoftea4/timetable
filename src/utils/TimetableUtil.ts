@@ -47,7 +47,8 @@ export default class TimetableUtil {
 
   static sortGroupsByYear(groups: string[]) {
     return groups.reduce((acc, group) => {
-      const yearIndex = +(group.split("-")?.at(-1)?.at(0) ?? 0);
+      const parts = group.split("-");
+      const yearIndex = +(parts[parts.length - 1][0] ?? 0);
       if (!acc[yearIndex]) acc[yearIndex] = [];
       acc[yearIndex].push(group);
       return acc;

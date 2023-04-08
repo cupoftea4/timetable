@@ -41,7 +41,7 @@ function romanToArabic(roman: string): number {
 }
 
 export function findAndConvertRomanNumeral(input: string): number {
-  const romanNumeralRegex = /(?<=\b)[IVXL]+(?=\b)/;
+  const romanNumeralRegex = /[IVXL]+/;
   const romanNumeral = input.match(romanNumeralRegex);
 
   if (romanNumeral) {

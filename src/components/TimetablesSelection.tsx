@@ -11,17 +11,16 @@ enum Year {
 }
 
 type OwnProps = {
-  className?: string;
   timetables: string[];
   withYears?: boolean;
 };
 
-const TimetablesSelection: FC<OwnProps> = ({className, timetables, withYears = false}) => {
+const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false}) => {
   const groupsByYear = TimetableUtil.sortGroupsByYear(timetables);
   const [expandedYear, setExpandedYear] = useState<Year | null>(null); // for mobile onClick event and keyboard navigation
 
   return (
-    <div className={`${styles.timetables} ${className} ${withYears && styles['with-years']}`}>
+    <div className={`${styles.timetables} ${withYears && styles['with-years']}`}>
       {withYears ?
           [Year.First, Year.Second, Year.Third, Year.Fourth].map((year) => 
             groupsByYear[year]?.length && groupsByYear[year].length !== 0 ?

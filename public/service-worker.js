@@ -1,8 +1,17 @@
 /* eslint-disable no-restricted-globals */
 
-const DYNAMIC_CACHE_NAME_PREFIX  = 'd-app-v';
-const CURRENT_CACHE_VERSION = "1.5";
+const DYNAMIC_CACHE_NAME_PREFIX  = "d-app-v";
+const CURRENT_CACHE_VERSION = "1.7";
 const DYNAMIC_CACHE_NAME  = `${DYNAMIC_CACHE_NAME_PREFIX}${CURRENT_CACHE_VERSION}`;
+const SERVER_FILE_NAME = "get.php";
+
+async function shouldCache(request, cache) {
+  const url = (new URL(request.url)).toString();
+  if (url.includes(SERVER_FILE_NAME)) return false;
+  return url.startsWith(location.origin + '/static/') || 
+         url.startsWith(location.origin  + '/shared/') ||
+         ((url.startsWith(location.origin  + '/') && !(await cache.match("/"))) ? "home" : false);
+}
 
 self.addEventListener('activate', event => {
   event.waitUntil(
@@ -22,20 +31,22 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const {request} = event;
-  const url = new URL(request.url);
-  if (url.toString().includes(location.origin + '/static/') || url.toString() === location.origin + '/') {
-    event.respondWith(networkFirst(request))
-  }
+  event.respondWith(networkFirst(request));
 })
 
 async function networkFirst(request) {
-  const cache = await caches.open(DYNAMIC_CACHE_NAME)
+  const cache = await caches.open(DYNAMIC_CACHE_NAME);
   try {
-    const response = await fetch(request)
-    await cache.put(request, response.clone())
-    return response
-  } catch (e) {
-    const cached = await cache.match(request)
-    return cached ?? await caches.match('offline.html')
+    const response = await fetch(request);
+    const cacheRes = await shouldCache(request, cache);  
+
+    if (cacheRes) {
+      cache.put(cacheRes === "home" ? "/" : request, response.clone());
+    }
+
+    return response ?? await cache.match(request);
+  } catch (error) {
+    return await cache.match(request).then(async res => res ?? await cache.match("/")); 
   }
+  
 }

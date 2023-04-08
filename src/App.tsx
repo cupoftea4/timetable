@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import HomePage from "./pages/HomePage";
-import TimetableManager from "./utils/TimetableManager";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import TimetablePage from "./pages/TimetablePage";
-import LoadingPage from "./pages/LoadingPage";
-import * as handler from './utils/requestHandler';
-import { Status } from "./utils/types";
 import { ToastContainer as MessageToast } from "react-toastify";
+import HomePage from "./pages/HomePage";
+import LoadingPage from "./pages/LoadingPage";
+import TimetablePage from "./pages/TimetablePage";
 import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
+import * as handler from "./utils/requestHandler";
+import TimetableManager from "./utils/TimetableManager";
+import { Status } from "./utils/types";
 
 /* TODO:
+  - move to vite
+  - add tests
   - update partials
   - add partial timetables to timetable-data
-  - add Merged timetables
   - fix light theme
   - fix timetable-data to work even if something goes wrong (like institutes fetching)
   - github actions to commit only diff

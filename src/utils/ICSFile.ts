@@ -45,7 +45,7 @@ export default class ISCFile {
         date.setDate(date.getDate() + daysUntilNextDayOfWeek + ((isSecondWeek === (curWeek === 2) && (isFirstSubgroup && isSecondSubgroup))? 7 : 0));
         const [start, end] = this.lessonNumberToICSTime(date, number);
         const rrule = this.getRRULE(isFirstWeek, isSecondWeek, curWeek);
-        const lectureRoom = lecturer.split(',').at(1);
+        const lectureRoom = lecturer.split(',')[1];
         const buildingNumber = lectureRoom ? findAndConvertRomanNumeral(lectureRoom) : -1;
         return this.createEvent({
           start, end,
