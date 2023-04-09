@@ -23,7 +23,7 @@ export function timeout<T>(ms: number, promise: Promise<T>): Promise<T> {
 }
 
 export const throttle = (callable: Function, period: number, context?: Function) => {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: number;
     let time: number;
     return function () {
         if (time) {

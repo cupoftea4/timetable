@@ -3,11 +3,7 @@ import { ExamsTimetableItem, TimetableItem, TimetableType } from "./types";
 
 const FALLBACK_URL = "https://raw.githubusercontent.com/cupoftea4/timetable-data/data/";
 
-type ExamsTimetableItemWithoutDate = Omit<ExamsTimetableItem, "date">;
-
-interface CachedExamsTimetableItem extends ExamsTimetableItemWithoutDate {
-  date: string; 
-}
+type CachedExamsTimetableItem = Omit<ExamsTimetableItem, "date"> & { date: string };
 
 export default class CachedData {
   private static async fetchData(path: string) {

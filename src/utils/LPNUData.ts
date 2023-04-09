@@ -5,7 +5,7 @@ import Parser  from "./Parser";
 const NULP_STUDENTS = "https://student.lpnu.ua/";
 const NULP_STAFF = "https://staff.lpnu.ua/";
 
-const PROXY = process.env.REACT_APP_PROXY;
+const PROXY = import.meta.env.VITE_PROXY;
 
 const TIMEOUT = 35000; // 35s
 
