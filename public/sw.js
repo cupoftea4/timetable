@@ -1,17 +1,18 @@
 /* eslint-disable no-restricted-globals */
 
 const DYNAMIC_CACHE_NAME_PREFIX  = "d-app-v";
-const CURRENT_CACHE_VERSION = "1.7";
+const CURRENT_CACHE_VERSION = "1.8";
 const DYNAMIC_CACHE_NAME  = `${DYNAMIC_CACHE_NAME_PREFIX}${CURRENT_CACHE_VERSION}`;
 const SERVER_FILE_NAME = "get.php";
 
-async function shouldCache(request, cache) {
-  const url = (new URL(request.url)).toString();
+function shouldCache(request, response) {
+  const url = request.url;
+  const responseType = response.headers.get("content-type");
   if (url.includes(SERVER_FILE_NAME)) return false;
   return url.startsWith(location.origin + '/assets/') || 
          url.startsWith(location.origin  + '/images/') ||
          url === location.origin  + '/manifest.json' ||
-         ((url.startsWith(location.origin  + '/') && !(await cache.match("/"))) ? "home" : false);
+         ((url.startsWith(location.origin  + '/') && responseType.includes("text/html")) ? "home" : false);
 }
 
 self.addEventListener('activate', event => {
@@ -39,7 +40,7 @@ async function networkFirst(request) {
   const cache = await caches.open(DYNAMIC_CACHE_NAME);
   try {
     const response = await fetch(request);
-    const cacheRes = await shouldCache(request, cache);  
+    const cacheRes = shouldCache(request, response);  
 
     if (cacheRes) {
       cache.put(cacheRes === "home" ? "/" : request, response.clone());
