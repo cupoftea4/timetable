@@ -1,5 +1,6 @@
 import TimetableManager from "./TimetableManager";
 import { CachedTimetable, TimetableItem, TimetableType } from "./types";
+import { findAndConvertRomanNumeral } from "./utils";
 
 const UPDATE_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 
@@ -18,8 +19,6 @@ export default class TimetableUtil {
   static mergeTimetables(timetables: (TimetableItem[] | undefined | null)[]) {
     const mergedTimetable = timetables.reduce((acc, timetable) => {
       timetable?.forEach(item => {
-        // if (!acc || acc.some(i => i?.day === item.day && i.number === item.number)) 
-        //   throw new Error("Conflicting timetables" + JSON.stringify(item));
         acc!.push(item);
       });
       return acc;
@@ -85,4 +84,21 @@ export default class TimetableUtil {
       TimetableManager.cachedLecturers
     )
   }
+
+  static formatLocationForGoogleMaps(location: string | undefined) {
+    const UNI_NAME = "НУ «Львівська політехніка»";
+
+    if (!location) return UNI_NAME;
+
+    let building = null;
+    if (location.includes("Гол. н.к.")) {
+      building = "Головний корпус";
+    } else {
+      const buildingNumber = findAndConvertRomanNumeral(location);
+      if (buildingNumber) building = `${buildingNumber}-й корпус`;
+    }
+
+    return UNI_NAME + (building ? `, ${building}` : "");
+  }
+
 }

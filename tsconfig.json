@@ -19,6 +19,6 @@
   },
   "include": [
     "src",
-    "build/service-worker.js"  
+    "build/sw.js"  
   ]
 }

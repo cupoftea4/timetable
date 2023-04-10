@@ -8,8 +8,9 @@ const SERVER_FILE_NAME = "get.php";
 async function shouldCache(request, cache) {
   const url = (new URL(request.url)).toString();
   if (url.includes(SERVER_FILE_NAME)) return false;
-  return url.startsWith(location.origin + '/static/') || 
-         url.startsWith(location.origin  + '/shared/') ||
+  return url.startsWith(location.origin + '/assets/') || 
+         url.startsWith(location.origin  + '/images/') ||
+         url === location.origin  + '/manifest.json' ||
          ((url.startsWith(location.origin  + '/') && !(await cache.match("/"))) ? "home" : false);
 }
 
