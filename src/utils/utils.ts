@@ -13,6 +13,7 @@ export async function optimisticRender<T>(
     render(data, false);
   } catch (e) {
     if (typeof e === 'string') return error(e);
+    console.error(e);
     error("Unknown error");
   }
 }

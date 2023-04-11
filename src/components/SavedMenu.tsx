@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import CheckMarkIcon from '../assets/CheckMarkIcon';
 import HistoryIcon from '../assets/HistoryIcon';
@@ -10,7 +10,11 @@ import TimetableUtil from '../utils/TimetableUtil';
 
 const MAX_SAVED_ITEMS = 5;
 
-const SavedMenu = () => {
+type OwnProps = {
+  timetableChanged: boolean;
+}
+
+const SavedMenu : FC<OwnProps> = ({timetableChanged}) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const groupParam = useParams().group?.trim();
   const [savedGroups, setSavedGroups] = useState<string[]>(getCachedGroups);
@@ -29,7 +33,7 @@ const SavedMenu = () => {
 
   useEffect(() => {
     setSavedGroups(getCachedGroups());
-  }, [groupParam]);
+  }, [groupParam, timetableChanged]);
 
   const openMenu = () => setIsMenuOpen(true);
 

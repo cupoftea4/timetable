@@ -156,7 +156,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
             <header className={`${headerStyles.header} ${styles.header}`}>
               <nav className={headerStyles['right-buttons']}> 
                 <Link state={{force: true}} to="/" aria-label="Home"><HomeIcon /></Link>
-                <SavedMenu />
+                <SavedMenu timetableChanged={loading} />
                 <h1 className={styles.title}>{timetableType === 'merged' ? "Мій розклад" : timetableGroup}</h1>
                 {
                   timetableType !== 'selective' &&
