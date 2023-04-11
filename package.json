@@ -1,6 +1,6 @@
 {
   "name": "timetable",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "homepage": "/",
   "private": true,
   "dependencies": {
@@ -9,15 +9,15 @@
     "react-datalist-input": "^3.2.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.3",
-    "react-scripts": "^5.0.1",
     "react-toastify": "^9.1.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "dev": "env-cmd -f dev.env npm start",
-    "build:prod": "env-cmd -f .env yarn run build",
-    "build:hope": "env-cmd -f hope.env yarn run build"
+    "start": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview",
+    "dev": "env-cmd -f dev.env vite",
+    "build:prod": "tsc && env-cmd -f .env vite build",
+    "build:hope": "tsc && env-cmd -f hope.env vite build --mode development"
   },
   "eslintConfig": {
     "extends": [
@@ -38,12 +38,17 @@
     ]
   },
   "devDependencies": {
+    "@total-typescript/ts-reset": "^0.4.2",
     "@types/node": "^18.14.0",
     "@types/react": "^18.0.21",
     "@types/react-dom": "^18.0.6",
+    "@vitejs/plugin-react": "^3.1.0",
     "dotenv": "^16.0.3",
     "env-cmd": "^10.1.0",
     "sass": "^1.55.0",
-    "typescript": "^4.8.4"
+    "typescript": "^4.8.4",
+    "vite": "^4.2.1",
+    "vite-plugin-svgr": "^2.4.0",
+    "vite-tsconfig-paths": "^4.0.8"
   }
 }

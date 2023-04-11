@@ -40,7 +40,7 @@ function romanToArabic(roman: string): number {
   return arabicValue <= 40 ? arabicValue : -1;
 }
 
-export function findAndConvertRomanNumeral(input: string): number {
+export function findAndConvertRomanNumeral(input: string): number | null {
   const romanNumeralRegex = /[IVXL]+/;
   const romanNumeral = input.match(romanNumeralRegex);
 
@@ -50,5 +50,5 @@ export function findAndConvertRomanNumeral(input: string): number {
         return arabicValue;
     }
   }
-  return -1;
+  return null;
 }

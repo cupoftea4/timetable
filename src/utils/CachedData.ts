@@ -3,18 +3,14 @@ import { ExamsTimetableItem, TimetableItem, TimetableType } from "./types";
 
 const FALLBACK_URL = "https://raw.githubusercontent.com/cupoftea4/timetable-data/data/";
 
-type ExamsTimetableItemWithoutDate = Omit<ExamsTimetableItem, "date">;
-
-interface CachedExamsTimetableItem extends ExamsTimetableItemWithoutDate {
-  date: string; 
-}
+type CachedExamsTimetableItem = Omit<ExamsTimetableItem, "date"> & { date: string };
 
 export default class CachedData {
-  private static async fetchData(path: string) {
+  private static async fetchData<T>(path: string) {
     if (DEVELOP) console.warn("Timetable fallback url", FALLBACK_URL + path);
 		const response = await fetch(FALLBACK_URL + path);
 		if (!response.ok) throw Error("Couldn't fetch or parse timetable");
-		return await response.json();
+		return await response.json() as T;
 	}
 
   static getInstitutes(): Promise<string[]> {
@@ -58,7 +54,7 @@ export default class CachedData {
     if (type === "lecturer") 
       fallbackPath = `exams/lecturers/${timetableName}.json`;
     
-    return this.fetchData(fallbackPath).then(
+    return this.fetchData<CachedExamsTimetableItem[]>(fallbackPath).then(
       (data: CachedExamsTimetableItem[]) => data.map(item => ({...item, date: new Date(item.date)}))
     );
   }

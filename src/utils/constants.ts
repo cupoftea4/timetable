@@ -4,4 +4,4 @@ export const NARROW_SCREEN_BREAKPOINT = 300;
 
 export const TOAST_AUTO_CLOSE_TIME = 5000;
 
-export const DEVELOP = process.env.REACT_APP_DEVELOP === "true";
+export const DEVELOP = import.meta.env.MODE === "development";

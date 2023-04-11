@@ -1,4 +1,5 @@
 import { toast } from "react-toastify";
+import { DEVELOP } from "./constants";
 import { showErrorToast, showPromiseToast, showWarningToast } from "./promiseHandling";
 
 const initErrors = [
@@ -33,12 +34,12 @@ export const NONEXISTING_GROUP = getRandomValue(nonexistingGroupErrors);
 export const NONEXISTING_TIMETABLE = "This timetable does not exist";
 
 export function error(error: string, userError: string = FETCH_ERROR) {
-  console.error("[Handler] " + error);
+  if (DEVELOP) console.error("[Handler] " + error);
   showErrorToast(userError);
 }
 
 export function warn(message: string) {
-  console.warn("[Handler] " + message);
+  if (DEVELOP) console.warn("[Handler] " + message);
   showWarningToast(message);
 }
 

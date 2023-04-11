@@ -1,6 +1,5 @@
 import TimetableUtil from "./TimetableUtil";
 import { ExamsTimetableItem, TimetableItem } from "./types";
-import { findAndConvertRomanNumeral } from "./utils";
 
 
 function toTFormattedString(date: Date, time: string) {
@@ -45,15 +44,13 @@ export default class ISCFile {
         date.setDate(date.getDate() + daysUntilNextDayOfWeek + ((isSecondWeek === (curWeek === 2) && (isFirstSubgroup && isSecondSubgroup))? 7 : 0));
         const [start, end] = this.lessonNumberToICSTime(date, number);
         const rrule = this.getRRULE(isFirstWeek, isSecondWeek, curWeek);
-        const lectureRoom = lecturer.split(',')[1];
-        const buildingNumber = lectureRoom ? findAndConvertRomanNumeral(lectureRoom) : -1;
+        const lectureLocation = lecturer.split(',')[1];
+
         return this.createEvent({
           start, end,
           summary: subject,
           description: location.replaceAll(/,./g, '').trim() + ", " + lecturer.trim().replace(/,$/, '') + " " + (urls[0] ?? ''),
-          location: "НУ «Львівська політехніка»" + (
-            buildingNumber !== -1 ? `, ${buildingNumber}-й корпус` : ""
-          ),
+          location: TimetableUtil.formatLocationForGoogleMaps(lectureLocation),
           rrule,
         });
     }).filter(Boolean).join(''));

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/png" href="/images/favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="NULP Timetable"
+    />
+    <link rel="manifest" href="/manifest.json" />
+
+    <title>Timetable</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+    <script>
+      window.addEventListener("load", () => {
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("/sw.js")
+            .then(registration => {
+              console.log("Service worker registered with scope:", registration.scope);
+            })
+            .catch(error => {
+              console.error("Service worker registration failed:", error);
+            });
+        }
+      });
+    </script>
+  </body>
+</html>
