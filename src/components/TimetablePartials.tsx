@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import { classes } from '../styles/utils';
 import { HalfTerm } from '../utils/types';
 import styles from './TimetablePartials.module.scss';
 
@@ -31,7 +32,7 @@ const TimetablePartials: FC<OwnProps> = ({partials, handlePartialClick}) => {
           onMouseEnter={openDropdown}  onMouseLeave={closeDropdown} 
           onFocusCapture={openDropdown}
         >
-          <button className={`${showDropdown && styles.active}`} tabIndex={-1}>
+          <button className={classes(showDropdown && styles.active)} tabIndex={-1}>
             {activePartial === 0 ? "Весь семестр" : activePartial + " півсеместр"} {showDropdown ? "▴" : "▾"}
           </button>
             {showDropdown &&
@@ -52,4 +53,4 @@ const TimetablePartials: FC<OwnProps> = ({partials, handlePartialClick}) => {
   )
 }
 
-export default TimetablePartials
+export default TimetablePartials;

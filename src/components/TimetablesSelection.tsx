@@ -1,5 +1,6 @@
 import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { classes } from '../styles/utils';
 import TimetableUtil from '../utils/TimetableUtil';
 import styles from './TimetablesSelection.module.scss';
 
@@ -20,11 +21,11 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false}) => 
   const [expandedYear, setExpandedYear] = useState<Year | null>(null); // for mobile onClick event and keyboard navigation
 
   return (
-    <div className={`${styles.timetables} ${withYears && styles['with-years']}`}>
+    <div className={classes(styles.timetables, withYears && styles['with-years'])}>
       {withYears ?
           [Year.First, Year.Second, Year.Third, Year.Fourth].map((year) => 
             groupsByYear[year]?.length && groupsByYear[year].length !== 0 ?
-                <ul key={year} className={`${styles.year} ${expandedYear === year ? styles.expanded : ''}`} 
+                <ul key={year} className={classes(styles.year, expandedYear === year && styles.expanded)} 
                     data-value={`${year} Курс`}
                     onClick={() => expandedYear === year ? setExpandedYear(null) : setExpandedYear(year)}
                   >

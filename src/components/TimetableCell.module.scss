@@ -47,14 +47,7 @@ $cell-border-radius: .625rem;
       }
     }
   }
-
-  &.show {
-    animation: appear 300ms ease-in-out; // overlaps links dropdown with forwards :/
-  }
-  &.hide {
-    animation: disappear 300ms ease-in-out forwards; // flickers without forwards :/
-  }
-
+  position: relative;
   .cell {
     margin: 0 .125rem .5rem .125rem;
     display: flex;
@@ -62,9 +55,12 @@ $cell-border-radius: .625rem;
     max-width: $max-cell-width;
     position: relative;
     font-size:  $small-font-size;
+    // position: absolute;
 
     @include min-timetable-mobile {
-      background-color: transparent;
+      &:not(.merged) {
+        background-color: transparent;
+      }
     }
 
     @include timetable-mobile {
@@ -139,6 +135,14 @@ td.empty {
   }
 }
 
+
+.show {
+  animation: appear 300ms ease-in-out; // overlaps links dropdown with forwards :/
+}
+
+.hide {
+  animation: disappear 300ms ease-in-out forwards; // flickers without forwards :/
+}
 
 
 @keyframes appear {

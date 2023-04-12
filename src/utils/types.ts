@@ -14,6 +14,8 @@ export type TimetableItem = {
   urls: string[]
 }
 
+export type MergedTimetableItem = TimetableItem & {timetableName: string};
+
 export type ExamsTimetableItem = {
   date: Date,
   lecturer: string,
@@ -27,7 +29,7 @@ export type LPNUTimetableType = 'timetable' | 'selective' | 'lecturer';
 export type TimetableType = LPNUTimetableType | 'merged';
 
 export type CachedTimetable = {group: string, time: number, subgroup?: 1 | 2};
-export interface MergedTimetable extends CachedTimetable { timetables: string[]; }
+export type MergedTimetable = CachedTimetable & { timetableNames: string[]; }
 export type CachedGroup = string;
 export type CachedInstitute = string;
 

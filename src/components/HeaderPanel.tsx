@@ -7,6 +7,7 @@ import styles from './HeaderPanel.module.scss';
 import { TABLET_SCREEN_BREAKPOINT, NARROW_SCREEN_BREAKPOINT } from '../utils/constants';
 import { TimetableType } from '../utils/types';
 import Navigation from './Navigation';
+import { classes } from '../styles/utils';
 
 type OwnProps = {
   timetableType: TimetableType;
@@ -25,7 +26,7 @@ const HeaderPanel : FC<OwnProps> = ({timetableType, className}) => {
   };
 
   return (
-    <header className={`${styles.header} ${className}`} >
+    <header className={classes(styles.header, className)} >
       <SearchBar toggleSearchBar={toggleSearchBar} show={showSearchBar} /> 
       {showSearchBar && shouldShrinkSearchBar ?
         null 

@@ -10,6 +10,7 @@ import * as handler from '../utils/requestHandler'
 import { TABLET_SCREEN_BREAKPOINT } from "../utils/constants";
 import catImage from '../assets/cat.svg';
 import { useLocation, useNavigate } from "react-router-dom";
+import { classes } from "../styles/utils";
 
 type OwnProps = {
   timetableType: TimetableType;
@@ -104,7 +105,7 @@ const HomePage: FC<OwnProps>  = ({timetableType }) => {
     <div className={styles.wrapper}>
       <HeaderPanel timetableType={timetableType} className={styles.header}/>
       <main className={styles.container}>
-        <section className={`${styles.selection} ${isTablet && selectedSecond && styles["one-column"]}`} 
+        <section className={classes(styles.selection, isTablet && selectedSecond && styles["one-column"])} 
           data-attr={timetableType + "-groups"}>
           {showFirstLayer &&
             <List items={firstLayer} selectedState={[selectedFirst, handleInstituteChange]} />

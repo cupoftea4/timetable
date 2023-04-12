@@ -1,8 +1,10 @@
 import TimetableManager from "./TimetableManager";
-import { CachedTimetable, TimetableItem, TimetableType } from "./types";
+import { CachedTimetable, MergedTimetableItem, TimetableItem, TimetableType } from "./types";
 import { findAndConvertRomanNumeral } from "./utils";
 
 const UPDATE_PERIOD = 24 * 60 * 60 * 1000; // 1 day
+
+const lessonsComparator = (a: TimetableItem, b: TimetableItem) => a.subject === b.subject && a.lecturer === b.lecturer;
 
 export default class TimetableUtil {
   static lessonsTimes = [ 
@@ -16,13 +18,13 @@ export default class TimetableUtil {
     {start: "21:00", end: "22:35"}
   ];
 
-  static mergeTimetables(timetables: (TimetableItem[] | undefined | null)[]) {
-    const mergedTimetable = timetables.reduce((acc, timetable) => {
-      timetable?.forEach(item => {
-        acc!.push(item);
+  static mergeTimetables(timetables: {name: string, timetable: (TimetableItem[] | undefined | null)}[]) {
+    const mergedTimetable = timetables.reduce((acc, timetableData) => {
+      timetableData.timetable?.forEach(item => {
+        acc!.push({...item, timetableName: timetableData.name});
       });
       return acc;
-    }, [] as TimetableItem[]);
+    }, [] as MergedTimetableItem[]);
     if (!mergedTimetable || !mergedTimetable.length) throw new Error("Something went wrong");
     return mergedTimetable;
   }
@@ -101,4 +103,10 @@ export default class TimetableUtil {
     return UNI_NAME + (building ? `, ${building}` : "");
   }
 
+  static unique(array: TimetableItem[]) {
+    return array.reduce((acc, item) => {
+      if (!acc.some(i => lessonsComparator(i, item))) acc.push(item);
+      return acc;
+    }, [] as TimetableItem[]);
+  }
 }

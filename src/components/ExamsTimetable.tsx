@@ -1,4 +1,5 @@
 import { FC } from 'react'
+import { classes } from '../styles/utils';
 import { LVIV_TIMEZONE } from '../utils/date';
 import { ExamsTimetableItem } from '../utils/types';
 import styles from './ExamsTimetable.module.scss';
@@ -19,7 +20,7 @@ const ExamsTimetable: FC<OwnProps> = ({exams}) => {
   return (
     <div className={styles.exams}>
       {exams?.sort(compareDates).map((exam, index) => (
-        <div key={index} className={`${isSameDay(exam.date, new Date()) && styles.active}`}>
+        <div key={index} className={classes(isSameDay(exam.date, new Date()) && styles.active)}>
           <div>
             <p>{exam.date.toLocaleString("uk-UA", {timeZone: LVIV_TIMEZONE, weekday: "long", day: "numeric", month: "long"})}</p>
             <p>{exam.number} пара</p>

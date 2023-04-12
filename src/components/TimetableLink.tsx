@@ -6,6 +6,7 @@ import SkypeIcon from '../assets/links/SkypeIcon';
 import TeamsIcon from '../assets/links/TeamsIcon';
 import YouTubeIcon from '../assets/links/YouTubeIcon';
 import ZoomIcon from '../assets/links/ZoomIcon';
+import { classes } from '../styles/utils';
 import { TimetableItemType } from '../utils/types';
 import styles from './TimetableLink.module.scss'
 
@@ -34,7 +35,7 @@ const TimetableLink: FC<OwnProps>  = ({ urls, type }) => {
     <>
       {urls.length === 1 ? 
         <a href={urls[0]} target="_blank" rel="noreferrer"
-          className={`${styles.link} ${type}`}
+          className={classes(styles.link, type)}
         >
           {getLinkIcon(urls[0])}
           Join
@@ -44,7 +45,7 @@ const TimetableLink: FC<OwnProps>  = ({ urls, type }) => {
           onMouseEnter={openDropdown}  onMouseLeave={closeDropdown} 
           onFocusCapture={openDropdown}
           >
-            <button className={`${type} ${showDropdown && styles.active}`} tabIndex={-1}>
+            <button className={classes(type, showDropdown && styles.active)} tabIndex={-1}>
               Links {showDropdown ? "▴" : "▾"}
             </button>
               {showDropdown &&
@@ -53,7 +54,7 @@ const TimetableLink: FC<OwnProps>  = ({ urls, type }) => {
                     <li key={index}>
                       <a href={url}
                         target="_blank" rel="noreferrer"
-                        className={`${styles.link}`}
+                        className={styles.link}
                       >
                         {getLinkIcon(url)}
                         Join

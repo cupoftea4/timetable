@@ -12,6 +12,7 @@ import Timetable from '../components/Timetable';
 import TimetablePartials from '../components/TimetablePartials';
 import Toggle from '../components/Toggle';
 import useWindowDimensions from '../hooks/useWindowDimensions';
+import { classes } from '../styles/utils';
 import { MOBILE_SCREEN_BREAKPOINT } from '../utils/constants';
 import { getCurrentUADate, getNULPWeek } from '../utils/date';
 import ISCFile from '../utils/ICSFile';
@@ -38,10 +39,8 @@ type OwnProps = {
 
 const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   const group = useParams().group?.trim() ?? "";
-
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
   const isSecondNULPWeek = () => getNULPWeek() % 2 === 0;
-
   const [timetableGroup, setTimetableGroup] = useState<string | null>();
   const [timetable, setTimetable] = useState<TimetableItem[]>();
   const [examsTimetable, setExamsTimetable] = useState<ExamsTimetableItem[]>();
@@ -60,6 +59,11 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   const isLecturers = timetableType === 'lecturer';
   const isMobile = width < MOBILE_SCREEN_BREAKPOINT;
 
+  function onError(e: string) {
+    handler.error(e);
+    setTimetableGroup(null);
+  };
+
   useEffect(() => {
     if (!timetableType) {
       handler.error(`Group ${group} doesn't exist`, handler.NONEXISTING_GROUP);
@@ -69,7 +73,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     if (timetableType === 'selective' && isExamsTimetable) navigate('/' + group);
     setTimetableGroup(group);
     setLoading(true);
-    getTimetable(group, isExamsTimetable, timetableType).finally(() => setLoading(false));
+    getTimetable(group, isExamsTimetable, timetableType)?.finally(() => setLoading(false));
     TimetableManager.updateLastOpenedTimetable(group);
   }, [group, isExamsTimetable, navigate, timetableType]);
   
@@ -79,11 +83,6 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
   }, [isExamsTimetable, timetable]);
 
   function getTimetable(group: string, exams: boolean, type?: TimetableType, checkCache: boolean = true) {
-    const onError = (e: string) => {
-      handler.error(e);
-      setTimetableGroup(null);
-    };
-
     if (exams) 
       return optimisticRender(
         setExamsTimetable, onError, 
@@ -91,18 +90,18 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
       );
 
     const renderTimetable = (timetable: TimetableItem[], optimistic: boolean) => {
-      setTimetable(t => {
-        JSON.stringify(t) !== JSON.stringify(timetable) && setTimetable(timetable); 
-        return t ?? timetable;
-      });
+      setTimetable(t => JSON.stringify(t) !== JSON.stringify(timetable) ? timetable : t);
       setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
       if (!optimistic && type === 'timetable') TimetableManager.getPartials(group).then(setPartials);
     };
-    
-    return optimisticRender(
-      renderTimetable, onError, 
-      TimetableManager.getTimetable(group, type, checkCache)
-    );
+    try {
+      return optimisticRender(
+        renderTimetable, onError, 
+        TimetableManager.getTimetable(group, type, checkCache)
+      );
+    } catch (e) {
+      onError(handler.NONEXISTING_TIMETABLE);
+    }
   };
 
   const changeIsSecondSubgroup = (isSecond: boolean | ((isSecond: boolean) => boolean)) => {
@@ -116,12 +115,12 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
     if (loading) return;
     setLoading(true);
     getTimetable(group, isExamsTimetable, timetableType, checkCache)
-      .finally(() => setLoading(false));
+      ?.finally(() => setLoading(false));
   };
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
     const path = TimetableUtil.isMerged(group) && TimetableManager.cachedMergedTimetable
-      ? TimetableManager.cachedMergedTimetable.timetables.find(
+      ? TimetableManager.cachedMergedTimetable.timetableNames.find(
           t => {
             const type = TimetableManager.tryToGetType(t);
             return type === 'timetable' || type === 'lecturer';
@@ -153,7 +152,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
       {timetableGroup !== null ? 
         !isLoading ?
           <div className={styles.wrapper}>
-            <header className={`${headerStyles.header} ${styles.header}`}>
+            <header className={classes(headerStyles.header, styles.header)}>
               <nav className={headerStyles['right-buttons']}> 
                 <Link state={{force: true}} to="/" aria-label="Home"><HomeIcon /></Link>
                 <SavedMenu timetableChanged={loading} />
@@ -211,7 +210,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
                 </button>
                 <button 
                   disabled={loading}
-                  className={`${styles.update} ${loading && styles.loading}`} title='Оновити дані' 
+                  className={classes(styles.update, loading && styles.loading)} title='Оновити дані' 
                   onClick={() => updateTimetable()}
                 >
                   <LoadingIcon/>

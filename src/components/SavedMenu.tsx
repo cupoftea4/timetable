@@ -7,11 +7,12 @@ import TimetableManager from '../utils/TimetableManager';
 import styles from './SavedMenu.module.scss';
 import * as handler from '../utils/requestHandler';
 import TimetableUtil from '../utils/TimetableUtil';
+import { classes } from '../styles/utils';
 
 const MAX_SAVED_ITEMS = 5;
 
 type OwnProps = {
-  timetableChanged: boolean;
+  timetableChanged?: boolean;
 }
 
 const SavedMenu : FC<OwnProps> = ({timetableChanged}) => {
@@ -74,7 +75,11 @@ const SavedMenu : FC<OwnProps> = ({timetableChanged}) => {
     >
       <HistoryIcon />
       {isMenuOpen &&
-        <div className={`${styles['saved-menu']} ${groupParam && styles.home}`} id="saved-menu" aria-hidden={!isMenuOpen ? "true" : "false"}>
+        <div 
+          className={classes(styles['saved-menu'], groupParam && styles.home)} 
+          id="saved-menu" 
+          aria-hidden={!isMenuOpen ? "true" : "false"}
+        >
           <span>
             {savedGroups.length !== 0 ? "Збережені" : "Немає збережених. Відкрийте будь-який розклад, щоб автоматично зберегти."}
           </span>
@@ -84,7 +89,7 @@ const SavedMenu : FC<OwnProps> = ({timetableChanged}) => {
                 <Link to={`/${group}`} onFocus={() => setSelectedItem(index)} onClick={() => closeMenu()}> 
                   <span 
                     title={TimetableUtil.isMerged(group) 
-                      ? TimetableManager.cachedMergedTimetable?.timetables.join("+")
+                      ? TimetableManager.cachedMergedTimetable?.timetableNames.join("+")
                       : group
                     }>
                     {TimetableUtil.getTimetableName(group)} 

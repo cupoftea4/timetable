@@ -48,17 +48,19 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
   const forBothSubgroups = (item: TimetableItem) => item.isFirstSubgroup && item.isSecondSubgroup;
   const forAllWeeks = (item: TimetableItem) => item.isFirstWeek && item.isSecondWeek;
 
-  const getLessonByDayAndTime = useCallback((number: number, day: number) => {
+  const getLessonsByDayAndTime = useCallback((number: number, day: number) => {
     if (!timetable) return null;
-    return timetable.find(item => 
+    const result = timetable.filter(item => 
       item.day === day &&
       item.number === number &&
       (cellSubgroup || item.isSecondSubgroup === isSecondSubgroup || forBothSubgroups(item)) &&
       (item.isSecondWeek === isSecondWeek || forAllWeeks(item))
-    ) ?? null;
+    );
+    return result.length === 0 ? null : TimetableUtil.unique(result);
   }, [timetable, isSecondSubgroup, isSecondWeek, cellSubgroup]);
 
   const tableContent = useMemo(() => {
+    console.log("Running scary useMemo");
     const table = lessonsTimes.map((time, i) => 
       <tr key={time.start}>{
         days.map((day, j) =>
@@ -69,17 +71,17 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
                 <span>{time.end}</span>
               </th> 
             : <TimetableCell
-                isAfterEmpty={i !== 0 && getLessonByDayAndTime(i, j) === null} 
-                lesson={getLessonByDayAndTime(i + 1, j)} 
+                isAfterEmpty={i !== 0 && getLessonsByDayAndTime(i, j) === null} 
+                lessons={getLessonsByDayAndTime(i + 1, j)} 
                 active={currentLessonNumber === i && currentDay === j} 
                 key={time.start + day}
                 cellSubgroup={cellSubgroup}
-            />
+              />
         )
       }</tr> 
     );
     return table;
-  }, [lessonsTimes, days, getLessonByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
+  }, [lessonsTimes,timetable, days, getLessonsByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
 
 
   return (

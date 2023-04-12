@@ -51,29 +51,18 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose}) => {
     setTimetablesToMerge([...timetablesToMerge, timetable]);
   }
 
-  async function resolveTimetables() {
-    const promises =  timetablesToMerge.map(timetable => TimetableManager.getTimetable(timetable));
-    const optimisticPromises = promises.map(tuple => tuple[0]);
-    const resolvedPromises = await Promise.all(optimisticPromises);
-    if (resolvedPromises.some(promise => promise === undefined || promise instanceof Error)) {
-      throw new Error("Failed to resolve timetable");
-    }
-    return resolvedPromises;
-  }
 
   function onCreateClick() {
     if (timetablesToMerge.length < 2 || timetablesToMerge.length > 5) {
       handler.warn("Виберіть від 2 до 5 груп");
       return;
     }
-    resolveTimetables()
-      .then(timetables => {
-        const mergedTimetable = TimetableUtil.mergeTimetables(timetables);
-        TimetableManager.saveMergedTimetable(mergedTimetable, timetablesToMerge);
-        onClose();
-        navigate("/my");
-      })
-      .catch(console.error);
+    TimetableManager.getMergedTimetable(timetablesToMerge)[1]
+    .then(() => {
+      onClose();
+      navigate("/my");
+    })
+    .catch(console.error); 
   }
 
   function onRemoveItem(timetable: string) {  

@@ -7,6 +7,7 @@ import { TimetableType } from '../utils/types';
 import useOnClickOutside from '../hooks/useOnOutsideClick';
 import TimetableUtil from '../utils/TimetableUtil';
 import VirtualizedDataList from './VirtualizedDataList';
+import { classes } from '../styles/utils';
 
 const getSearchBarOptions = () => {
   return TimetableUtil.getAllTimetables().map(group => ({id: group, value: group}));
@@ -24,7 +25,7 @@ const SearchBar: FC<OwnProps> = ({toggleSearchBar, show}) => {
   const ref = useOnClickOutside(() => toggleSearchBar(false));
 
   return (
-    <span className={`${styles.bar} ${!show && styles['hidden-search']}`} ref={ref}>
+    <span className={classes(styles.bar, !show && styles['hidden-search'])} ref={ref}>
       <SearchIcon onClick={() => toggleSearchBar()}/>
       <span className={styles.search}>
         <VirtualizedDataList

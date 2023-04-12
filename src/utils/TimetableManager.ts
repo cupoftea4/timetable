@@ -171,7 +171,12 @@ class TimetableManager {
   getTimetable(group: string, type?: TimetableType, checkCache = true) {
     const timetableType = type ?? this.tryToGetType(group);
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${group}`);
-    if (timetableType === 'merged') return this.getMergedTimetable();
+    try {
+      if (timetableType === 'merged') return this.getMergedTimetable();
+    } catch (error) {
+      console.error("ERROR", error);
+      throw Error(`Couldn't get merged timetable!`);
+    }
 
     let cacheData: Promise<TimetableItem[] | undefined>, fetchData: Promise<TimetableItem[] | null>;
     group = group.trim();
@@ -199,30 +204,35 @@ class TimetableManager {
     }
 
     fetchData = LPNUData.getTimetable(timetableType, group).catch(() => {
-      cacheData.then(setStorageData);
+      cacheData.then(data => {
+        setStorageData(data);
+        return data;
+      });
       handler.warn("Data is possibly outdated!");
       return null;
     });
 
     fetchData.then(setStorageData);
-    
     return [cacheData, fetchData] as const;
   }
 
-  getMergedTimetable() {
-    if (!this.mergedTimetable) throw Error("Merge doesn't exist!");
+  getMergedTimetable(timetablesToMerge?: string[]) {
+    const timetableNames = timetablesToMerge ?? this.mergedTimetable?.timetableNames; 
+    if (!timetableNames) throw Error("Merge doesn't exist!");
     let cacheData: Promise<TimetableItem[] | undefined>, fetchData: Promise<TimetableItem[] | null>;
-    const timetables = this.mergedTimetable.timetables.map(el => this.getTimetable(el));
-    const cachePromises = timetables.map(([cache]) => cache);
-    const fetchPromises = timetables.map(([_, fetch]) => fetch);
-    cacheData = Promise.all(cachePromises).then(timetables => {
-      const merged = Util.mergeTimetables(timetables);
-      return merged;
-    });
+    const timetables = timetableNames.map(el => ({name: el, data: this.getTimetable(el)}));
+    const cachePromises = timetables.map(({name, data}) => data[0].then(timetable => ({timetable, name})));
+    const fetchPromises = timetables.map(({name, data}) => data[1].then(timetable => ({timetable, name})));
+    cacheData = Promise.all(cachePromises).then(timetables => Util.mergeTimetables(timetables));
+
     fetchData = Promise.all(fetchPromises).then(timetables => {
       const merged = Util.mergeTimetables(timetables)
+      this.saveMergedTimetable(merged, timetableNames);
       return merged;
     }).catch(() => {
+      cacheData.then(merged =>
+        merged && this.saveMergedTimetable(merged, timetableNames)
+      );
       handler.warn("Data is possibly outdated!");
       return null;
     });
@@ -270,7 +280,7 @@ class TimetableManager {
     group = group.trim();
 
     if (Util.isMerged(group)) {
-      if (!this.mergedTimetable) throw Error("Merge doesn't exist!");
+      if (!this.mergedTimetable) throw Error("Updating subgroup: Merge doesn't exist!");
       this.mergedTimetable = {
         ...this.mergedTimetable,
         subgroup: subgroup
@@ -295,7 +305,10 @@ class TimetableManager {
     if (!group) return;
     
     if (Util.isMerged(group)) {
-      if (!this.mergedTimetable) throw Error("Merge doesn't exist!");
+      if (!this.mergedTimetable) {
+        if (DEVELOP) console.error("Getting subgroup: Merge doesn't exist!");
+        return 1;
+      }
       return this.mergedTimetable.subgroup;
     }
     
@@ -321,7 +334,7 @@ class TimetableManager {
       group: "Мій розклад",
       time: Date.now(),
       subgroup: 1,
-      timetables: timetablesToMerge,
+      timetableNames: timetablesToMerge,
     }
     return storage.setItem(MERGED_TIMETABLE,  this.mergedTimetable);
   }
