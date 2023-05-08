@@ -37,7 +37,8 @@ type StudentParams = {
 type LecturerParams = {
 	department_name_selective: string,
 	teachername_selective?: string,
-	assetbuilding_name_selective?: "весь семестр"
+	assetbuilding_name_selective?: "весь семестр",
+	semestr_selective?: '1' | '2'
 }
 
 type ExamsStudentParams = {
@@ -126,6 +127,7 @@ export default class LPNUData {
 			return this.fetchHTML({
 				department_name_selective: timetableCategory,
 				teachername_selective: timetableName,
+				semestr_selective: '2',
 				assetbuilding_name_selective: "весь семестр"
 			}, LECTURER_SUFFIX).then(Parser.parseTimetable.bind(Parser));
 		}
