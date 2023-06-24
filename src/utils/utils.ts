@@ -1,7 +1,7 @@
 export async function optimisticRender<T>(
   render: (data: T, optimistic: boolean) => void, 
   error: ((error: string) => void) | (() => void), 
-  promises: readonly [Promise<T | null | undefined>, Promise<T| null>]
+  promises: readonly [Promise<T | null | undefined>, Promise<T | null>]
 ) {
   const [first, second] = promises;
   try {

@@ -1,0 +1,43 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.header {
+  max-width: var(--max-app-width);
+  margin: 0 auto;
+  padding: 2rem 4rem .75rem 4rem;
+  @include tablet {
+    padding: 2rem 2.5rem .75rem 2.5rem;
+    gap: .5rem;
+  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  .right-buttons {
+    display: flex;
+    gap: .875rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    button.exams {
+      @include light-pillow-button;
+      border-radius: $border-radius;
+    }
+
+    svg {
+      width: clamp(2rem, 8vw, 2.75rem);
+      height: clamp(2rem, 8vw, 2.75rem); 
+      transition: all .2s ease-in-out;
+      transform-origin: center;
+      cursor: pointer;
+    }
+    h1 {
+      align-self: flex-end;
+      font-size: clamp(1rem, 8vw, 2rem);
+      font-weight: $semi-bold-font;
+      color: var(--text-clr);
+      text-align: center;
+    }
+  }
+}

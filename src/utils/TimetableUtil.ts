@@ -1,4 +1,4 @@
-import TimetableManager from "./TimetableManager";
+import TimetableManager from "./data/TimetableManager";
 import { CachedTimetable, MergedTimetableItem, TimetableItem, TimetableType } from "./types";
 import { findAndConvertRomanNumeral } from "./utils";
 
@@ -7,7 +7,7 @@ const UPDATE_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 const lessonsComparator = (a: TimetableItem, b: TimetableItem) => a.subject === b.subject && a.lecturer === b.lecturer;
 
 export default class TimetableUtil {
-  static lessonsTimes = [ 
+  static readonly lessonsTimes = [ 
     {start:  "8:30", end: "10:05"},
     {start: "10:20", end: "11:55"},
     {start: "12:10", end: "13:45"},
@@ -56,7 +56,7 @@ export default class TimetableUtil {
     }, [] as string[][]);
   }
 
-  static getFirstLetters = (array: string[]) => {
+  static getFirstLetters = (array: readonly string[]) => {
     const alphabet = [...new Set<string>([...array].map(group => group[0]).sort((a, b) => a.localeCompare(b)))];
     const alphabetArray = alphabet.reduce((acc, letter, index) => {
       if (index % 2 === 0) acc.push(letter);

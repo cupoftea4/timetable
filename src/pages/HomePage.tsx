@@ -1,16 +1,16 @@
 import { FC, useCallback, useEffect, useState } from "react";
-import TimetablesSelection from "../components/TimetablesSelection";
-import HeaderPanel from "../components/HeaderPanel";
-import TimetableManager from "../utils/TimetableManager";
-import { TimetableType } from "../utils/types";
-import styles from "./HomePage.module.scss";
-import useWindowDimensions from "../hooks/useWindowDimensions";
-import List from "../components/List";
-import * as handler from '../utils/requestHandler'
-import { TABLET_SCREEN_BREAKPOINT } from "../utils/constants";
-import catImage from '../assets/cat.svg';
 import { useLocation, useNavigate } from "react-router-dom";
-import { classes } from "../styles/utils";
+import TimetablesSelection from "@/features/home/TimetablesSelection";
+import HeaderPanel from "@/features/header/HeaderPanel";
+import useWindowDimensions from "@/hooks/useWindowDimensions";
+import TimetableManager from "@/utils/data/TimetableManager";
+import * as handler from '@/utils/requestHandler'
+import { TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
+import { TimetableType } from "@/utils/types";
+import List from "@/shared/List";
+import catImage from '@/assets/cat.svg';
+import { classes } from "@/styles/utils";
+import styles from "./HomePage.module.scss";
 
 type OwnProps = {
   timetableType: TimetableType;

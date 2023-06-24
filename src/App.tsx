@@ -6,7 +6,7 @@ import LoadingPage from "./pages/LoadingPage";
 import TimetablePage from "./pages/TimetablePage";
 import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 import * as handler from "./utils/requestHandler";
-import TimetableManager from "./utils/TimetableManager";
+import TimetableManager from "./utils/data/TimetableManager";
 import { Status } from "./utils/types";
 
 /* TODO:
