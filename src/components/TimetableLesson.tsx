@@ -18,7 +18,7 @@ const TimetableLesson: FC<OwnProps> = ({lesson, cellSubgroup, isMerged}) => {
   const isForBothSubgroups = lesson.isFirstSubgroup && lesson.isSecondSubgroup;
   const times = TimetableUtil.lessonsTimes[lesson.number - 1];
   const [innerLesson, shouldAppear] = useDelayedProp(lesson, ANIMATION_DURATION);
-  const [onTop, setOnTop] = useState(0);
+  // const [onTop, setOnTop] = useState(0);
 
   return ( 
     <>

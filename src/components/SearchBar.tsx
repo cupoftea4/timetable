@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import SearchIcon from '../assets/SearchIcon';
 import styles from './SearchBar.module.scss';
-import 'react-datalist-input/dist/styles.scss';
+import 'react-datalist-input/dist/styles.css';
 import { useNavigate } from 'react-router-dom';
 import { TimetableType } from '../utils/types';
 import useOnClickOutside from '../hooks/useOnOutsideClick';
