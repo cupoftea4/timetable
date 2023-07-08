@@ -1,4 +1,4 @@
-import TimetableUtil from "../TimetableUtil";
+import { formatLocationForGoogleMaps, lessonsTimes } from "../timetable";
 import { ExamsTimetableItem, TimetableItem } from "../types";
 
 
@@ -41,7 +41,11 @@ export default class ISCFile {
         if (isSecondSubgroup !== (subgroup === 2) && !(isFirstSubgroup && isSecondSubgroup)) return null;
         const date = new Date();
         const daysUntilNextDayOfWeek = (day - new Date().getDay() + 7) % 7;
-        date.setDate(date.getDate() + daysUntilNextDayOfWeek + ((isSecondWeek === (curWeek === 2) && (isFirstSubgroup && isSecondSubgroup))? 7 : 0));
+        date.setDate(
+          date.getDate() + 
+          daysUntilNextDayOfWeek + 
+          ((isSecondWeek === (curWeek === 2) && (isFirstSubgroup && isSecondSubgroup)) ? 7 : 0)
+        );
         const [start, end] = this.lessonNumberToICSTime(date, number);
         const rrule = this.getRRULE(isFirstWeek, isSecondWeek, curWeek);
         const lectureLocation = lecturer.split(',')[1];
@@ -50,7 +54,7 @@ export default class ISCFile {
           start, end,
           summary: subject,
           description: location.replaceAll(/,./g, '').trim() + ", " + lecturer.trim().replace(/,$/, '') + " " + (urls[0] ?? ''),
-          location: TimetableUtil.formatLocationForGoogleMaps(lectureLocation),
+          location: formatLocationForGoogleMaps(lectureLocation),
           rrule,
         });
     }).filter(Boolean).join(''));
@@ -63,7 +67,24 @@ export default class ISCFile {
     curWeek: 1 | 2,
   ): string {
     const date = new Date();
-    const lastMonth = new Date(date.getFullYear(), date.getMonth() < 8 ? 5 : 12, 0);
+    const LAST_MONTH_TERM_1 = 5; // June
+    const LAST_MONTH_TERM_2 = 11; // December
+    const FIRST_MONTH_TERM_2 = 7; // September 
+
+    const isHoliday = (month: number) => month >= LAST_MONTH_TERM_1 && month < FIRST_MONTH_TERM_2;
+
+    const currentMonth = date.getMonth();
+    let month;
+  
+    if (isHoliday(currentMonth)) {
+      month = currentMonth + 1;
+    } else if (currentMonth <= LAST_MONTH_TERM_1) {
+      month = LAST_MONTH_TERM_1;
+    } else {
+      month = LAST_MONTH_TERM_2;
+    }
+
+    const lastMonth = new Date(date.getFullYear(), month, 0);
     const weeksToLastMonth = weeksLeftToDate(lastMonth);
     const halfWeeksToLastMonth = 
       (week: 1|2) => curWeek === week 
@@ -81,7 +102,7 @@ export default class ISCFile {
   }
 
   private static lessonNumberToICSTime(date: Date, number: number) {
-    const {start, end} = TimetableUtil.lessonsTimes[number - 1];;
+    const {start, end} = lessonsTimes[number - 1];;
     const startTime = toTFormattedString(date, start);
     const endTime = toTFormattedString(date, end);;
     return [startTime, endTime];

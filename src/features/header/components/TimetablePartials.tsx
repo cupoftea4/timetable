@@ -37,7 +37,7 @@ const TimetablePartials: FC<OwnProps> = ({partials, handlePartialClick}) => {
           </button>
             {showDropdown &&
               <ul className={styles.dropdown}>
-                {[0, ...partials]/* .filter((partial) => partial !== activePartial) */.map((partial, index) => (
+                {[0, ...partials].map((partial, index) => (
                   <li key={index}>
                     <button onClick={() => onPartialClick(partial)}
                     >

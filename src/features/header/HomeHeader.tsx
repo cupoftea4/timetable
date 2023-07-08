@@ -1,13 +1,13 @@
-import SavedMenu from './SavedMenu'
 import { FC, useMemo, useState } from 'react'
-import SearchBar from './SearchBar';
+import SavedMenu from './components/SavedMenu'
+import SearchBar from './components/SearchBar';
+import Navigation from './components/Navigation';
 // import ThemesIcon from '../assets/ThemesIcon';
-import useWindowDimensions from '../../hooks/useWindowDimensions';
+import useWindowDimensions from '@/hooks/useWindowDimensions';
+import { TABLET_SCREEN_BREAKPOINT, NARROW_SCREEN_BREAKPOINT } from '@/utils/constants';
+import { TimetableType } from '@/utils/types';
+import { classes } from '@/styles/utils';
 import styles from './HeaderPanel.module.scss';
-import { TABLET_SCREEN_BREAKPOINT, NARROW_SCREEN_BREAKPOINT } from '../../utils/constants';
-import { TimetableType } from '../../utils/types';
-import Navigation from './Navigation';
-import { classes } from '../../styles/utils';
 
 type OwnProps = {
   timetableType: TimetableType;

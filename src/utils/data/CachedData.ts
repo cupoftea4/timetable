@@ -1,5 +1,5 @@
 import { DEVELOP } from "../constants";
-import { ExamsTimetableItem, TimetableItem, TimetableType } from "../types";
+import { ExamsTimetableItem, LPNUTimetableType, TimetableItem, TimetableType } from "../types";
 
 const FALLBACK_URL = "https://raw.githubusercontent.com/cupoftea4/timetable-data/data/";
 
@@ -39,7 +39,7 @@ export default class CachedData {
     return this.fetchData("lecturers/departments.json");
   }
 
-  static getTimetable(type: TimetableType, timetableName: string): Promise<TimetableItem[]> {
+  static getTimetable(type: LPNUTimetableType, timetableName: string): Promise<TimetableItem[]> {
     let fallbackPath = `timetables/${timetableName}.json`;
     if (type === "lecturer") 
       fallbackPath = `lecturers/timetables/${timetableName}.json`;

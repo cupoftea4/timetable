@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
-import TimetableUtil from '@/utils/TimetableUtil';
+import { sortGroupsByYear } from '@/utils/timetable';
 import { classes } from '@/styles/utils';
 import styles from './TimetablesSelection.module.scss';
 
@@ -17,7 +17,7 @@ type OwnProps = {
 };
 
 const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false}) => {
-  const groupsByYear = TimetableUtil.sortGroupsByYear(timetables);
+  const groupsByYear = sortGroupsByYear(timetables);
   const [expandedYear, setExpandedYear] = useState<Year | null>(null); // for mobile onClick event and keyboard navigation
 
   return (
@@ -30,11 +30,12 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false}) => 
                     onClick={() => expandedYear === year ? setExpandedYear(null) : setExpandedYear(year)}
                   >
                     {groupsByYear[year].map(group => (
-                                        <li key={group}>
-                                          <Link to={"/" + group} onFocus={() => setExpandedYear(year)}>
-                                            {group}
-                                          </Link>
-                                        </li>)  
+                          <li key={group}>
+                            <Link to={"/" + group} onFocus={() => setExpandedYear(year)}>
+                              {group}
+                            </Link>
+                          </li>
+                        )  
                       ) 
                     }
                 </ul> 

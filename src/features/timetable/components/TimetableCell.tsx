@@ -4,6 +4,7 @@ import { useDelayedProp } from '@/hooks/useDelayedProp';
 import { TimetableItem } from '@/utils/types';
 import { classes } from '@/styles/utils';
 import styles from './TimetableCell.module.scss';
+import { generateId } from '@/utils/timetable';
 
 type OwnProps = {
   lessons: TimetableItem[] | null;
@@ -18,7 +19,6 @@ const TimetableCell: FC<OwnProps> = ({lessons, active, cellSubgroup, isAfterEmpt
   const [innerLessons, shouldAppear] = useDelayedProp(lessons, ANIMATION_DURATION);
   const isMerged = Boolean(innerLessons && innerLessons.length > 1);
 
-
   return ( 
     <>
       {innerLessons !== null ? (
@@ -31,8 +31,11 @@ const TimetableCell: FC<OwnProps> = ({lessons, active, cellSubgroup, isAfterEmpt
             )
           }>
             {
-              innerLessons.map((lesson, index) =>
-                <TimetableLesson key={index} lesson={lesson} cellSubgroup={cellSubgroup} isMerged={isMerged} />
+              innerLessons.map((lesson) =>
+                <TimetableLesson 
+                  key={generateId(lesson)} 
+                  lesson={lesson} cellSubgroup={cellSubgroup} isMerged={isMerged} 
+                />
               )
             }
           </td>

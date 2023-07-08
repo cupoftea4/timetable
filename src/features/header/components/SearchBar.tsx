@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useOnClickOutside from '@/hooks/useOnOutsideClick';
 import { TimetableType } from '@/utils/types';
-import TimetableUtil from '@/utils/TimetableUtil';
+import { getAllTimetables } from '@/utils/timetable';
 import VirtualizedDataList from '@/shared/VirtualizedDataList';
 import { classes } from '@/styles/utils';
 import SearchIcon from '@/assets/SearchIcon';
@@ -10,7 +10,7 @@ import 'react-datalist-input/dist/styles.css';
 import styles from './SearchBar.module.scss';
 
 const getSearchBarOptions = () => {
-  return TimetableUtil.getAllTimetables().map(group => ({id: group, value: group}));
+  return getAllTimetables().map(group => ({id: group, value: group}));
 }
 
 type OwnProps = {

@@ -2,7 +2,7 @@ import { FC } from 'react';
 import styles from './Toggle.module.scss';
 
 type OwnProps = {
-  toggleState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+  toggleState: [boolean, (active: boolean) => void];
   states: [string, string];
 };
 

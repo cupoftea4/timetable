@@ -1,8 +1,8 @@
 import { FC, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import TimetableManager from '@/utils/data/TimetableManager'; 
-import TimetableUtil from '@/utils/TimetableUtil';
-import * as handler from '@/utils/requestHandler';
+import { getTimetableName, isMerged } from '@/utils/timetable';
+import Toast from '@/utils/toasts';
 import CheckMarkIcon from '@/assets/CheckMarkIcon';
 import HistoryIcon from '@/assets/HistoryIcon';
 import RemoveIcon from '@/assets/RemoveIcon';
@@ -43,7 +43,7 @@ const SavedMenu : FC<OwnProps> = ({timetableChanged}) => {
   const deleteItem = (index: number) => {
     TimetableManager.deleteTimetable(savedGroups[index]).then(
       () => setSavedGroups(getCachedGroups())
-    ).catch((e) => handler.error(e, handler.DELETE_TIMETABLE_ERROR));
+    ).catch((e) => Toast.error(e, Toast.DELETE_TIMETABLE_ERROR));
   };
 
   const arrowNavigation = (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -88,11 +88,11 @@ const SavedMenu : FC<OwnProps> = ({timetableChanged}) => {
               <li key={index} className={selectedItem === index ? styles.selected : ""}>
                 <Link to={`/${group}`} onFocus={() => setSelectedItem(index)} onClick={() => closeMenu()}> 
                   <span 
-                    title={TimetableUtil.isMerged(group) 
+                    title={isMerged(group) 
                       ? TimetableManager.cachedMergedTimetable?.timetableNames.join("+")
                       : group
                     }>
-                    {TimetableUtil.getTimetableName(group)} 
+                    {getTimetableName(group)} 
                     {groupParam === group ? <CheckMarkIcon className={styles['check-mark']}/> : null}
                   </span> 
                 </Link>

@@ -1,4 +1,4 @@
-import { timeout } from "@/utils/promiseHandling";
+import { timeout } from "@/utils/promises";
 import { LPNUTimetableType, TimetableType } from "@/utils/types";
 import Parser  from "./Parser";
 

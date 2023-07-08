@@ -1,5 +1,5 @@
-@use '../../styles/_variables' as *;
-@use '../../styles/_mixins' as *;
+@use '../../../styles/_variables' as *;
+@use '../../../styles/_mixins' as *;
 
 $placeholder-clr: hsla(0, 0%, 100%, 0.8);
 $icon-size: 1em;

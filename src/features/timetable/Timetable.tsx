@@ -1,6 +1,6 @@
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import TimetableCell from './TimetableCell';
-import TimetableUtil from '@/utils/TimetableUtil';
+import TimetableCell from './components/TimetableCell';
+import { lessonsTimes, unique } from '@/utils/timetable';
 import { getCurrentUADate, stringToDate } from '@/utils/date';
 import { TimetableItem } from '@/utils/types';
 import styles from './Timetable.module.scss';
@@ -22,8 +22,8 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
     timetable?.reduce((max, item) => item.day > max ? item.day : max, 0) || 0,
   [timetable]);
 
-  const lessonsTimes = useMemo(() => 
-    TimetableUtil.lessonsTimes.slice(0, maxLessonNumber), 
+  const timetableLessonsTimes = useMemo(() => 
+    lessonsTimes.slice(0, maxLessonNumber), 
   [maxLessonNumber]);
 
   const days = useMemo(() => 
@@ -32,8 +32,8 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
 
   const getCurrentLessonNumber = useCallback(() => {
     const curDate = getCurrentUADate();
-    return lessonsTimes.findIndex(time => curDate <= stringToDate(time.end));
-  }, [lessonsTimes]);
+    return timetableLessonsTimes.findIndex(time => curDate <= stringToDate(time.end));
+  }, [timetableLessonsTimes]);
 
   const currentDay =  getCurrentUADate().getDay();
   const [currentLessonNumber, setCurrentLessonNumber] = useState(getCurrentLessonNumber());
@@ -56,12 +56,12 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
       (cellSubgroup || item.isSecondSubgroup === isSecondSubgroup || forBothSubgroups(item)) &&
       (item.isSecondWeek === isSecondWeek || forAllWeeks(item))
     );
-    return result.length === 0 ? null : TimetableUtil.unique(result);
+    return result.length === 0 ? null : unique(result);
   }, [timetable, isSecondSubgroup, isSecondWeek, cellSubgroup]);
 
   const tableContent = useMemo(() => {
     console.log("Running scary useMemo");
-    const table = lessonsTimes.map((time, i) => 
+    const table = timetableLessonsTimes.map((time, i) => 
       <tr key={time.start}>{
         days.map((day, j) =>
           day === null 
@@ -81,7 +81,7 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
       }</tr> 
     );
     return table;
-  }, [lessonsTimes,timetable, days, getLessonsByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
+  }, [timetableLessonsTimes,timetable, days, getLessonsByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
 
 
   return (

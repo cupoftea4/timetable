@@ -9,11 +9,11 @@ import {
   TimetableItem,
   TimetableType
 } from "../types";
-import Util from "../TimetableUtil";
+import * as Util from "../timetable";
 import { DEVELOP } from "../constants";
 import LPNUData from "./LPNUData";
 import FallbackData from "./CachedData";
-import * as handler from "../requestHandler";
+import Toast from "../toasts";
 
 // storage keys
 const LAST_OPENED_INSTITUTE = "last_opened_institute";
@@ -168,52 +168,84 @@ class TimetableManager {
       .filter(el => el) as HalfTerm[];
   }
 
-  getTimetable(group: string, type?: TimetableType, checkCache = true) {
-    const timetableType = type ?? this.tryToGetType(group);
-    if (!timetableType) throw Error(`Couldn't define a type! Group: ${group}`);
-    try {
-      if (timetableType === 'merged') return this.getMergedTimetable();
-    } catch (error) {
-      console.error("ERROR", error);
-      throw Error(`Couldn't get merged timetable!`);
-    }
+  getTimetable(group: string, type?: TimetableType, checkCache = true): readonly [Promise<TimetableItem[] | undefined>, Promise<TimetableItem[] | null>] {
+    const groupName = group.trim();
+    const timetableType = type ?? this.tryToGetType(groupName);
+    if (!timetableType) throw Error(`Couldn't define a type! Group: ${groupName}`);
+
+    if (timetableType === 'merged') return this.getMergedTimetable();
 
     let cacheData: Promise<TimetableItem[] | undefined>, fetchData: Promise<TimetableItem[] | null>;
-    group = group.trim();
-    const data = this.timetables.find(el => el.group.toUpperCase() === group.toUpperCase());
+    const data = this.timetables.find(el => el.group.toUpperCase() === groupName.toUpperCase());
 
-    if (data && !Util.needsUpdate(data.time)) {
-      cacheData = storage.getItem(TIMETABLE + group);
+    if (checkCache && data && !Util.needsUpdate(data.time)) {
+      cacheData = storage.getItem(TIMETABLE + groupName);
     } else {
-      cacheData = FallbackData.getTimetable(timetableType, group)
-        .catch(() => storage.getItem(TIMETABLE + group));
+      cacheData = FallbackData.getTimetable(timetableType, groupName)
+        .catch(() => storage.getItem(TIMETABLE + groupName));
     }
 
-    const setStorageData = (timetable: TimetableItem[] | null | undefined) => {
-      if(!timetable) return;
-      this.timetables = this.timetables.filter(
-        el => el.group.toUpperCase() !== group.toUpperCase()
-      );
-      this.timetables.push({
-        group: group,
-        time: Date.now(),
-        subgroup: data?.subgroup
-      });
-      storage.setItem(TIMETABLE + group, timetable);
-      storage.setItem(TIMETABLES, this.timetables);
-    }
-
-    fetchData = LPNUData.getTimetable(timetableType, group).catch(() => {
-      cacheData.then(data => {
-        setStorageData(data);
-        return data;
-      });
-      handler.warn("Data is possibly outdated!");
+    fetchData = LPNUData.getTimetable(timetableType, groupName).catch(() => {
+      cacheData.then(t => this.saveTimetableLocally(groupName, t, data?.subgroup));
+      Toast.warn("Data is possibly outdated!");
       return null;
     });
 
-    fetchData.then(setStorageData);
+    fetchData.then(t => this.saveTimetableLocally(groupName, t, data?.subgroup));
     return [cacheData, fetchData] as const;
+  }
+
+
+  getExamsTimetable(group: string, type?: TimetableType, checkCache = true) {
+    const groupName = group.trim();
+    const timetableType = type ?? this.tryToGetType(groupName);
+    if (!timetableType) throw Error(`Couldn't define a type! Group: ${groupName}`);
+
+    let cacheData: Promise<ExamsTimetableItem[]>, fetchData: Promise<ExamsTimetableItem[] | null>;
+    const data = this.examsTimetables.find(el => el.group.toUpperCase() === groupName.toUpperCase());
+
+    if (checkCache && data && !Util.needsUpdate(data.time)) {
+      cacheData = storage.getItem(EXAMS_TIMETABLE + groupName);      
+    } else {
+      cacheData = FallbackData.getExamsTimetable(timetableType, groupName)
+        .catch(() => storage.getItem(EXAMS_TIMETABLE + groupName));;
+    }
+
+    fetchData = LPNUData.getExamsTimetable(timetableType, groupName).catch(() => {
+      cacheData.then(t => this.saveExamsLocally(groupName, t));
+      Toast.warn("Data is possibly outdated!");
+      return null;
+    });
+
+    fetchData.then(t => this.saveExamsLocally(groupName, t));
+    return [cacheData, fetchData] as const;
+  }
+  
+  saveTimetableLocally(group: string, timetable?: TimetableItem[] | null, subgroup?: 1 | 2) {
+    if(!timetable) return;
+    this.timetables = this.timetables.filter(
+      el => el.group.toUpperCase() !== group.toUpperCase()
+    );
+    this.timetables.push({
+      group,
+      time: Date.now(),
+      subgroup
+    });
+    storage.setItem(TIMETABLE + group, timetable);
+    storage.setItem(TIMETABLES, this.timetables);
+    return timetable;
+  }
+
+
+  saveExamsLocally(group: string, timetable?: ExamsTimetableItem[] | null) {
+    if(!timetable) return;
+    this.examsTimetables = this.examsTimetables.filter(
+      el => el.group.toUpperCase() !== group.toUpperCase()
+    );
+    this.examsTimetables.push({ group, time: Date.now() });
+    storage.setItem(EXAMS_TIMETABLE + group, timetable);
+    storage.setItem(EXAMS_TIMETABLES, this.examsTimetables);
+    return timetable;
   }
 
   getMergedTimetable(timetablesToMerge?: string[]) {
@@ -233,45 +265,9 @@ class TimetableManager {
       cacheData.then(merged =>
         merged && this.saveMergedTimetable(timetableNames)
       );
-      handler.warn("Data is possibly outdated!");
+      Toast.warn("Data is possibly outdated!");
       return null;
     });
-    return [cacheData, fetchData] as const;
-  }
-
-
-  getExamsTimetable(group: string, type?: TimetableType, checkCache = true) {
-    let cacheData: Promise<ExamsTimetableItem[]>, fetchData: Promise<ExamsTimetableItem[] | null>;
-    group = group.trim();
-    const data = this.examsTimetables.find(el => el.group.toUpperCase() === group.toUpperCase());
-    const timetableType = type ?? this.tryToGetType(group);
-    if (!timetableType) throw Error(`Couldn't define a type! Group: ${group}`);
-
-    if (checkCache && data && !Util.needsUpdate(data.time)) {
-      cacheData = storage.getItem(EXAMS_TIMETABLE + group);      
-    } else {
-      cacheData = FallbackData.getExamsTimetable(timetableType, group);
-    }
-
-    this.examsTimetables = this.examsTimetables.filter(
-      el => el.group.toUpperCase() !== group.toUpperCase()
-    );
-    this.examsTimetables.push({ group: group, time: Date.now() });
-
-    const setStorageData = (timetable: ExamsTimetableItem[] | null) => {
-      if(!timetable) return;
-      storage.setItem(EXAMS_TIMETABLE + group, timetable);
-      storage.setItem(EXAMS_TIMETABLES, this.examsTimetables);
-    }
-
-    fetchData = LPNUData.getExamsTimetable(timetableType, group).catch(() => {
-      cacheData.then(setStorageData);
-      handler.warn("Data is possibly outdated!");
-      return null;
-    });
-
-    fetchData.then(setStorageData);
-    
     return [cacheData, fetchData] as const;
   }
 
