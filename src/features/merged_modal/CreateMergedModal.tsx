@@ -81,7 +81,7 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose}) => {
               <span className={styles.selected}>
                 {timetablesToMerge.map((timetable, index) => (
                   <span 
-                    key={index} 
+                    key={timetable} 
                     onClick={() => onRemoveItem(timetable)} 
                     className={styles.selectedItem} 
                     data-content={timetable}>
