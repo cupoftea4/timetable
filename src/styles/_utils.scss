@@ -1,0 +1,75 @@
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin blur($radius: 1rem) {
+  backdrop-filter: blur($radius);
+  -webkit-backdrop-filter: blur($radius);
+}
+
+@mixin inset-0 {
+  @include inset(0);
+}
+
+@mixin inset($value: 0) {
+  top: $value;
+  right: $value;
+  bottom: $value;
+  left: $value;
+}
+
+@mixin mobile {
+  @media only screen and (max-width: 480px) {
+      @content;
+  }
+}
+
+@mixin tablet {
+  @media only screen and (max-width: 768px) {
+      @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: 768px) {
+      @content;
+  }
+}
+
+@mixin large-screen {
+  @media (min-width: 1860px) {
+      @content;
+  }
+}
+
+@mixin screen-2k {
+  @media (min-width: 2500px) {
+      @content;
+  }
+}
+
+@mixin screen-4k {
+  @media (min-width: 3600px) {
+      @content;
+  }
+}
+
+@mixin touchscreen {
+  @media (hover: none) {
+      @content;
+  }
+}
+
+@mixin can-hover {
+  @media (hover: hover) {
+      @content;
+  }
+}
+
+@mixin dark-mode {
+  @media screen and (prefers-color-scheme: dark) {
+    @content;
+  }
+}

@@ -1,5 +1,5 @@
-@use '../../../styles/_variables' as *;
-@use '../../../styles/_mixins' as *;
+@use '../../../styles/utils' as *;
+@use '../../../styles/variables' as *;
 
 .saved {
   position: relative;
@@ -59,11 +59,11 @@ $icon-size: 0.875rem;
         display: block;
         width: $icon-size;
         height: $icon-size;
-        transition: all 0.2s ease-in-out;
+        transition: transform 0.2s ease-in-out;
+        cursor: pointer;
         &:hover, &:focus {
           outline: none;
           transform: scale(1.15);
-          cursor: pointer;
         }
       }
     }

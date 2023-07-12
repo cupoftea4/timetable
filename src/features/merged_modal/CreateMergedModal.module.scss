@@ -1,11 +1,9 @@
+@use '../../styles/utils' as *;
 @use '../../styles/mixins' as *;
 
 .wrapper {
   position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  @include inset-0;
   background-color: hsla(0, 0%, 0%, 0.7);
   z-index: 100;
   @include flex-center;
@@ -34,24 +32,23 @@
             padding: .25em .5em;
             border-radius: .325em;
             position: relative;
-            transition: all .2s ease-in-out;
+            cursor: pointer;
             &::before {
               content: attr(data-content);
-              transition: all .2s ease-in-out;
+              transition: color .2s ease-in-out;
             }
             &::after {
-              content: url(../assets/close.svg);
+              content: url(../../assets/close.svg);
               width: .875rem;
               height: auto;
               position: absolute;
               top: 50%;
               right: 50%;
               transform: translateX(50%) translateY(-40%);
-              transition: all .2s ease-in-out;
+              transition: opacity .2s ease-in-out;
               opacity: 0;
             }
             &:hover {
-              cursor: pointer;
               &::before {
                 color: transparent;
               }
@@ -59,7 +56,6 @@
                 opacity: 1;
               }
             }
-    
           }
           
         }
@@ -88,14 +84,14 @@
       }
     }
     .button {
-      background-color: hsla(0, 0%, 100%, 0.9);
-      margin: 0 auto;
       display: block;
+      margin: 0 auto;
       margin-top: 1em;
       padding: .325em .75em;
       border-radius: .5em;
+      background-color: hsla(0, 0%, 100%, 0.9);
       color:hsla(0, 0%, 0%, 0.8);
-      transition: all .2s;
+      transition: background-color .2s;
       &:hover {
         background-color: hsla(226, 55%, 94%, 0.9);
       }

@@ -1,5 +1,5 @@
 @use '../../../styles/variables' as *;
-@use '../../../styles/mixins' as *;
+@use '../../../styles/utils' as *;
 
 .partials {
   position: relative;
@@ -10,12 +10,12 @@
   }
 
   .dropdown {
+    width: 100%;
     position: absolute;
     background: var(--accent-clr);
     backdrop-filter: blur(20px);
-    z-index: 100;
     border-radius: $border-radius;
-    width: 100%;
+    z-index: 100;
     animation: show-menu 0.1s ease-in-out;
     li {
       @include flex-center;

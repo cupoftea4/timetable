@@ -1,5 +1,6 @@
 @use '../../styles/variables' as *;
 @use '../../styles/mixins' as *;
+@use '../../styles/utils' as *;
 
 .header {
   max-width: var(--max-app-width);
@@ -28,7 +29,6 @@
     svg {
       width: clamp(2rem, 8vw, 2.75rem);
       height: clamp(2rem, 8vw, 2.75rem); 
-      transition: all .2s ease-in-out;
       transform-origin: center;
       cursor: pointer;
     }

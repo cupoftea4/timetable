@@ -1,5 +1,6 @@
-@use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
+@use '../../../styles/utils' as *;
+@use '../../../styles/variables' as *;
 
 $spacer-width: 0.5rem;
 $spacer-height: 1.325rem;
@@ -55,7 +56,6 @@ $cell-border-radius: .625rem;
     max-width: $max-cell-width;
     position: relative;
     font-size:  $small-font-size;
-    // position: absolute;
 
     @include min-timetable-mobile {
       &:not(.merged) {

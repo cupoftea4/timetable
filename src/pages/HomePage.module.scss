@@ -1,6 +1,7 @@
-@use '../styles/_themes.scss' as *;
-@use '../styles/_variables.scss' as *;
-@use '../styles/_mixins.scss' as *;
+@use '../styles/themes' as *;
+@use '../styles/mixins' as *;
+@use '../styles/utils' as *;
+@use '../styles/variables' as *;
 
 $first-layer-width: 9rem;
 $second-layer-width: 9rem;

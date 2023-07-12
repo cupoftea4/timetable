@@ -1,6 +1,7 @@
-@use '../../styles/variables' as *;
-@use '../../styles/mixins' as *;
 @use '../../styles/themes' as *;
+@use '../../styles/mixins' as *;
+@use '../../styles/utils' as *;
+@use '../../styles/variables' as *;
 
 @mixin expand-year {
   li {
@@ -20,11 +21,11 @@
   height: fit-content;
   display: grid;
   gap: 1rem;
+  font-size: $medium-font-size;
   
   @include timetable-mobile {
     padding: 0rem;
   }
-  font-size: $medium-font-size;
 
   button.back {
     justify-self: flex-start;
@@ -37,15 +38,10 @@
         a {
           display: inline-block;
           padding: .25rem;
-          transition: all .2s ease-in;
+          transition: background-color .2s ease-in;
           border-radius: .625rem;
-          // will-change: transform;
-          // backface-visibility: hidden;
-          // transform: translateZ(0);
-          // -webkit-font-smoothing: subpixel-antialiased;
           &:hover {
             background-color: var(--accent-clr);
-            // transform: scale(1.05) perspective(2px);
           }
         }
       }
@@ -68,12 +64,29 @@
 
     .year {
       animation: slideUp .2s ease forwards;
-      transition: all .8s ease-in-out;
+      transition: max-height .8s ease-in-out;
       min-height: 5rem;
       max-height: 5rem;
       overflow: hidden;
-      a {
-        pointer-events: none;
+      
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: .5rem;
+      background: linear-gradient(145.37deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.1) 73.95%);
+      border: var(--border-clr) solid 1px;
+      border-radius: $border-radius;
+      padding: 1rem;
+
+      &.expanded {
+        @include expand-year;
+      }
+
+      @include can-hover {
+        &:hover {
+          @include expand-year;
+        }
       }
 
       &::after {
@@ -82,6 +95,10 @@
         margin: .125em;
         position: absolute;
         animation: slideUp .2s ease forwards;
+      }
+
+      a {
+        pointer-events: none;
       }
 
       li {
@@ -94,25 +111,6 @@
         
       }
 
-      &.expanded {
-        @include expand-year;
-      }
-
-      @include can-hover {
-        &:hover {
-          @include expand-year;
-        }
-      }
-
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: .5rem;
-      background: linear-gradient(145.37deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.1) 73.95%);
-      border: var(--border-clr) solid 1px;
-      border-radius: $border-radius;
-      padding: 1rem;
     }
   }
   
