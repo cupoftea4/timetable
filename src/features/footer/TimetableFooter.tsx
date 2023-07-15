@@ -1,10 +1,10 @@
+import { FC } from 'react';
 import { useParams } from 'react-router-dom';
 import DownloadIcon from '@/assets/DownloadIcon';
 import LoadingIcon from '@/assets/LoadingIcon';
 import MergeIcon from '@/assets/MergeIcon';
 import { classes } from '@/styles/utils';
 import styles from './TimetableFooter.module.scss';
-import { FC } from 'react';
 
 type OwnProps = {
   loading: boolean;

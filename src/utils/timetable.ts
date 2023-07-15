@@ -1,6 +1,12 @@
 import TimetableManager from "./data/TimetableManager";
-import { CachedTimetable, ExamsTimetableItem, MergedTimetableItem, TimetableItem, TimetableType } from "./types";
 import { findAndConvertRomanNumeral, hashCode } from "./general";
+import type { 
+  CachedTimetable, 
+  ExamsTimetableItem, 
+  MergedTimetableItem, 
+  TimetableItem, 
+  TimetableType 
+} from "@/types/timetable";
 
 const UPDATE_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 

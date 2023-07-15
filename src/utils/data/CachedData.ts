@@ -1,5 +1,5 @@
 import { DEVELOP } from "../constants";
-import { ExamsTimetableItem, LPNUTimetableType, TimetableItem, TimetableType } from "../types";
+import type { ExamsTimetableItem, LPNUTimetableType, TimetableItem, TimetableType } from "@/types/timetable";
 
 const FALLBACK_URL = "https://raw.githubusercontent.com/cupoftea4/timetable-data/data/";
 

@@ -5,9 +5,9 @@ import Navigation from './components/Navigation';
 // import ThemesIcon from '../assets/ThemesIcon';
 import useWindowDimensions from '@/hooks/useWindowDimensions';
 import { TABLET_SCREEN_BREAKPOINT, NARROW_SCREEN_BREAKPOINT } from '@/utils/constants';
-import { TimetableType } from '@/utils/types';
 import { classes } from '@/styles/utils';
 import styles from './HeaderPanel.module.scss';
+import type { TimetableType } from '@/types/timetable';
 
 type OwnProps = {
   timetableType: TimetableType;

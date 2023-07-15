@@ -7,7 +7,7 @@ import TimetablePage from "./pages/TimetablePage";
 import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 import Toast from "./utils/toasts";
 import TimetableManager from "./utils/data/TimetableManager";
-import { Status } from "./utils/types";
+import { Status } from "./types/utils";
 
 /* TODO:
   - add tests

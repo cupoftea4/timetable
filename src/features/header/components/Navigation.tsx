@@ -2,9 +2,9 @@ import { FC } from 'react'
 import { Link, useNavigate } from 'react-router-dom';
 import useWindowDimensions from '@/hooks/useWindowDimensions';
 import { TABLET_SCREEN_BREAKPOINT } from '@/utils/constants';
-import { TimetableType } from '@/utils/types';
 import MobileSelect from '@/shared/MobileSelect';
 import styles from './Navigation.module.scss';
+import type { TimetableType } from '@/types/timetable';
 
 const navigationItems: {value: TimetableType, name: string}[] = [
   {value: "timetable", name: "Студент"},

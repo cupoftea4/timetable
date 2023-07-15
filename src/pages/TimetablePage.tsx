@@ -11,8 +11,9 @@ import Toast from '@/utils/toasts';
 import { optimisticRender } from '@/utils/general';
 import TimetableManager from '@/utils/data/TimetableManager';
 import { getCurrentUADate, getNULPWeek } from '@/utils/date';
-import { ExamsTimetableItem, HalfTerm, RenderPromises, TimetableItem, TimetableType } from '@/utils/types';
 import styles from './TimetablePage.module.scss';
+import type { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from '@/types/timetable';
+import type { RenderPromises } from '@/types/utils';
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => { // yeah, naming! :)
   const width = el.getBoundingClientRect().width;

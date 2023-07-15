@@ -1,4 +1,4 @@
-import { RenderPromises } from "./types";
+import type { RenderPromises } from "@/types/utils";
 
 /**
  * Renders the optimistic data first, then the real data if possible. 

@@ -2,8 +2,8 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import TimetableCell from './components/TimetableCell';
 import { lessonsTimes, unique } from '@/utils/timetable';
 import { getCurrentUADate, stringToDate } from '@/utils/date';
-import { TimetableItem } from '@/utils/types';
 import styles from './Timetable.module.scss';
+import type { TimetableItem } from '@/types/timetable';
 
 type OwnProps = {
   timetable: TimetableItem[];
@@ -62,7 +62,7 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
   const tableContent = useMemo(() => {
     console.log("Running scary useMemo");
     const table = timetableLessonsTimes.map((time, i) => 
-      <tr key={time.start}>{
+      <tr key={time.start}>{  
         days.map((day, j) =>
           day === null 
             ? <th key={time.start + day} style={{height: "5rem"}}>

@@ -1,9 +1,9 @@
 import { FC } from 'react'
 import TimetableLink from './ui/TimetableLink';
 import { LVIV_TIMEZONE } from '@/utils/date';
-import { ExamsTimetableItem } from '@/utils/types';
 import { classes } from '@/styles/utils';
 import styles from './ExamsTimetable.module.scss';
+import type { ExamsTimetableItem } from '@/types/timetable';
 
 type OwnProps = {
   exams: ExamsTimetableItem[]

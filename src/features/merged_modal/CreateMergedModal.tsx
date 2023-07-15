@@ -7,7 +7,8 @@ import { getAllTimetables, isMerged } from '@/utils/timetable';
 import Toast from '@/utils/toasts';
 import VirtualizedDataList from '@/shared/VirtualizedDataList';
 import styles from './CreateMergedModal.module.scss';
-import { RenderPromises, TimetableItem } from '@/utils/types';
+import type { TimetableItem } from '@/types/timetable';
+import type { RenderPromises } from '@/types/utils';
 
 const getSearchBarOptions = () => {
   return getAllTimetables().map(group => ({id: group, value: group}));

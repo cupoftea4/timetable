@@ -1,5 +1,3 @@
-export type IconStyles = {className?: string, style?: React.CSSProperties};
-
 export type TimetableItem = {
   day: number,
   isFirstSubgroup: boolean,
@@ -40,17 +38,7 @@ export enum Year {
   Fourth,
 }
 
-export enum Status {
-  Loading,
-  Idle,
-  Failed
-}
-
 export enum HalfTerm {
   First = 1,
   Second = 2
 }
-
-export type OptimisticPromise<T> = Promise<T | null | undefined>;
-export type ActualPromise<T> = Promise<T | null>;
-export type RenderPromises<T> = readonly [OptimisticPromise<T>, ActualPromise<T>];

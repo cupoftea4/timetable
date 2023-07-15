@@ -1,5 +1,5 @@
 import { formatLocationForGoogleMaps, lessonsTimes } from "../timetable";
-import { ExamsTimetableItem, TimetableItem } from "../types";
+import type { ExamsTimetableItem, TimetableItem } from "@/types/timetable";
 
 
 function toTFormattedString(date: Date, time: string) {

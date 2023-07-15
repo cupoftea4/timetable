@@ -6,7 +6,7 @@ import useWindowDimensions from "@/hooks/useWindowDimensions";
 import TimetableManager from "@/utils/data/TimetableManager";
 import Toast from '@/utils/toasts'
 import { TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
-import { TimetableType } from "@/utils/types";
+import { TimetableType } from "@/types/timetable";
 import List from "@/shared/List";
 import catImage from '@/assets/cat.svg';
 import { classes } from "@/styles/utils";

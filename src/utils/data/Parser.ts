@@ -1,4 +1,4 @@
-import { ExamsTimetableItem, TimetableItem, TimetableItemType } from "@/utils/types";
+import type { ExamsTimetableItem, TimetableItem, TimetableItemType } from "@/types/timetable";
 
 const INSTITUTES_SELECTOR = "#edit-departmentparent-abbrname-selective";
 const GROUPS_SELECTOR = "#edit-studygroup-abbrname-selective";

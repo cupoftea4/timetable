@@ -1,8 +1,8 @@
 import { FC, useState } from 'react'
 import { classes } from '../../../styles/utils';
-import { TimetableItemType } from '../../../utils/types';
 import styles from './TimetableLink.module.scss'
 import LinkIcon from '@/shared/LinkIcon';
+import type { TimetableItemType } from '@/types/timetable';
 
 type OwnProps = {
   urls: string[];

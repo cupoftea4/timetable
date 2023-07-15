@@ -1,10 +1,10 @@
 import { FC, memo } from 'react';
 import TimetableLesson from './TimetableLesson';
 import { useDelayedProp } from '@/hooks/useDelayedProp';
-import { TimetableItem } from '@/utils/types';
 import { generateId } from '@/utils/timetable';
 import styles from './TimetableCell.module.scss';
 import { classes } from '@/styles/utils';
+import type { TimetableItem } from '@/types/timetable';
 
 type OwnProps = {
   lessons: TimetableItem[] | null;
@@ -25,9 +25,8 @@ const TimetableCell: FC<OwnProps> = ({lessons, active, cellSubgroup, isAfterEmpt
           <td className={
             classes(
               styles['timetable-td'], 
-              innerLessons[0]?.type, 
               active && styles.active,
-              !shouldAppear && !lessons ? styles.hide : styles.show, 
+              !shouldAppear && !lessons ? styles.hide : styles.show
             )
           }>
             {

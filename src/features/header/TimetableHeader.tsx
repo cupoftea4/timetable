@@ -1,4 +1,4 @@
-import React, { FC, useState } from 'react';
+import React, { FC } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import SavedMenu from './components/SavedMenu';
 import TimetablePartials from './components/TimetablePartials';
@@ -7,12 +7,12 @@ import useWindowDimensions from '@/hooks/useWindowDimensions';
 import { MOBILE_SCREEN_BREAKPOINT } from '@/utils/constants';
 import { isMerged } from '@/utils/timetable';
 import TimetableManager from '@/utils/data/TimetableManager';
-import { HalfTerm } from '@/utils/types';
 import HomeIcon from '@/assets/HomeIcon';
 import { classes } from '@/styles/utils';
 import Toast from '@/utils/toasts';
 import styles from './HeaderPanel.module.scss';
 import outerStyles from './TimetableHeader.module.scss';
+import type { HalfTerm } from '@/types/timetable';
 
 type OwnProps = {
   loading: boolean;

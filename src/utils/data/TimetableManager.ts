@@ -1,22 +1,20 @@
 import storage from "../storage"
+import * as Util from "../timetable";
+import { DEVELOP } from "../constants";
+import LPNUData from "./LPNUData";
+import FallbackData from "./CachedData";
+import Toast from "../toasts";
 import {
-  ActualPromise,
   CachedGroup,
   CachedInstitute,
   CachedTimetable,
   ExamsTimetableItem,
   HalfTerm,
   MergedTimetable,
-  OptimisticPromise,
-  RenderPromises,
   TimetableItem,
   TimetableType
-} from "../types";
-import * as Util from "../timetable";
-import { DEVELOP } from "../constants";
-import LPNUData from "./LPNUData";
-import FallbackData from "./CachedData";
-import Toast from "../toasts";
+} from "@/types/timetable";
+import type { RenderPromises, ActualPromise, OptimisticPromise } from "@/types/utils";
 
 // storage keys
 const LAST_OPENED_INSTITUTE = "last_opened_institute";

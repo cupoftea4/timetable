@@ -1,6 +1,6 @@
 import { timeout } from "@/utils/promises";
-import { LPNUTimetableType, TimetableType } from "@/utils/types";
 import Parser  from "./Parser";
+import type { LPNUTimetableType, TimetableType } from "@/types/timetable";
 
 const NULP_STUDENTS = "https://student.lpnu.ua/";
 const NULP_STAFF = "https://staff.lpnu.ua/";

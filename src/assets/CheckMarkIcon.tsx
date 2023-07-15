@@ -1,4 +1,4 @@
-import { IconStyles } from "../utils/types";
+import type { IconStyles } from "@/types/utils";
 
 const CheckMarkIcon = ({className}: IconStyles) => {
   return (

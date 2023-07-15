@@ -1,9 +1,9 @@
 import { FC, memo } from 'react';
 import TimetableLink from '../ui/TimetableLink';
 import { lessonsTimes } from '@/utils/timetable';
-import { TimetableItem } from '@/utils/types';
 import { classes } from '@/styles/utils';
 import styles from './TimetableCell.module.scss';
+import type { TimetableItem } from '@/types/timetable';
 
 type OwnProps = {
   lesson: TimetableItem;
