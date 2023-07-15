@@ -16,7 +16,7 @@ const TimetableLink: FC<OwnProps>  = ({ urls, type }) => {
   const closeDropdown = () => setShowDropdown(false);
   return (
     <>
-      {urls.length === 1 ? 
+      {urls.length === 1 && urls[0] ? 
         <a href={urls[0]} target="_blank" rel="noreferrer"
           className={classes(styles.link, type)}
         >

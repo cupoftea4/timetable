@@ -6,13 +6,13 @@ import ExamsTimetable from '@/features/timetable/ExamsTimetable';
 import Timetable from '@/features/timetable/Timetable';
 import TimetableFooter from '@/features/footer/TimetableFooter'
 import CreateMergedModal from '@/features/merged_modal/CreateMergedModal';
-import { optimisticRender } from '@/utils/general';
-import { getCurrentUADate, getNULPWeek } from '@/utils/date';
-import TimetableManager from '@/utils/data/TimetableManager';
+import useTimetableISCFile from '@/features/footer/hooks/useTimetableISCFile';
 import Toast from '@/utils/toasts';
+import { optimisticRender } from '@/utils/general';
+import TimetableManager from '@/utils/data/TimetableManager';
+import { getCurrentUADate, getNULPWeek } from '@/utils/date';
 import { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from '@/utils/types';
 import styles from './TimetablePage.module.scss';
-import useTimetableISCFile from '@/features/footer/hooks/useTimetableISCFile';
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => { // yeah, naming! :)
   const width = el.getBoundingClientRect().width;
@@ -84,7 +84,13 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
       );
 
     const renderTimetable = (timetable: TimetableItem[], optimistic: boolean) => {
-      setTimetable(t => JSON.stringify(t) !== JSON.stringify(timetable) ? timetable : t);
+      console.log('renderTimetable');
+      setTimetable(t => {
+        const stringified = JSON.stringify(t);
+        const stringifiedTimetable = JSON.stringify(timetable);
+        console.log('setTimetable', stringified, stringifiedTimetable, stringified === stringifiedTimetable);
+        return stringified !== stringifiedTimetable ? timetable : t
+      });
       setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
       if (!optimistic && type === 'timetable') TimetableManager.getPartials(group).then(setPartials);
     };

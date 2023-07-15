@@ -11,7 +11,7 @@ const useTimetableISCFile = (
     console.log(timetable);
     let fileContent;
     if (!timetable) return undefined;
-    if (!isExams(timetable[0])) {
+    if (timetable[0] && !isExams(timetable[0])) {
       fileContent = ISCFile.fromTimetable(timetable as TimetableItem[], isSecondSubgroup ? 2 : 1, isSecondWeek ? 2 : 1);     
     } else {
       fileContent = ISCFile.fromExamsTimetable(timetable as ExamsTimetableItem[]);

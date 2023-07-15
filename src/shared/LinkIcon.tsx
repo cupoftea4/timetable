@@ -11,7 +11,7 @@ type OwnProps = {
   link: string;
 }
 
-const linkIcons : Record<string, () => JSX.Element> = {
+const linkIcons: Readonly<Record<string, () => JSX.Element>> = {
   zoom: ZoomIcon,
   teams: TeamsIcon,
   google: GoogleMeetsIcon,
@@ -28,7 +28,7 @@ const LinkIcon: FC<OwnProps> = ({ link }) => {
   return (
     <>
       {
-        linkIcon ? React.createElement(linkIcons[linkIcon]) : <DefaultLink />
+        linkIcon ? React.createElement(linkIcons[linkIcon]!) : <DefaultLink />
       }
     </>
   )

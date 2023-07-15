@@ -5,7 +5,7 @@ import { ExamsTimetableItem, TimetableItem } from "../types";
 function toTFormattedString(date: Date, time: string) {
   const [hours, minutes] = time.split(':');
   const dateOnly = date.toISOString().substring(0, 10).replace(/-/g, '');
-  const formattedTime = `${dateOnly}T${hours.padStart(2, '0')}${minutes}00`;
+  const formattedTime = `${dateOnly}T${hours?.padStart(2, '0')}${minutes}00`;
   return formattedTime;
 }
 
@@ -102,10 +102,11 @@ export default class ISCFile {
   }
 
   private static lessonNumberToICSTime(date: Date, number: number) {
-    const {start, end} = lessonsTimes[number - 1];;
+    if (!lessonsTimes[number - 1]) throw new Error(`Invalid lesson number: ${number}`);
+    const {start, end} = lessonsTimes[number - 1]!;
     const startTime = toTFormattedString(date, start);
-    const endTime = toTFormattedString(date, end);;
-    return [startTime, endTime];
+    const endTime = toTFormattedString(date, end);
+    return [startTime, endTime] as const;
   }
 
   private static createICSFile(content: string) {

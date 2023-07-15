@@ -41,7 +41,8 @@ const SavedMenu : FC<OwnProps> = ({timetableChanged}) => {
   const closeMenu = () => setIsMenuOpen(false);
 
   const deleteItem = (index: number) => {
-    TimetableManager.deleteTimetable(savedGroups[index]).then(
+    if (!savedGroups[index]) return;
+    TimetableManager.deleteTimetable(savedGroups[index]!).then(
       () => setSavedGroups(getCachedGroups())
     ).catch((e) => Toast.error(e, Toast.DELETE_TIMETABLE_ERROR));
   };

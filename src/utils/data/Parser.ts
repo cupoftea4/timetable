@@ -164,7 +164,7 @@ class TimetableParser {
 		let currentLessonNumber = 0;
 		for(let i = 0; i < contentChildren.length; i++) {
 			const child = contentChildren[i];
-			if(child.classList.contains("stud_schedule")) {
+			if(child?.classList.contains("stud_schedule")) {
 				const lessons = this.parsePair(child);
 				if(currentLessonNumber === 0) console.warn("Lesson number is 0!", child);
 	
@@ -175,7 +175,7 @@ class TimetableParser {
 				
 				dayLessons = dayLessons.concat(lessons);
 			} else {
-				currentLessonNumber = Number.parseInt(child.textContent ?? "0");
+				currentLessonNumber = Number.parseInt(child?.textContent ?? "0");
 			}
 		}
 		return dayLessons;
@@ -232,10 +232,11 @@ class TimetableParser {
 		const split = id.split("_");
 		let subgroup: number | "all" = "all";
 		let week = "full";
+		if (!split[1] || !split[split.length - 1]) throw Error("Got wrong lesson id!");
 		if(id.includes("sub")) {
 			subgroup = Number.parseInt(split[1]);
 		}
-		week = split[split.length-1];
+		week = split[split.length - 1]!;
 		return {
 			isFirstWeek: week === "full" || week === "chys",
 			isSecondWeek: week === "full" || week === "znam",

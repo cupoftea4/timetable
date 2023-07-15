@@ -18,6 +18,7 @@ const getTimezoneOffset = (timeZone: string, date = new Date()) => {
 export const stringToDate = (time: string) => {
     const date = getCurrentUADate();
     const [hours, minutes] = time.split(':');
+    if (!hours || !minutes) return "Invalid time format";
     date.setHours(+hours);
     date.setMinutes(+minutes)
     date.setSeconds(0);

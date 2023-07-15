@@ -38,7 +38,7 @@ function romanToArabic(roman: string): number {
   let arabicValue = 0;
   let previousValue = 0;
   for (let i = 0; i < roman.length; i++) {
-      const currentValue = romanNumeralMap[roman[i]];
+      const currentValue = romanNumeralMap[roman[i]!];
       if (!currentValue) return -1;
       arabicValue += currentValue;
 

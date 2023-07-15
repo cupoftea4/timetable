@@ -24,12 +24,12 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false}) => 
     <div className={classes(styles.timetables, withYears && styles['with-years'])}>
       {withYears ?
           [Year.First, Year.Second, Year.Third, Year.Fourth].map((year) => 
-            groupsByYear[year]?.length && groupsByYear[year].length !== 0 ?
+            groupsByYear[year]?.length && groupsByYear[year]!.length !== 0 ?
                 <ul key={year} className={classes(styles.year, expandedYear === year && styles.expanded)} 
                     data-value={`${year} Курс`}
                     onClick={() => expandedYear === year ? setExpandedYear(null) : setExpandedYear(year)}
                   >
-                    {groupsByYear[year].map(group => (
+                    {groupsByYear[year]!.map(group => (
                           <li key={group}>
                             <Link to={"/" + group} onFocus={() => setExpandedYear(year)}>
                               {group}

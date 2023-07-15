@@ -58,11 +58,11 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose}) => {
       return;
     }
     TimetableManager.getMergedTimetable(timetablesToMerge)[1]
-    .then(() => {
-      onClose();
-      navigate("/my");
-    })
-    .catch(console.error); 
+      .then(() => {
+        onClose();
+        navigate("/my");
+      })
+      .catch(console.error);
   }
 
   function onRemoveItem(timetable: string) {  
