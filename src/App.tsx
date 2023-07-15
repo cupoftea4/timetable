@@ -10,7 +10,6 @@ import TimetableManager from "./utils/data/TimetableManager";
 import { Status } from "./utils/types";
 
 /* TODO:
-  - move to vite
   - add tests
   - update partials
   - add partial timetables to timetable-data

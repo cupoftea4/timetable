@@ -11,7 +11,7 @@ import Toast from '@/utils/toasts';
 import { optimisticRender } from '@/utils/general';
 import TimetableManager from '@/utils/data/TimetableManager';
 import { getCurrentUADate, getNULPWeek } from '@/utils/date';
-import { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from '@/utils/types';
+import { ExamsTimetableItem, HalfTerm, RenderPromises, TimetableItem, TimetableType } from '@/utils/types';
 import styles from './TimetablePage.module.scss';
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => { // yeah, naming! :)
@@ -110,6 +110,10 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
       ?.finally(() => setLoading(false));
   };
 
+  function renderTimetableFromPromises(promises: RenderPromises<TimetableItem[]>) {
+    optimisticRender((timetable: TimetableItem[]) => setTimetable(timetable), onError, promises);
+  }
+
   return (
     <>
       {timetableGroup !== null ? 
@@ -153,6 +157,7 @@ const TimetablePage: FC<OwnProps> = ({isExamsTimetable = false}) => {
               <CreateMergedModal 
                 defaultTimetable={group} 
                 onClose={() => setShowCreateMergedModal(false)}
+                showTimetable={renderTimetableFromPromises}
               />
             }
           </div>       

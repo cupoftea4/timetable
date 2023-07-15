@@ -35,6 +35,8 @@ export default class Toast {
   static readonly INIT_ERROR = getRandomValue(initErrors);
   static readonly NONEXISTING_GROUP = getRandomValue(nonexistingGroupErrors);
   static readonly NONEXISTING_TIMETABLE = "This timetable does not exist";
+  
+  static readonly PENDING_MERGED = "Merging your timetables. Wait a bit, please";
 
 
   static error(error: string, userError: string = Toast.FETCH_ERROR) {

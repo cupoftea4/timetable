@@ -1,11 +1,14 @@
 import storage from "../storage"
 import {
+  ActualPromise,
   CachedGroup,
   CachedInstitute,
   CachedTimetable,
   ExamsTimetableItem,
   HalfTerm,
   MergedTimetable,
+  OptimisticPromise,
+  RenderPromises,
   TimetableItem,
   TimetableType
 } from "../types";
@@ -168,14 +171,14 @@ class TimetableManager {
       .filter(el => el) as HalfTerm[];
   }
 
-  getTimetable(group: string, type?: TimetableType, checkCache = true): readonly [Promise<TimetableItem[] | undefined>, Promise<TimetableItem[] | null>] {
+  getTimetable(group: string, type?: TimetableType, checkCache = true): RenderPromises<TimetableItem[]> {
     const groupName = group.trim();
     const timetableType = type ?? this.tryToGetType(groupName);
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${groupName}`);
 
     if (timetableType === 'merged') return this.getMergedTimetable();
 
-    let cacheData: Promise<TimetableItem[] | undefined>, fetchData: Promise<TimetableItem[] | null>;
+    let cacheData: OptimisticPromise<TimetableItem[]>, fetchData: ActualPromise<TimetableItem[]>;
     const data = this.timetables.find(el => el.group.toUpperCase() === groupName.toUpperCase());
 
     if (checkCache && data && !Util.needsUpdate(data.time)) {
@@ -196,12 +199,12 @@ class TimetableManager {
   }
 
 
-  getExamsTimetable(group: string, type?: TimetableType, checkCache = true) {
+  getExamsTimetable(group: string, type?: TimetableType, checkCache = true): RenderPromises<ExamsTimetableItem[]> {
     const groupName = group.trim();
     const timetableType = type ?? this.tryToGetType(groupName);
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${groupName}`);
 
-    let cacheData: Promise<ExamsTimetableItem[]>, fetchData: Promise<ExamsTimetableItem[] | null>;
+    let cacheData: Promise<ExamsTimetableItem[]>, fetchData: ActualPromise<ExamsTimetableItem[]>;
     const data = this.examsTimetables.find(el => el.group.toUpperCase() === groupName.toUpperCase());
 
     if (checkCache && data && !Util.needsUpdate(data.time)) {
@@ -248,7 +251,7 @@ class TimetableManager {
     return timetable;
   }
 
-  getMergedTimetable(timetablesToMerge?: string[]) {
+  getMergedTimetable(timetablesToMerge?: string[]): RenderPromises<TimetableItem[]> {
     const timetableNames = timetablesToMerge ?? this.mergedTimetable?.timetableNames; 
     if (!timetableNames) throw Error("Merge doesn't exist!");
     let cacheData: Promise<TimetableItem[] | undefined>, fetchData: Promise<TimetableItem[] | null>;

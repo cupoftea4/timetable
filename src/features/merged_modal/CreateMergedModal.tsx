@@ -7,6 +7,7 @@ import { getAllTimetables, isMerged } from '@/utils/timetable';
 import Toast from '@/utils/toasts';
 import VirtualizedDataList from '@/shared/VirtualizedDataList';
 import styles from './CreateMergedModal.module.scss';
+import { RenderPromises, TimetableItem } from '@/utils/types';
 
 const getSearchBarOptions = () => {
   return getAllTimetables().map(group => ({id: group, value: group}));
@@ -21,9 +22,10 @@ function getSavedTimetables(){
 type OwnProps = {
   defaultTimetable?: string;
   onClose: () => void;
+  showTimetable: (promises: RenderPromises<TimetableItem[]>) => void;
 };
 
-const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose}) => {
+const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose, showTimetable}) => {
   const [timetablesToMerge, setTimetablesToMerge] = useState<string[]>(
     defaultTimetable && !isMerged(defaultTimetable) ? [defaultTimetable] : []
   );
@@ -57,12 +59,12 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose}) => {
       Toast.warn("Виберіть від 2 до 5 груп");
       return;
     }
-    TimetableManager.getMergedTimetable(timetablesToMerge)[1]
-      .then(() => {
-        onClose();
-        navigate("/my");
-      })
-      .catch(console.error);
+    onClose();
+    const promises = TimetableManager.getMergedTimetable(timetablesToMerge);
+    if (location.pathname.includes("/my")) showTimetable(promises);
+    Toast.promise(Promise.all(promises).finally(() => {
+      navigate("/my");
+    }), Toast.PENDING_MERGED);
   }
 
   function onRemoveItem(timetable: string) {  

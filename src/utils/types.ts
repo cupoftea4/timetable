@@ -50,3 +50,7 @@ export enum HalfTerm {
   First = 1,
   Second = 2
 }
+
+export type OptimisticPromise<T> = Promise<T | null | undefined>;
+export type ActualPromise<T> = Promise<T | null>;
+export type RenderPromises<T> = readonly [OptimisticPromise<T>, ActualPromise<T>];

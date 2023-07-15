@@ -1,3 +1,4 @@
+import { RenderPromises } from "./types";
 
 /**
  * Renders the optimistic data first, then the real data if possible. 
@@ -10,7 +11,7 @@
 export async function optimisticRender<T>(
   render: (data: T, optimistic: boolean) => void, 
   error: ((error: string) => void) | (() => void), 
-  promises: readonly [Promise<T | null | undefined>, Promise<T | null>]
+  promises: RenderPromises<T>
 ) {
   const [first, second] = promises;
   try {
