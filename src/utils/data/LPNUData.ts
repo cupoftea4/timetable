@@ -65,7 +65,7 @@ const buildURL = (base: string, params: Record<string, string> | null) => {
 	const originalUrl = new URL(base);
 	if (!params) return originalUrl.href;
 	(getKeysWithTypes(params)).forEach(key => 
-		originalUrl.searchParams.set(key, params[key]))
+		originalUrl.searchParams.set(key, params[key]!))
 	return originalUrl.href;
 }
 

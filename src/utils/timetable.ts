@@ -42,21 +42,21 @@ export function getTimetableName(timetable: CachedTimetable | string) {
 export function getGroupName(group: string, timetableType: TimetableType) {
   if (timetableType === "selective") return group.split("-")[0] + "-" + group.split("-")[1];
   if (timetableType === "lecturer") return group;
-  return group.split("-")[0];
+  return group.split("-")[0]!;
 }
 
 export function sortGroupsByYear(groups: string[]) {
   return groups.reduce((acc, group) => {
     const parts = group.split("-");
-    const yearIndex = +(parts[parts.length - 1][0] ?? 0);
+    const yearIndex = +(parts[parts.length - 1]![0] ?? 0);
     if (!acc[yearIndex]) acc[yearIndex] = [];
-    acc[yearIndex].push(group);
+    acc[yearIndex]!.push(group);
     return acc;
   }, [] as string[][]);
 }
 
 export function getFirstLetters(array: readonly string[]) {
-  const alphabet = [...new Set<string>([...array].map(group => group[0]).sort((a, b) => a.localeCompare(b)))];
+  const alphabet = [...new Set<string>([...array].map(group => group[0]!).sort((a, b) => a.localeCompare(b)))];
   const alphabetArray = alphabet.reduce((acc, letter, index) => {
     if (index % 2 === 0) acc.push(letter);
     else acc[acc.length - 1] += "-" + letter;
@@ -67,8 +67,9 @@ export function getFirstLetters(array: readonly string[]) {
 
 export function startsWithLetters(str: string, letters: string) { // letters = "А-Б"
   const [start, end] = letters.split("-");
+  if (!start) return false;
   if (!end) return str.startsWith(start);
-  return str[0].localeCompare(start) >= 0 && str[0].localeCompare(end) <= 0;
+  return Boolean(str[0] && str[0].localeCompare(start) >= 0 && str[0].localeCompare(end) <= 0);
 }
 
 export function needsUpdate(timestamp: number) {
