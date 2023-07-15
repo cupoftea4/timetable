@@ -1,0 +1,65 @@
+@use '../../../styles/variables' as *;
+
+.links {
+  position: relative;
+  
+  button {
+    --bg-alpha: 1;
+    color: var(--text-clr);
+    padding: 0.25em 0.5em;
+    border-radius: .5rem;
+  }
+  .dropdown {
+    position: absolute;
+    animation: show-menu 0.1s ease-in-out;
+    background: var(--accent-clr);
+    backdrop-filter: blur(20px);
+    z-index: 100;
+    border-radius: 0.5rem;
+    li {
+      &:hover {
+        background: var(--accent-clr);
+      }
+      &:first-child {
+        border-radius: 0.5rem 0.5rem 0 0;
+      }
+      &:last-child {
+        border-radius: 0 0 0.5rem 0.5rem;
+      }
+    }
+    li a {
+      padding: .5rem;
+      z-index: 200;
+      background-color: transparent;
+      border-radius: 0;
+    }
+  }
+}
+
+.link {
+  --bg-alpha: 1;
+  display: flex;
+  align-items: center;
+  gap: .25rem;
+  font-size: $small-font-size;
+  cursor: pointer;
+  padding: 0.25em 0.5em; 
+  border-radius: 1rem;
+  color: var(--text-clr);
+  svg {
+    width: 1rem;
+    height: auto;
+  }
+}
+
+
+@keyframes show-menu {
+  0% {
+    opacity: 0;
+    transform: translateY(.5rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

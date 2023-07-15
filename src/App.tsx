@@ -5,8 +5,8 @@ import HomePage from "./pages/HomePage";
 import LoadingPage from "./pages/LoadingPage";
 import TimetablePage from "./pages/TimetablePage";
 import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
-import * as handler from "./utils/requestHandler";
-import TimetableManager from "./utils/TimetableManager";
+import Toast from "./utils/toasts";
+import TimetableManager from "./utils/data/TimetableManager";
 import { Status } from "./utils/types";
 
 /* TODO:
@@ -29,7 +29,7 @@ const App = () => {
         .then(() => setStatus(Status.Idle))
         .catch((e) => {
           setStatus(Status.Failed);
-          handler.error(e, handler.INIT_ERROR + ". Try again or use another browser.");
+          Toast.error(e, Toast.INIT_ERROR + ". Try again or use another browser.");
         });
     }, []
   );

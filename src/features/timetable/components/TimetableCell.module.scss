@@ -1,0 +1,168 @@
+@use '../../../styles/mixins' as *;
+@use '../../../styles/utils' as *;
+@use '../../../styles/variables' as *;
+
+$spacer-width: 0.5rem;
+$spacer-height: 1.325rem;
+$min-cell-height: 5rem;
+$max-cell-width: 17rem;
+$cell-border-radius: .625rem;
+
+.timetable-td {
+  position: relative;
+  --bg-alpha: 0.05;
+
+  @include timetable-mobile {
+    --bg-alpha: 0;
+  }
+  
+  .spacer {
+    --bg-alpha: 1;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    min-width: $spacer-width;
+    @include timetable-mobile {
+      width: calc(100% - 0.125rem * 2);
+      height: $spacer-height;
+      border-radius: $cell-border-radius $cell-border-radius 0 0;
+      margin: 0 .125rem;
+      z-index: 5;
+      display: block;
+      &::before, &::after {
+        color: white;
+        font-size: $small-font-size;
+        position: absolute;
+        top: 50%;
+        height: 100%;
+        transform: translateY(-50%);
+      }
+      &::before {
+        content: attr(data-time);
+        right: .5rem;
+        
+      }
+      &::after {
+        content: attr(data-number);
+        left: .5rem;;
+      }
+    }
+  }
+  position: relative;
+  .cell {
+    margin: 0 .125rem .5rem .125rem;
+    display: flex;
+    min-height: $min-cell-height;
+    max-width: $max-cell-width;
+    position: relative;
+    font-size:  $small-font-size;
+
+    @include min-timetable-mobile {
+      &:not(.merged) {
+        background-color: transparent;
+      }
+    }
+
+    @include timetable-mobile {
+      border-radius: $cell-border-radius;
+      --bg-alpha: .5;
+      color: white;
+      @include dark-mode {
+        --bg-alpha: .3;
+        color: var(--text-clr);
+      } 
+      backdrop-filter: blur(10px);
+    }
+    
+    @include timetable-mobile {
+      max-width: initial;
+    }
+    .info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      padding: 0.325rem 0.5rem 0;
+      margin-left: $spacer-width;
+      @include timetable-mobile {
+        margin-left: 0;
+        margin-top: $spacer-height;
+      }
+      .subgroup {
+        color: $extra-text-clr;
+      }
+      /* Name and lecturer */
+      .title {
+        line-height: 1.4;
+        .name {
+          font-size:  inherit;
+          font-weight: $semi-bold-font;
+        }      
+      }
+      /* Type and link */
+      > .extra {
+        display: flex;
+        gap: 1.5rem;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: .325rem;
+        color: $extra-text-clr;
+        padding-right: .25rem;
+        line-height: normal;
+      }
+    }
+  }
+  td.active {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+td.empty {
+  min-width: 12rem;
+  &.border {
+    position: relative;
+    &::before {
+      $border-padding: .75rem;
+      content: '';
+      position: absolute;
+      top: 0;
+      left: $border-padding;
+      width: calc(100% - #{$border-padding} * 2);
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+  }
+}
+
+
+.show {
+  animation: appear 300ms ease-in-out; // overlaps links dropdown with forwards :/
+}
+
+.hide {
+  animation: disappear 300ms ease-in-out forwards; // flickers without forwards :/
+}
+
+
+@keyframes appear {
+  0% {
+    opacity: 0;
+    transform: translateY(.5rem);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes disappear {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}

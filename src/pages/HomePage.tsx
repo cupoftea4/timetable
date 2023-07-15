@@ -1,16 +1,16 @@
 import { FC, useCallback, useEffect, useState } from "react";
-import TimetablesSelection from "../components/TimetablesSelection";
-import HeaderPanel from "../components/HeaderPanel";
-import TimetableManager from "../utils/TimetableManager";
-import { TimetableType } from "../utils/types";
-import styles from "./HomePage.module.scss";
-import useWindowDimensions from "../hooks/useWindowDimensions";
-import List from "../components/List";
-import * as handler from '../utils/requestHandler'
-import { TABLET_SCREEN_BREAKPOINT } from "../utils/constants";
-import catImage from '../assets/cat.svg';
 import { useLocation, useNavigate } from "react-router-dom";
-import { classes } from "../styles/utils";
+import TimetablesSelection from "@/features/home/TimetablesSelection";
+import HeaderPanel from "@/features/header/HomeHeader";
+import useWindowDimensions from "@/hooks/useWindowDimensions";
+import TimetableManager from "@/utils/data/TimetableManager";
+import Toast from '@/utils/toasts'
+import { TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
+import { TimetableType } from "@/utils/types";
+import List from "@/shared/List";
+import catImage from '@/assets/cat.svg';
+import { classes } from "@/styles/utils";
+import styles from "./HomePage.module.scss";
 
 type OwnProps = {
   timetableType: TimetableType;
@@ -45,9 +45,9 @@ const HomePage: FC<OwnProps>  = ({timetableType }) => {
     setSelectedSecond(major);
     if (!major) return;
     handleHashChange(major);
-    handler.promise(TimetableManager.getThirdLayerByType(timetableType, major), 'Fetching timetables...')
+    Toast.promise(TimetableManager.getThirdLayerByType(timetableType, major), 'Fetching timetables...')
       .then(setThirdLayer)
-      .catch(handler.error);
+      .catch(Toast.error);
   }, [timetableType]);
 
   useEffect(() => {
@@ -67,11 +67,11 @@ const HomePage: FC<OwnProps>  = ({timetableType }) => {
   
   useEffect(() => {
     setThirdLayer([]);
-    handler.promise(
+    Toast.promise(
       TimetableManager.getFirstLayerSelectionByType(timetableType), 
       "Fetching institutes...")
     .then(setFirstLayer)
-    .catch(handler.error);
+    .catch(Toast.error);
 
     TimetableManager.getLastOpenedInstitute().then((inst) => {
       if (!inst) return;
@@ -85,14 +85,14 @@ const HomePage: FC<OwnProps>  = ({timetableType }) => {
       updateSecondLayer(timetableType, inst);        
     });
     // BUG: In strict mode it kinda ruins nonexisting group error toast
-    return () => handler.hideAllMessages();
+    return () => Toast.hideAllMessages();
   }, [timetableType]);
 
   const updateSecondLayer = (timetableType: TimetableType, query: string) => {
     TimetableManager.updateLastOpenedInstitute(query);   
-    handler.promise(TimetableManager.getSecondLayerByType(timetableType, query), 'Fetching groups...')
+    Toast.promise(TimetableManager.getSecondLayerByType(timetableType, query), 'Fetching groups...')
       .then(setSecondLayer)
-      .catch(handler.error);
+      .catch(Toast.error);
   };
 
   const handleInstituteChange = (institute: string | null) => {

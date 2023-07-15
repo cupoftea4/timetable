@@ -36,6 +36,6 @@ function getStorage(dbPromise: Promise<IDBPDatabase<unknown>>, storeName: string
 
 
 
-const storage = getStorage(DEFAULT_DB_PROMISE, DEFAULT_STORE_NAME);
+const storage = getStorage(DEFAULT_DB_PROMISE, DEFAULT_STORE_NAME)!;
 
 export default storage;

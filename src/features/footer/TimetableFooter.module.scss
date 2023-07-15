@@ -1,0 +1,43 @@
+@use '../../styles/utils' as *;
+@use '../../styles/variables' as *;
+
+.bottom {
+  @include flex-center;
+  flex-direction: column;
+  font-size: $small-font-size;
+  padding: 1rem 0;
+  gap: .125rem;
+  span {
+    display: flex;
+    align-items: center;
+    gap: .625rem;
+    .merge {
+      --icon-size: 1.625rem;
+    }
+    .download {
+      --icon-size: 1.325rem;
+    }
+    .update {
+      --icon-size: 1.625rem;
+      &:disabled {
+        cursor: not-allowed;
+          svg path {
+          fill: hsla(0, 0%, 72%, 0.766);
+        }
+      }
+      &.loading {
+        svg {
+          animation: $spin-animation;
+        }
+      }
+    }
+  }
+  svg {
+    transition: transform .2s ease-in-out;
+    &:hover {
+      transform: scale(1.1);
+    }
+    width: var(--icon-size);
+    height: var(--icon-size);
+  }
+}

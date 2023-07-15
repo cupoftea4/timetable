@@ -1,0 +1,15 @@
+@use '../../styles/mixins' as *;
+@use '../../styles/utils' as *;
+
+.header {
+  width: 100%;
+}
+
+.params {
+  @include flex-center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  @include timetable-mobile {
+    width: 100%;
+  }
+}
