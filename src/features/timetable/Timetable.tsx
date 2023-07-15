@@ -85,15 +85,15 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
 
 
   return (
-      <table className={styles.timetable}>
-        <thead>
-          <tr>
-            {days.map((day, index) => <th key={index}>{day}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {tableContent}
-        </tbody>
+    <table className={styles.timetable}>
+      <thead>
+        <tr>
+          {days.map((day, index) => <th key={index}>{day}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {tableContent}
+      </tbody>
      </table>
   )
 };

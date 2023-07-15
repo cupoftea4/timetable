@@ -18,9 +18,10 @@ $cell-border-radius: .625rem;
   
   .spacer {
     --bg-alpha: 1;
-    position: absolute;
-    top: 0;
-    height: 100%;
+    position: relative;
+    transform: translateY(calc(#{$spacer-height} / 2));
+    // top: 0;
+    // height: 100%;
     min-width: $spacer-width;
     @include timetable-mobile {
       width: calc(100% - 0.125rem * 2);
