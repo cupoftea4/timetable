@@ -250,7 +250,7 @@ class TimetableParser {
 		if(location.includes("практична")) return "practical";
 		if(location.includes("лабораторна")) return "lab";
 		if(location.includes("конс.")) return "consultation";
-		return "lecture";
+		return "lection";
 	}
 	
 	private parseAndGetFirstElBySelector(html: string, css: string): HTMLElement | null {

@@ -24,7 +24,7 @@ export type ExamsTimetableItem = {
   urls: string[]
 }
 
-export type TimetableItemType = 'lecture' | 'practical' | 'lab' | 'consultation';
+export type TimetableItemType = 'lection' | 'practical' | 'lab' | 'consultation';
 export type LPNUTimetableType = 'timetable' | 'selective' | 'lecturer';
 export type TimetableType = LPNUTimetableType | 'merged';
 
