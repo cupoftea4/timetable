@@ -8,12 +8,73 @@ $min-cell-height: 5rem;
 $max-cell-width: 17rem;
 $cell-border-radius: .625rem;
 
+@function build-hsla($hsl) {
+  @return hsla($hsl, var(--bg-alpha));
+}
+
 .timetable-td {
   position: relative;
   --bg-alpha: 0.05;
 
+  --lab-clr: #{hsl-list($timetable-lab-hsl)};
+  --pract-clr: #{hsl-list($timetable-pract-hsl)};
+  --lect-clr: #{hsl-list($timetable-lect-hsl)};
+  --consultation-clr: #{hsl-list($timetable-consultation-hsl)};
+
+  --gradient-degree: 180deg;
   @include timetable-mobile {
     --bg-alpha: 0;
+    --gradient-degree: 145deg;
+    &:where(.color-2, .color-3, .color-4) .cells {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &.color-1 {
+    background-color: build-hsla(var(--color-1));
+    @include timetable-mobile {
+      .cell {
+        background-color: build-hsla(var(--color-1));
+      }
+    }
+  }
+
+  @for $i from 1 through 4 {
+    &:not(.color-1) .cell:nth-child(#{$i}) {
+      background-color: build-hsla(var(--color-#{$i}));
+    }
+  }
+
+  &:where(.color-2, .color-3, .color-4) .spacer:not(:first-child) {
+    display: none;
+  }
+
+  .cell:nth-child(1), .cell:nth-child(2) .info {
+      @include timetable-mobile {
+        margin-top: 0;
+        padding-top: 1.5rem;
+      }
+  }
+
+  .cell:not(:nth-child(1)):not(:nth-child(2)) {
+    z-index: -1; // second ow was overlapping links from the first one
+  }
+
+  @for $i from 2 through 4 {
+    &.color-#{$i} .cell {
+      margin-block: 0.25rem;
+    }
+  }
+
+  &.color-2 .spacer {
+    @include gradient-2(build-hsla(var(--color-1)), build-hsla(var(--color-2)));
+  }
+  &.color-3 .spacer {
+    @include gradient-3(build-hsla(var(--color-1)), build-hsla(var(--color-2)), build-hsla(var(--color-3)));
+  }
+  &.color-4 .spacer {
+    @include gradient-4(build-hsla(var(--color-1)), build-hsla(var(--color-2)), build-hsla(var(--color-3)), build-hsla(var(--color-4)));
   }
   
   .spacer {
@@ -22,11 +83,12 @@ $cell-border-radius: .625rem;
     top: 0;
     height: 100%;
     min-width: $spacer-width;
+
     @include timetable-mobile {
       width: calc(100% - 0.125rem * 2);
       height: $spacer-height;
       position: relative;
-      transform: translateY(calc(#{$spacer-height} / 2));
+      transform: translateY(calc(#{$spacer-height} ));
       border-radius: $cell-border-radius $cell-border-radius 0 0;
       margin: 0 .125rem;
       z-index: 5;
@@ -58,13 +120,6 @@ $cell-border-radius: .625rem;
     max-width: $max-cell-width;
     position: relative;
     font-size:  $small-font-size;
-
-    @include min-timetable-mobile {
-      &:not(.merged) {
-        background-color: transparent;
-      }
-    }
-
     @include timetable-mobile {
       border-radius: $cell-border-radius;
       --bg-alpha: .5;
@@ -84,11 +139,10 @@ $cell-border-radius: .625rem;
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      padding: 0.325rem 0.5rem 0;
+      padding: 0.625rem 0.5rem 0;
       margin-left: $spacer-width;
       @include timetable-mobile {
         margin-left: 0;
-        margin-top: $spacer-height;
       }
       .subgroup {
         color: $extra-text-clr;

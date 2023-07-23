@@ -14,13 +14,12 @@ type OwnProps = {
 
 const TimetableLesson: FC<OwnProps> = ({lesson, cellSubgroup, isMerged}) => {
   const isForBothSubgroups = lesson.isFirstSubgroup && lesson.isSecondSubgroup;
-  const times = lessonsTimes[lesson.number - 1];
 
   return ( 
     <>
-      <div className={classes(styles.spacer, lesson.type)} 
-        data-time={`${times?.start}-${times?.end}`} data-number={lesson.number}/>
-      <div className={classes(styles.cell, lesson.type, isMerged && styles.merged, !lesson ? styles.hide : styles.show)} >
+      <div className={
+          classes(styles.cell, isMerged && styles.merged, !lesson ? styles.hide : styles.show)
+        }>
         <div className={styles.info}>
           {cellSubgroup && !isForBothSubgroups  && 
             <span className={styles.subgroup}>

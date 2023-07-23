@@ -73,3 +73,25 @@
     @content;
   }
 }
+
+@function scss-hsla($hsl, $alpha: 1) {
+  $hsl-list: $hsl;
+  @return hsla(nth($hsl-list, 1), nth($hsl-list, 2), nth($hsl-list, 3), $alpha);
+}
+
+@function hsl-list($hsl) {
+  $list: $hsl;
+  @return nth($list, 1), nth($list, 2), nth($list, 3);
+}
+
+@mixin gradient-2($color-1, $color-2, $deg: var(--gradient-degree)) {
+  background: linear-gradient($deg, $color-1 0%, $color-2 100%);
+}
+
+@mixin gradient-3($color-1, $color-2, $color-3, $deg: var(--gradient-degree)) {
+  background: linear-gradient($deg, $color-1 0%, $color-2 50%, $color-3 100%);
+}
+
+@mixin gradient-4($color-1, $color-2, $color-3, $color-4, $deg: var(--gradient-degree)) {
+  background: linear-gradient($deg, $color-1 0%, $color-2 33.33%, $color-3 66.66%, $color-4 100%);
+}
