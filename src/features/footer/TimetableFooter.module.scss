@@ -25,6 +25,9 @@
           fill: hsla(0, 0%, 72%, 0.766);
         }
       }
+      svg:hover {
+        transform: scale(1.1);
+      }
       &.loading {
         svg {
           animation: $spin-animation;
