@@ -58,4 +58,9 @@
   tr td:last-child, th:last-child {
     border-right: none;
   }
+  @for $i from 1 through 9 {
+    tr:nth-child(#{$i}) td {
+      z-index: 10 - $i;
+    }
+  }
 }

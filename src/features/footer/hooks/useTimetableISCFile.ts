@@ -8,7 +8,6 @@ const useTimetableISCFile = (
   isSecondSubgroup: boolean, isSecondWeek: boolean
 ) => {
   const icsFILE = useMemo(() => {
-    console.log(timetable);
     let fileContent;
     if (!timetable) return undefined;
     if (timetable[0] && !isExams(timetable[0])) {
