@@ -1,10 +1,10 @@
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function useDelayedProp<T>(prop: T, delay: number): [T, boolean] {
   const [innerProp, setInnerProp] = useState(prop);
   const [shouldAppear, setShouldAppear] = useState(true);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setShouldAppear(false);
     const id = setTimeout(() => {
       setInnerProp(prop);
