@@ -4,6 +4,7 @@ import { lessonsTimes, unique } from '@/utils/timetable';
 import { getCurrentUADate, stringToDate } from '@/utils/date';
 import styles from './Timetable.module.scss';
 import type { TimetableItem } from '@/types/timetable';
+import { classes } from '@/styles/utils';
 
 type OwnProps = {
   timetable: TimetableItem[];
@@ -66,9 +67,9 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
         days.map((day, j) =>
           day === null 
             ? <th key={time.start + day} style={{height: "5rem"}}>
-                <span>{time.start}</span>
-                <span>{i + 1}</span> 
-                <span>{time.end}</span>
+                <span className={classes(styles.metadata, styles.start)}>{time.start}</span>
+                <span className={classes(styles.metadata, styles.number)}>{i + 1}</span> 
+                <span className={classes(styles.metadata, styles.end)}>{time.end}</span>
               </th> 
             : <TimetableCell
                 isAfterEmpty={i !== 0 && getLessonsByDayAndTime(i, j) === null} 
@@ -81,7 +82,7 @@ const Timetable: FC<OwnProps> = ({timetable, isSecondSubgroup, isSecondWeek, cel
       }</tr> 
     );
     return table;
-  }, [timetableLessonsTimes,timetable, days, getLessonsByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
+  }, [timetableLessonsTimes, timetable, days, getLessonsByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
 
 
   return (

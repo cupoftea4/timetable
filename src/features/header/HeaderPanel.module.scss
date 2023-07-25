@@ -32,12 +32,5 @@
       transform-origin: center;
       cursor: pointer;
     }
-    h1 {
-      align-self: flex-end;
-      font-size: clamp(1rem, 8vw, 2rem);
-      font-weight: $semi-bold-font;
-      color: var(--text-clr);
-      text-align: center;
-    }
   }
 }

@@ -5,6 +5,7 @@ import { TABLET_SCREEN_BREAKPOINT } from '@/utils/constants';
 import MobileSelect from '@/shared/MobileSelect';
 import styles from './Navigation.module.scss';
 import type { TimetableType } from '@/types/timetable';
+import { classes } from '@/styles/utils';
 
 const navigationItems: {value: TimetableType, name: string}[] = [
   {value: "timetable", name: "Студент"},
@@ -34,7 +35,7 @@ const Navigation: FC<OwnProps> = ({timetableType}) => {
                   state={{force: true}}
                   to={"/" + (type.value === "timetable" ? "" : type.value)}
                   key={type.value}
-                  className={timetableType === type.value ? styles.active : ""}
+                  className={classes(styles['nav-link'], timetableType === type.value && styles.active)}
                 >
                   {type.name}
                 </Link>

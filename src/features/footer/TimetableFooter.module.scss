@@ -25,17 +25,17 @@
           fill: hsla(0, 0%, 72%, 0.766);
         }
       }
-      svg:hover {
+      .button:hover {
         transform: scale(1.1);
       }
       &.loading {
-        svg {
+        .button {
           animation: $spin-animation;
         }
       }
     }
   }
-  svg {
+  .button svg {
     transition: transform .2s ease-in-out;
     &:hover {
       transform: scale(1.1);

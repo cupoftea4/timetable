@@ -10,8 +10,8 @@ import TimetableManager from '@/utils/data/TimetableManager';
 import HomeIcon from '@/assets/HomeIcon';
 import { classes } from '@/styles/utils';
 import Toast from '@/utils/toasts';
-import styles from './HeaderPanel.module.scss';
-import outerStyles from './TimetableHeader.module.scss';
+import generalStyles from './HeaderPanel.module.scss';
+import styles from './TimetableHeader.module.scss';
 import type { HalfTerm } from '@/types/timetable';
 
 type OwnProps = {
@@ -61,15 +61,15 @@ const TimetableHeader: FC<OwnProps> = ({
   };
 
   return (
-    <header className={classes(styles.header, outerStyles.header)}>
-    <nav className={styles['right-buttons']}> 
+    <header className={classes(generalStyles.header, styles.header)}>
+    <nav className={generalStyles['right-buttons']}> 
       <Link state={{force: true}} to="/" aria-label="Home"><HomeIcon /></Link>
       <SavedMenu timetableChanged={loading} />
-      <h1 className={outerStyles.title}>{timetableType === 'merged' ? "Мій розклад" : group}</h1>
+      <h1 className={styles.title}>{timetableType === 'merged' ? "Мій розклад" : group}</h1>
       {
         timetableType !== 'selective' &&
           <button
-            className={styles.exams}
+            className={generalStyles.exams}
             title={isExamsTimetable ? "Переключити на розклад пар" : "Переключити на розклад екзаменів"} 
             onClick={() => handleIsExamsTimetableChange(!isExamsTimetable)}
           >
@@ -81,7 +81,7 @@ const TimetableHeader: FC<OwnProps> = ({
           <TimetablePartials partials={partials} handlePartialClick={updatePartialTimetable} />
       }
     </nav>
-    <span className={outerStyles.params}>
+    <span className={styles.params}>
       {!isExamsTimetable &&
           <>
             {!isLecturers && 

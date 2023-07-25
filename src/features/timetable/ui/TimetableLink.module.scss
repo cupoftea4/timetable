@@ -1,3 +1,4 @@
+@use '../../../styles/utils' as *;
 @use '../../../styles/variables' as *;
 
 .links {
@@ -12,8 +13,8 @@
   .dropdown {
     position: absolute;
     animation: show-menu 0.1s ease-in-out;
-    background: var(--accent-clr);
-    backdrop-filter: blur(20px);
+    background: hsla(0, 0%, 30%, 0.85);
+    @include blur(40px);
     z-index: 100;
     border-radius: 0.5rem;
     li {

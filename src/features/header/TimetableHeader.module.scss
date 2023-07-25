@@ -1,5 +1,6 @@
 @use '../../styles/mixins' as *;
 @use '../../styles/utils' as *;
+@use '../../styles/variables' as *;
 
 .header {
   width: 100%;
@@ -12,4 +13,12 @@
   @include timetable-mobile {
     width: 100%;
   }
+}
+
+.title {     
+  align-self: flex-end;
+  font-size: clamp(1rem, 8vw, 2rem);
+  font-weight: $semi-bold-font;
+  color: var(--text-clr);
+  text-align: center;
 }

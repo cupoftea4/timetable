@@ -81,14 +81,15 @@ const SavedMenu : FC<OwnProps> = ({timetableChanged}) => {
           id="saved-menu" 
           aria-hidden={!isMenuOpen ? "true" : "false"}
         >
-          <span>
+          <span className={styles.title}>
             {savedGroups.length !== 0 ? "Збережені" : "Немає збережених. Відкрийте будь-який розклад, щоб автоматично зберегти."}
           </span>
           <ul>
             {savedGroups.map((group, index) => (
               <li key={index} className={selectedItem === index ? styles.selected : ""}>
-                <Link to={`/${group}`} onFocus={() => setSelectedItem(index)} onClick={() => closeMenu()}> 
+                <Link to={`/${group}`} className={styles['list-item']} onFocus={() => setSelectedItem(index)} onClick={() => closeMenu()}> 
                   <span 
+                    className={styles.name}
                     title={isMerged(group) 
                       ? TimetableManager.cachedMergedTimetable?.timetableNames.join("+")
                       : group

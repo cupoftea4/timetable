@@ -25,20 +25,21 @@ const TimetableFooter: FC<OwnProps> = ({
 
   return (
     <footer className={styles.bottom}>
-      <span>
+      <span className={styles.container}>
         <button 
           title='Об`єднати кілька розкладів в одну таблицю' 
-          onClick={showCreateMergedModal} className={styles.merge}>
+          onClick={showCreateMergedModal} className={classes(styles.merge, styles.button)}>
           <MergeIcon/>
         </button>
         <button 
           disabled={loading}
-          className={classes(styles.update, loading && styles.loading)} title='Оновити дані' 
+          className={classes(styles.update, loading && styles.loading, styles.button)} title='Оновити дані' 
           onClick={() => updateTimetable()}
         >
           <LoadingIcon/>
         </button>
-        <a className={styles.download} title='Експортувати розклад для Google Calendar' href={icsFILE} 
+        <a className={classes(styles.download, styles.button)} 
+          title='Експортувати розклад для Google Calendar' href={icsFILE} 
           download={isExamsTimetable ? `${group}-exams.ics` : `${group}-${isSecondSubgroup ? 2 : 1}.ics`}
         >
           <DownloadIcon/>

@@ -2,7 +2,6 @@
 @use '../../styles/mixins' as *;
 
 
-
 .timetable {
   max-width: var(--max-app-width);
   border-collapse: collapse;
@@ -32,32 +31,30 @@
 
     width: 5rem;
     position: relative;
-    span {
-      position: absolute;
-    }
-    /* Start time */
-    span:first-child {
-      @include small-italic-text;
-      top: 0%;
-      right: .5rem;
-    }
-    /* Lesson number */
-    :nth-child(2) {
-      top: 0%;
-      right: 3.5rem;
-    }
-    /* End time */
-    span:last-child {
-      @include small-italic-text;
-      bottom: 0%;
-      right: .5rem;
-    }
     border-left: none;
+    .metadata {
+      position: absolute;
+      &.start {
+        @include small-italic-text;
+        top: 0%;
+        right: .5rem;
+      }
+      &.number {
+        top: 0%;
+        right: 3.5rem;
+      }
+      &.end {
+        @include small-italic-text;
+        bottom: 0%;
+        right: .5rem;
+      }
+    }
   }
   /* Last column */
   tr td:last-child, th:last-child {
     border-right: none;
   }
+  
   @for $i from 1 through 9 {
     tr:nth-child(#{$i}) td {
       z-index: 10 - $i;

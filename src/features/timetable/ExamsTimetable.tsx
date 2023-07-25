@@ -20,13 +20,13 @@ const ExamsTimetable: FC<OwnProps> = ({exams}) => {
   return (
     <div className={styles.exams}>
       {exams?.sort(compareDates).map((exam, index) => (
-        <div key={index} className={classes(isSameDay(exam.date, new Date()) && styles.active)}>
-          <div>
+        <div key={index} className={classes(styles.exam, isSameDay(exam.date, new Date()) && styles.active)}>
+          <div className={styles.top}>
             <p>{exam.date.toLocaleString("uk-UA", {timeZone: LVIV_TIMEZONE, weekday: "long", day: "numeric", month: "long"})}</p>
             <p>{exam.number} пара</p>
           </div>
           <h3>{exam.subject}</h3>
-          <div>
+          <div className={styles.bottom}>
             <p>{exam.lecturer.trim().replace(/,$/, '')}</p>
             <TimetableLink urls={exam.urls} type={'lab'} />
           </div>
