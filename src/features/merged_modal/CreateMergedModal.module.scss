@@ -1,0 +1,100 @@
+@use '../../styles/utils' as *;
+@use '../../styles/mixins' as *;
+
+.wrapper {
+  position: fixed;
+  @include inset-0;
+  background-color: hsla(0, 0%, 0%, 0.7);
+  z-index: 100;
+  @include flex-center;
+
+  .modal {
+    margin: 1rem;
+    width: clamp(20rem, 40vw, 30rem);
+    background-color: hsla(0, 0%, 100%, 0.15);
+    box-shadow: 2px 2px 11px 0px hsla(0, 0%, 0%, 0.7);
+    @include blur(2rem);
+    padding: 1.625rem;
+    border-radius: .625rem;
+    .fieldset {
+      margin: .75rem 0 1.25rem;
+      padding: 0 .5rem .5rem;
+      border-radius: .625rem;
+      .choice {
+        display: flex;
+        flex-wrap: wrap;
+        .selected {
+          display: flex;
+          flex-wrap: wrap;
+          gap: .5rem;
+          .selectedItem {
+            background-color: cadetblue;
+            padding: .25em .5em;
+            border-radius: .325em;
+            position: relative;
+            cursor: pointer;
+            &::before {
+              content: attr(data-content);
+              transition: color .2s ease-in-out;
+            }
+            &::after {
+              content: url(../../assets/close.svg);
+              width: .875rem;
+              height: auto;
+              position: absolute;
+              top: 50%;
+              right: 50%;
+              transform: translateX(50%) translateY(-40%);
+              transition: opacity .2s ease-in-out;
+              opacity: 0;
+            }
+            &:hover {
+              &::before {
+                color: transparent;
+              }
+              &::after {
+                opacity: 1;
+              }
+            }
+          }
+          
+        }
+        .search-bar {
+          display: inline;
+          color:hsla(0, 0%, 0%, 0.7);
+          max-width: 10rem;
+          input {
+            background-color: transparent;
+            border: none;
+            outline: none;
+            color: white;
+          }
+          ul {
+            background: white;
+            @include blur(2rem);
+            left: 0;
+            max-height: 10rem;
+            @include auto-scroll(y, thin, $thumb-color: hsla(0, 0%, 0%, 0.7));
+            mark {
+              background: cadetblue;  
+              color: white;
+            }
+          }
+        }
+      }
+    }
+    .button {
+      display: block;
+      margin: 0 auto;
+      margin-top: 1em;
+      padding: .325em .75em;
+      border-radius: .5em;
+      background-color: hsla(0, 0%, 100%, 0.9);
+      color:hsla(0, 0%, 0%, 0.8);
+      transition: background-color .2s;
+      &:hover {
+        background-color: hsla(226, 55%, 94%, 0.9);
+      }
+    }
+  }
+}

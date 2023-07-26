@@ -1,0 +1,36 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+@use '../../styles/utils' as *;
+
+.header {
+  max-width: var(--max-app-width);
+  margin: 0 auto;
+  padding: 2rem 4rem .75rem 4rem;
+  @include tablet {
+    padding: 2rem 2.5rem .75rem 2.5rem;
+    gap: .5rem;
+  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  .right-buttons {
+    display: flex;
+    gap: .875rem;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+    button.exams {
+      @include light-pillow-button;
+      border-radius: $border-radius;
+    }
+
+    svg {
+      width: clamp(2rem, 8vw, 2.75rem);
+      height: clamp(2rem, 8vw, 2.75rem); 
+      transform-origin: center;
+      cursor: pointer;
+    }
+  }
+}

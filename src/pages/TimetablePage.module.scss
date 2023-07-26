@@ -2,15 +2,6 @@
 @use '../styles/variables' as *;
 
 
-.params {
-  @include flex-center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  @include timetable-mobile {
-    width: 100%;
-  }
-}
-
 .wrapper {
   min-height: 100vh;
   min-height: 100dvh;
@@ -43,46 +34,5 @@
         scroll-snap-stop: always;
       }
     }
-  }
-}
-
-.bottom {
-  @include flex-center;
-  flex-direction: column;
-  font-size: $small-font-size;
-  padding: 1rem 0;
-  gap: .125rem;
-  span {
-    display: flex;
-    align-items: center;
-    gap: .625rem;
-    .merge {
-      --icon-size: 1.625rem;
-    }
-    .download {
-      --icon-size: 1.325rem;
-    }
-    .update {
-      --icon-size: 1.625rem;
-      &:disabled {
-        cursor: not-allowed;
-          svg path {
-          fill: hsla(0, 0%, 72%, 0.766);
-        }
-      }
-      &.loading {
-        svg {
-          animation: $spin-animation;
-        }
-      }
-    }
-  }
-  svg {
-    transition: all .2s ease-in-out;
-    &:hover {
-      transform: scale(1.1);
-    }
-    width: var(--icon-size);
-    height: var(--icon-size);
   }
 }

@@ -1,10 +1,5 @@
 @use './variables' as vars;
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+@use './utils' as utils;
 
 @mixin small-italic-text {
   font-size: 0.75rem;
@@ -18,40 +13,34 @@
   background-color: var(--accent-clr);
   border: var(--border-clr) solid 1px;
   cursor: pointer;
-  transition: all .2s ease-in-out;
+  transition: background-color .2s ease-in-out;
   &:hover {
     background-color: rgba(255, 255, 255, 0.3);
   }
 }
 
 @mixin animated-underline {
-      position: relative;
-      transition: all .1s ease-in-out;
-      &::after{
-          content: '';
-          position: absolute;
-          width: 60%;
-          height: .2rem;
-          bottom: 0;
-          left: 50%;
-          transform: translateX(-50%) scaleX(0);
-          background-color: var(--text-clr);
-          border-radius: .7rem;
-          visibility: hidden;
-          transition: .25s linear;
-      }
-      &:hover:after,
-      &:focus:after {
-          visibility: visible;
-          transform: translateX(-50%) scaleX(1);
-      }
+  position: relative;
+  transition: transform .1s ease-in-out;
+  &::after{
+      content: '';
+      position: absolute;
+      width: 60%;
+      height: .2rem;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      background-color: var(--text-clr); 
+      border-radius: .7rem;
+      visibility: hidden;
+      transition: .25s linear;
+  }
+  &:hover:after,
+  &:focus:after {
+      visibility: visible;
+      transform: translateX(-50%) scaleX(1);
+  }
 }
-
-@mixin blur($radius: 1rem) {
-  backdrop-filter: blur($radius);
-  -webkit-backdrop-filter: blur($radius);
-}
-
 
 @mixin auto-scroll (
   $direction: y, 
@@ -91,14 +80,14 @@
 
 
 @mixin scroll-on-hover ($direction: y, $width: auto, $track-color: var(--accent-clr), $thumb-color: var(--accent-clr)) {
-  @include can-hover {
+  @include utils.can-hover {
     overflow-#{$direction}: hidden;
     &:hover {
       @include auto-scroll($direction, $width, $track-color, $thumb-color);
     }
   }
 
-  @include touchscreen {
+  @include utils.touchscreen {
     @include auto-scroll($direction, $width, $track-color, $thumb-color, false);
   }
 }
@@ -126,58 +115,4 @@
   @media only screen and (min-width: 1000px) {
     @content;
   } 
-}
-
-@mixin mobile {
-  @media only screen and (max-width: 480px) {
-      @content;
-  }
-}
-
-@mixin tablet {
-  @media only screen and (max-width: 768px) {
-      @content;
-  }
-}
-
-@mixin desktop {
-  @media (min-width: 768px) {
-      @content;
-  }
-}
-
-@mixin large-screen {
-  @media (min-width: 1860px) {
-      @content;
-  }
-}
-
-@mixin screen-2k {
-  @media (min-width: 2500px) {
-      @content;
-  }
-}
-
-@mixin screen-4k {
-  @media (min-width: 3600px) {
-      @content;
-  }
-}
-
-@mixin touchscreen {
-  @media (hover: none) {
-      @content;
-  }
-}
-
-@mixin can-hover {
-  @media (hover: hover) {
-      @content;
-  }
-}
-
-@mixin dark-mode {
-  @media screen and (prefers-color-scheme: dark) {
-    @content;
-  }
 }

@@ -1,7 +1,8 @@
 /* eslint-disable no-restricted-globals */
 
 const DYNAMIC_CACHE_NAME_PREFIX  = "d-app-v";
-const CURRENT_CACHE_VERSION = "1.8";
+const urlParams = new URLSearchParams(location.search);
+const CURRENT_CACHE_VERSION = urlParams.get("v");
 const DYNAMIC_CACHE_NAME  = `${DYNAMIC_CACHE_NAME_PREFIX}${CURRENT_CACHE_VERSION}`;
 const SERVER_FILE_NAME = "get.php";
 

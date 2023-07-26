@@ -4,4 +4,4 @@ export const NARROW_SCREEN_BREAKPOINT = 300;
 
 export const TOAST_AUTO_CLOSE_TIME = 5000;
 
-export const DEVELOP = import.meta.env.MODE === "development";
+export const DEVELOP = import.meta.env.MODE === 'development';

@@ -1,0 +1,29 @@
+@use '../../styles/utils' as *;
+@use '../../styles/variables' as *;
+
+.exams {
+  display: flex;
+  flex-direction: column;
+  gap: .125rem;
+  .exam {
+    padding: .75rem 1rem;
+    animation: $appear-animation;
+    border-radius: .5rem;
+    width: 30rem;
+    @include mobile {
+      width: 85vw;
+    }
+    &.active {
+      background: var(--accent-clr);
+    }
+    
+    .top, .bottom {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      padding: .25rem 0;
+      font-size: $small-font-size;
+    }
+   
+  }  
+}
