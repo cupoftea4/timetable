@@ -9,6 +9,7 @@ export default defineConfig({
   plugins: [react(), viteTsconfigPaths(), svgrPlugin()],
   build: {
     outDir: 'build',
+    sourcemap: true
   },
   resolve: {
     alias: {
@@ -17,5 +18,5 @@ export default defineConfig({
   },
   define: {
     APP_VERSION: JSON.stringify(process.env.npm_package_version),
-  },
+  }
 });

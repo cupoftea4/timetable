@@ -44,6 +44,7 @@
         "public/",
         "src/global.d.ts",
         "src/reset.d.ts",
-        "vite-env.d.ts"
+        "vite-env.d.ts",
+        "vite.config.ts"
     ]
 }
