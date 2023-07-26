@@ -1,4 +1,4 @@
-export type IconStyles = {className?: string, style?: React.CSSProperties};
+export type IconStyles = { className?: string, style?: React.CSSProperties };
 
 export enum Status {
   Loading,

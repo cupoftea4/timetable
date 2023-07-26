@@ -1,4 +1,4 @@
-
+/* eslint-disable max-len */
 const ZoomIcon = () => {
   return (
     <svg width="22" height="13" viewBox="0 0 22 13" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -6,7 +6,7 @@ const ZoomIcon = () => {
       <path d="M16.386 6.13872C16.3857 5.43171 16.6501 4.74866 17.1299 4.21663L19.6697 1.39913C20.3565 0.6408 21.646 1.11038 21.646 2.11955V10.8812C21.646 11.8918 20.3566 12.3614 19.6712 11.6016L17.1299 8.78413C16.6504 8.25249 16.3861 7.57002 16.386 6.86351V6.13872Z" fill="white"/>
     </svg>
 
-  )
-}
+  );
+};
 
 export default ZoomIcon;

@@ -46,7 +46,7 @@ const MergeIcon = () => {
       245 0 245 365 0 365 0 0 -225z"/>
       </g>
     </svg>
-  )
-}
+  );
+};
 
 export default MergeIcon;

@@ -1,35 +1,35 @@
-import React, { FC, useMemo } from 'react'
+import React, { type FC, useMemo } from 'react';
 import DatalistInput, { useComboboxControls } from 'react-datalist-input';
 
 type OwnProps = {
-  options: {id: string, value: string}[];
-  onSelect: (item: {id: string, value: string}) => void;
-  clearOnSelect?: boolean;
-  containerRef?: React.RefObject<HTMLDivElement>;
-  label?: string;
-  placeholder?: string;
-  className?: string;
-  initialDisplayedCount?: number;
-  autoFocus?: boolean;
-}
+  options: Array<{ id: string, value: string }>
+  onSelect: (item: { id: string, value: string }) => void
+  clearOnSelect?: boolean
+  containerRef?: React.RefObject<HTMLDivElement>
+  label?: string
+  placeholder?: string
+  className?: string
+  initialDisplayedCount?: number
+  autoFocus?: boolean
+};
 
 const VirtualizedDataList: FC<OwnProps> = ({
-    options, 
-    onSelect, 
-    className, 
-    containerRef,
-    clearOnSelect = false,
-    label = "",
-    placeholder = "",
-    initialDisplayedCount = 10, 
-    autoFocus = false
+  options,
+  onSelect,
+  className,
+  containerRef,
+  clearOnSelect = false,
+  label = '',
+  placeholder = '',
+  initialDisplayedCount = 10,
+  autoFocus = false
 }) => {
   const { value: inputValue, setValue: setInputValue } = useComboboxControls({ isExpanded: false });
   const [displayedCount, setDisplayedCount] = React.useState(initialDisplayedCount);
 
   const displayedOptions = useMemo(() => {
     const timetables = options
-      .filter(({value}) => 
+      .filter(({ value }) =>
         value.toLocaleLowerCase().includes(inputValue.toLocaleLowerCase())
       );
     return timetables.slice(0, displayedCount);
@@ -37,7 +37,7 @@ const VirtualizedDataList: FC<OwnProps> = ({
 
   const showMoreOptions = () => {
     setDisplayedCount(displayedCount + initialDisplayedCount);
-  }
+  };
 
   return (
     <DatalistInput
@@ -60,11 +60,11 @@ const VirtualizedDataList: FC<OwnProps> = ({
       label={label}
       onSelect={item => {
         onSelect(item);
-        clearOnSelect && setInputValue("");
+        clearOnSelect && setInputValue('');
       }}
       items={displayedOptions}
     />
-  )
-}
+  );
+};
 
-export default VirtualizedDataList
+export default VirtualizedDataList;

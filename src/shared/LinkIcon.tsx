@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { type FC } from 'react';
 import DefaultLink from '@/assets/links/DefaultLink';
 import DiscordIcon from '@/assets/links/DiscordIcon';
 import GoogleMeetsIcon from '@/assets/links/GoogleMeetsIcon';
@@ -8,8 +8,8 @@ import YouTubeIcon from '@/assets/links/YouTubeIcon';
 import ZoomIcon from '@/assets/links/ZoomIcon';
 
 type OwnProps = {
-  link: string;
-}
+  link: string
+};
 
 const linkIcons: Readonly<Record<string, () => JSX.Element>> = {
   zoom: ZoomIcon,
@@ -17,12 +17,11 @@ const linkIcons: Readonly<Record<string, () => JSX.Element>> = {
   google: GoogleMeetsIcon,
   discord: DiscordIcon,
   youtube: YouTubeIcon,
-  "youtu.be": YouTubeIcon,
-  skype: SkypeIcon,
+  'youtu.be': YouTubeIcon,
+  skype: SkypeIcon
 };
 
 const LinkIcon: FC<OwnProps> = ({ link }) => {
-  
   const linkIcon = Object.keys(linkIcons).find((key) => link.includes(key));
 
   return (
@@ -31,8 +30,7 @@ const LinkIcon: FC<OwnProps> = ({ link }) => {
         linkIcon ? React.createElement(linkIcons[linkIcon]!) : <DefaultLink />
       }
     </>
-  )
-}
-
+  );
+};
 
 export default LinkIcon;

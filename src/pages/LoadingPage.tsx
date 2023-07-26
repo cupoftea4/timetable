@@ -1,4 +1,4 @@
-import LoadingIcon from "../assets/LoadingIcon";
+import LoadingIcon from '../assets/LoadingIcon';
 import styles from './LoadingPage.module.scss';
 
 const LoadingPage = () => {
@@ -9,7 +9,7 @@ const LoadingPage = () => {
         <span>Loading...</span>
       </div>
     </main>
-  )
+  );
 };
 
 export default LoadingPage;

@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useOnClickOutside from '@/hooks/useOnOutsideClick';
 import useFocus from '@/hooks/useFocus';
@@ -11,22 +11,22 @@ import type { TimetableItem } from '@/types/timetable';
 import type { RenderPromises } from '@/types/utils';
 
 const getSearchBarOptions = () => {
-  return getAllTimetables().map(group => ({id: group, value: group}));
-}
+  return getAllTimetables().map(group => ({ id: group, value: group }));
+};
 
-function getSavedTimetables(){
+function getSavedTimetables () {
   return TimetableManager.getCachedTimetables()
     .filter(group => !isMerged(group.group))
     .map(timetable => timetable.group);
 }
 
 type OwnProps = {
-  defaultTimetable?: string;
-  onClose: () => void;
-  showTimetable: (promises: RenderPromises<TimetableItem[]>) => void;
+  defaultTimetable?: string
+  onClose: () => void
+  showTimetable: (promises: RenderPromises<TimetableItem[]>) => void
 };
 
-const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose, showTimetable}) => {
+const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimetable }) => {
   const [timetablesToMerge, setTimetablesToMerge] = useState<string[]>(
     defaultTimetable && !isMerged(defaultTimetable) ? [defaultTimetable] : []
   );
@@ -34,13 +34,13 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose, showTimeta
   const options = useMemo(() => {
     const savedTimetables = getSavedTimetables();
     const timetables = getSearchBarOptions()
-      .filter(({value}) => 
-        !timetablesToMerge.includes(value) && 
-        !savedTimetables.includes(value) 
+      .filter(({ value }) =>
+        !timetablesToMerge.includes(value) &&
+        !savedTimetables.includes(value)
       );
     timetables.unshift(...savedTimetables
       .filter(group => !timetablesToMerge.includes(group))
-      .map(group => ({id: group, value: group})));
+      .map(group => ({ id: group, value: group })));
     return timetables;
   }, [timetablesToMerge]);
 
@@ -48,27 +48,25 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose, showTimeta
   const [datalistRef, setInputFocus] = useFocus<HTMLDivElement>();
   const navigate = useNavigate();
 
-
-  function addTimetableToMerge(timetable: string) {
+  function addTimetableToMerge (timetable: string) {
     if (timetablesToMerge.includes(timetable) || timetablesToMerge.length >= 4) return;
     setTimetablesToMerge([...timetablesToMerge, timetable]);
   }
 
-
-  function onCreateClick() {
+  function onCreateClick () {
     if (timetablesToMerge.length < 2 || timetablesToMerge.length > 5) {
-      Toast.warn("Виберіть від 2 до 5 груп");
+      Toast.warn('Виберіть від 2 до 5 груп');
       return;
     }
     onClose();
     const promises = TimetableManager.getMergedTimetable(timetablesToMerge);
-    if (location.pathname.includes("/my")) showTimetable(promises);
+    if (location.pathname.includes('/my')) showTimetable(promises);
     Toast.promise(Promise.all(promises).finally(() => {
-      navigate("/my");
+      navigate('/my');
     }), Toast.PENDING_MERGED);
   }
 
-  function onRemoveItem(timetable: string) {  
+  function onRemoveItem (timetable: string) {
     setTimetablesToMerge([...timetablesToMerge.filter(t => t !== timetable)]);
   }
 
@@ -78,15 +76,15 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose, showTimeta
         <div className={styles.header}>
           <h2 className={styles.title}>Оберіть групи для злиття</h2>
         </div>
-          <fieldset className={styles.fieldset} onClick={() => setInputFocus(true)}>
+          <fieldset className={styles.fieldset} onClick={() => { setInputFocus(true); }}>
             <legend className={styles.legend}>Пошук</legend>
             <div className={styles.choice}>
               <span className={styles.selected}>
                 {timetablesToMerge.map((timetable, index) => (
-                  <span 
-                    key={timetable} 
-                    onClick={() => onRemoveItem(timetable)} 
-                    className={styles.selectedItem} 
+                  <span
+                    key={timetable}
+                    onClick={() => { onRemoveItem(timetable); }}
+                    className={styles.selectedItem}
                     data-content={timetable}>
                   </span>
                 ))}
@@ -96,7 +94,7 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose, showTimeta
                     autoFocus
                     clearOnSelect
                     containerRef={datalistRef}
-                    className={styles["search-bar"]}
+                    className={styles['search-bar']}
                     onSelect={item => {
                       addTimetableToMerge(item.value);
                     }}
@@ -108,7 +106,7 @@ const CreateMergedModal : FC<OwnProps> = ({defaultTimetable, onClose, showTimeta
         <button className={styles.button} onClick={onCreateClick}>Створити</button>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default CreateMergedModal;

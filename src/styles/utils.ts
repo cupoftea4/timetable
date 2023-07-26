@@ -1,3 +1,3 @@
-export function classes(...parts: (string | false | undefined | null)[]) {
+export function classes (...parts: Array<string | false | undefined | null>) {
   return parts.filter(Boolean).join(' ');
 }

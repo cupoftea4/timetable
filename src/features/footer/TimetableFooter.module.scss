@@ -25,13 +25,9 @@
           fill: hsla(0, 0%, 72%, 0.766);
         }
       }
-      .button:hover {
-        transform: scale(1.1);
-      }
       &.loading {
-        .button {
-          animation: $spin-animation;
-        }
+        transform-origin: 50% 42%;
+        animation: $spin-animation;
       }
     }
   }

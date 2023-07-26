@@ -1,15 +1,14 @@
-import { formatLocationForGoogleMaps, lessonsTimes } from "../timetable";
-import type { ExamsTimetableItem, TimetableItem } from "@/types/timetable";
+import { formatLocationForGoogleMaps, lessonsTimes } from '../timetable';
+import type { ExamsTimetableItem, TimetableItem } from '@/types/timetable';
 
-
-function toTFormattedString(date: Date, time: string) {
+function toTFormattedString (date: Date, time: string) {
   const [hours, minutes] = time.split(':');
   const dateOnly = date.toISOString().substring(0, 10).replace(/-/g, '');
   const formattedTime = `${dateOnly}T${hours?.padStart(2, '0')}${minutes}00`;
   return formattedTime;
 }
 
-function weeksLeftToDate(date: Date) {
+function weeksLeftToDate (date: Date) {
   const timeDiff = date.getTime() - new Date().getTime();
   const oneWeek = 1000 * 60 * 60 * 24 * 7;
   const weeksLeft = Math.ceil(timeDiff / oneWeek);
@@ -17,33 +16,34 @@ function weeksLeftToDate(date: Date) {
 }
 
 export default class ISCFile {
-  public static fromExamsTimetable(timetable: ExamsTimetableItem[]): string {
+  public static fromExamsTimetable (timetable: ExamsTimetableItem[]): string {
     const text = this.createICSFile(
       timetable.map(({
         date, subject, lecturer, number, urls
       }) => {
         const [start, end] = this.lessonNumberToICSTime(date, number);
         return this.createEvent({
-          start, end,
+          start,
+          end,
           summary: subject,
           description: lecturer,
           location: urls[0] ?? ''
         });
       }).join(''));
     return text;
-  } 
+  }
 
-  public static fromTimetable(timetable: TimetableItem[], subgroup: 1 | 2, curWeek: 1 | 2): string {
+  public static fromTimetable (timetable: TimetableItem[], subgroup: 1 | 2, curWeek: 1 | 2): string {
     const text = this.createICSFile(
       timetable.map((
-        {day, number, subject, lecturer, location, urls, isFirstWeek, isSecondWeek, isFirstSubgroup, isSecondSubgroup}
+        { day, number, subject, lecturer, location, urls, isFirstWeek, isSecondWeek, isFirstSubgroup, isSecondSubgroup }
       ) => {
         if (isSecondSubgroup !== (subgroup === 2) && !(isFirstSubgroup && isSecondSubgroup)) return null;
         const date = new Date();
         const daysUntilNextDayOfWeek = (day - new Date().getDay() + 7) % 7;
         date.setDate(
-          date.getDate() + 
-          daysUntilNextDayOfWeek + 
+          date.getDate() +
+          daysUntilNextDayOfWeek +
           ((isSecondWeek === (curWeek === 2) && (isFirstSubgroup && isSecondSubgroup)) ? 7 : 0)
         );
         const [start, end] = this.lessonNumberToICSTime(date, number);
@@ -51,31 +51,33 @@ export default class ISCFile {
         const lectureLocation = lecturer.split(',')[1];
 
         return this.createEvent({
-          start, end,
+          start,
+          end,
           summary: subject,
-          description: location.replaceAll(/,./g, '').trim() + ", " + lecturer.trim().replace(/,$/, '') + " " + (urls[0] ?? ''),
+          description: location.replaceAll(/,./g, '').trim() + ', ' +
+            lecturer.trim().replace(/,$/, '') + ' ' + (urls[0] ?? ''),
           location: formatLocationForGoogleMaps(lectureLocation),
-          rrule,
+          rrule
         });
-    }).filter(Boolean).join(''));
+      }).filter(Boolean).join(''));
     return text;
   }
 
-  private static getRRULE(
+  private static getRRULE (
     isFirstWeek: boolean,
-    isSecondWeek: boolean, 
-    curWeek: 1 | 2,
+    isSecondWeek: boolean,
+    curWeek: 1 | 2
   ): string {
     const date = new Date();
     const LAST_MONTH_TERM_1 = 5; // June
     const LAST_MONTH_TERM_2 = 11; // December
-    const FIRST_MONTH_TERM_2 = 7; // September 
+    const FIRST_MONTH_TERM_2 = 7; // September
 
     const isHoliday = (month: number) => month >= LAST_MONTH_TERM_1 && month < FIRST_MONTH_TERM_2;
 
     const currentMonth = date.getMonth();
     let month;
-  
+
     if (isHoliday(currentMonth)) {
       month = currentMonth + 1;
     } else if (currentMonth <= LAST_MONTH_TERM_1) {
@@ -86,9 +88,9 @@ export default class ISCFile {
 
     const lastMonth = new Date(date.getFullYear(), month, 0);
     const weeksToLastMonth = weeksLeftToDate(lastMonth);
-    const halfWeeksToLastMonth = 
-      (week: 1|2) => curWeek === week 
-        ? Math.ceil(weeksToLastMonth / 2) 
+    const halfWeeksToLastMonth =
+      (week: 1 | 2) => curWeek === week
+        ? Math.ceil(weeksToLastMonth / 2)
         : Math.floor(weeksToLastMonth / 2);
     if (isFirstWeek && isSecondWeek) {
       return 'FREQ=WEEKLY;INTERVAL=1;COUNT=' + weeksToLastMonth;
@@ -101,16 +103,16 @@ export default class ISCFile {
     }
   }
 
-  private static lessonNumberToICSTime(date: Date, number: number) {
+  private static lessonNumberToICSTime (date: Date, number: number) {
     if (!lessonsTimes[number - 1]) throw new Error(`Invalid lesson number: ${number}`);
-    const {start, end} = lessonsTimes[number - 1]!;
+    const { start, end } = lessonsTimes[number - 1]!;
     const startTime = toTFormattedString(date, start);
     const endTime = toTFormattedString(date, end);
     return [startTime, endTime] as const;
   }
 
-  private static createICSFile(content: string) {
-    return  `BEGIN:VCALENDAR
+  private static createICSFile (content: string) {
+    return `BEGIN:VCALENDAR
 PRODID:Calendar
 VERSION:2.0
 BEGIN:VTIMEZONE
@@ -133,13 +135,13 @@ ${content}
 END:VCALENDAR`;
   }
 
-  private static createEvent({start, end, summary, description, location, rrule}: {
-    start: string,
-    end: string,
-    summary: string,
-    description: string,
-    location?: string,
-    rrule?: string,
+  private static createEvent ({ start, end, summary, description, location, rrule }: {
+    start: string
+    end: string
+    summary: string
+    description: string
+    location?: string
+    rrule?: string
   }) {
     return `
 BEGIN:VEVENT
@@ -147,8 +149,8 @@ DTSTART:${start}
 DTEND:${end}
 SUMMARY:${summary}
 DESCRIPTION:${description}\
-${location ? "\nLOCATION:" + location : ""}\
-${rrule ? "\nRRULE:" + rrule : ""}
+${location ? '\nLOCATION:' + location : ''}\
+${rrule ? '\nRRULE:' + rrule : ''}
 TRANSP:TRANSPARENT
 END:VEVENT`;
   }
