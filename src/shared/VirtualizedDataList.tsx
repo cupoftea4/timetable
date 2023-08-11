@@ -1,4 +1,4 @@
-import React, { type FC, useMemo } from 'react';
+import React, { type FC, useCallback } from 'react';
 import DatalistInput, { useComboboxControls } from 'react-datalist-input';
 
 type OwnProps = {
@@ -26,14 +26,22 @@ const VirtualizedDataList: FC<OwnProps> = ({
 }) => {
   const { value: inputValue, setValue: setInputValue } = useComboboxControls({ isExpanded: false });
   const [displayedCount, setDisplayedCount] = React.useState(initialDisplayedCount);
+  const SEARCH_REGEX = /[^\p{L}\p{N}]/gu;
 
-  const displayedOptions = useMemo(() => {
-    const timetables = options
-      .filter(({ value }) =>
-        value.toLocaleLowerCase().includes(inputValue.toLocaleLowerCase())
-      );
-    return timetables.slice(0, displayedCount);
-  }, [options, inputValue, displayedCount]);
+  const matchesSearch = (itemName: string, searchQuery: string) => {
+    searchQuery = searchQuery.toLocaleLowerCase().replace(SEARCH_REGEX, '');
+    return itemName?.toLocaleLowerCase()
+      .replace(SEARCH_REGEX, '')
+      .includes(searchQuery);
+  };
+
+  const filterFunction = useCallback(
+    // eslint-disable-next-line no-trailing-spaces
+    (timetableItems: Array<{ id: string, value: string }>, searchQuery: any) => timetableItems
+      .filter((item) => matchesSearch(item.value, searchQuery))
+      .slice(0, displayedCount),
+    [options, inputValue, displayedCount]
+  );
 
   const showMoreOptions = () => {
     setDisplayedCount(displayedCount + initialDisplayedCount);
@@ -62,7 +70,8 @@ const VirtualizedDataList: FC<OwnProps> = ({
         onSelect(item);
         clearOnSelect && setInputValue('');
       }}
-      items={displayedOptions}
+      items={options}
+      filters={[filterFunction]}
     />
   );
 };
