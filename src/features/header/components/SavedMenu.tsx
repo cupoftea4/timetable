@@ -95,7 +95,7 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
                   <span
                     className={styles.name}
                     title={isMerged(group)
-                      ? TimetableManager.cachedMergedTimetable?.timetableNames.join('+')
+                      ? TimetableManager.cachedMergedTimetable?.timetables?.join('+')
                       : group
                     }>
                     {getTimetableName(group)}

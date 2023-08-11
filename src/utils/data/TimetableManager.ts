@@ -254,7 +254,8 @@ class TimetableManager {
   }
 
   getMergedTimetable (timetablesToMerge?: string[]): RenderPromises<TimetableItem[]> {
-    const timetableNames = timetablesToMerge ?? this.mergedTimetable?.timetableNames;
+    const timetableNames = timetablesToMerge ?? this.mergedTimetable?.timetables ??
+      (this.mergedTimetable as any)?.timetableNames as string[]; // for backward compatibility
     if (!timetableNames) throw Error("Merge doesn't exist!");
     const timetables = timetableNames.map(el => ({ name: el, data: this.getTimetable(el) }));
     const cachePromises = timetables.map(({ name, data }) => data[0].then(timetable => ({ timetable, name })));
@@ -335,7 +336,7 @@ class TimetableManager {
       group: 'Мій розклад',
       time: Date.now(),
       subgroup: 1,
-      timetableNames: timetablesToMerge
+      timetables: timetablesToMerge
     };
     return storage.setItem(MERGED_TIMETABLE, this.mergedTimetable);
   }

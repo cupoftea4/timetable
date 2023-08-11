@@ -45,7 +45,7 @@ const TimetableHeader: FC<OwnProps> = ({
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
     const path = isMerged(group) && TimetableManager.cachedMergedTimetable
-      ? TimetableManager.cachedMergedTimetable.timetableNames.find(t => {
+      ? TimetableManager.cachedMergedTimetable.timetables?.find(t => {
         const type = TimetableManager.tryToGetType(t);
         return type === 'timetable' || type === 'lecturer';
       }) ?? group
