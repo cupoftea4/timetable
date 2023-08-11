@@ -99,6 +99,7 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
                       addTimetableToMerge(item.value);
                     }}
                     options={options}
+                    ignoreSpecialCharacters
                   />
                 }
             </div>

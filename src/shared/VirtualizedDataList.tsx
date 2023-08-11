@@ -1,9 +1,15 @@
 import React, { type FC, useCallback } from 'react';
 import DatalistInput, { useComboboxControls } from 'react-datalist-input';
 
+type DataListOption = {
+  id: string
+  value: string
+};
+
 type OwnProps = {
-  options: Array<{ id: string, value: string }>
-  onSelect: (item: { id: string, value: string }) => void
+  options: DataListOption[]
+  onSelect: (item: DataListOption) => void
+  ignoreSpecialCharacters?: boolean
   clearOnSelect?: boolean
   containerRef?: React.RefObject<HTMLDivElement>
   label?: string
@@ -13,11 +19,14 @@ type OwnProps = {
   autoFocus?: boolean
 };
 
+const SPECIAL_CHARACTERS_REGEX = /[^\p{L}\p{N}]/gu;
+
 const VirtualizedDataList: FC<OwnProps> = ({
   options,
   onSelect,
   className,
   containerRef,
+  ignoreSpecialCharacters = false,
   clearOnSelect = false,
   label = '',
   placeholder = '',
@@ -26,22 +35,23 @@ const VirtualizedDataList: FC<OwnProps> = ({
 }) => {
   const { value: inputValue, setValue: setInputValue } = useComboboxControls({ isExpanded: false });
   const [displayedCount, setDisplayedCount] = React.useState(initialDisplayedCount);
-  const SEARCH_REGEX = /[^\p{L}\p{N}]/gu;
 
-  const matchesSearch = (itemName: string, searchQuery: string) => {
-    searchQuery = searchQuery.toLocaleLowerCase().replace(SEARCH_REGEX, '');
-    return itemName?.toLocaleLowerCase()
-      .replace(SEARCH_REGEX, '')
-      .includes(searchQuery);
+  const matchesSearch = (itemName: string, searchQuery?: string) => {
+    if (!searchQuery) return true;
+    if (ignoreSpecialCharacters) {
+      const query = searchQuery.toLocaleLowerCase().replace(SPECIAL_CHARACTERS_REGEX, '');
+      return itemName.toLocaleLowerCase()
+        .replace(SPECIAL_CHARACTERS_REGEX, '')
+        .includes(query);
+    }
+    return itemName.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase());
   };
 
-  const filterFunction = useCallback(
-    // eslint-disable-next-line no-trailing-spaces
-    (timetableItems: Array<{ id: string, value: string }>, searchQuery: any) => timetableItems
-      .filter((item) => matchesSearch(item.value, searchQuery))
+  const filterOptions = useCallback((datalistItems: DataListOption[], searchQuery?: string) =>
+    datalistItems
+      .filter(item => matchesSearch(item.value, searchQuery))
       .slice(0, displayedCount),
-    [options, inputValue, displayedCount]
-  );
+  [options, inputValue, displayedCount]);
 
   const showMoreOptions = () => {
     setDisplayedCount(displayedCount + initialDisplayedCount);
@@ -49,8 +59,18 @@ const VirtualizedDataList: FC<OwnProps> = ({
 
   return (
     <DatalistInput
-      inputProps={{
-        autoFocus
+      value={inputValue}
+      setValue={setInputValue}
+      ref={containerRef}
+      className={className}
+      placeholder={placeholder}
+      label={label}
+      items={options}
+      filters={[filterOptions]}
+      inputProps={{ autoFocus }}
+      onSelect={item => {
+        onSelect(item);
+        clearOnSelect && setInputValue('');
       }}
       listboxProps={{
         onScroll: (e) => {
@@ -60,18 +80,6 @@ const VirtualizedDataList: FC<OwnProps> = ({
           }
         }
       }}
-      value={inputValue}
-      setValue={setInputValue}
-      ref={containerRef}
-      className={className}
-      placeholder={placeholder}
-      label={label}
-      onSelect={item => {
-        onSelect(item);
-        clearOnSelect && setInputValue('');
-      }}
-      items={options}
-      filters={[filterFunction]}
     />
   );
 };

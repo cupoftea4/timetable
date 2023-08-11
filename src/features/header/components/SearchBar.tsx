@@ -32,6 +32,7 @@ const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
           options={options}
           onSelect={item => { navigate(`/${item.value}`); }}
           placeholder="Розклад..."
+          ignoreSpecialCharacters
          />
       </span>
     </span>
