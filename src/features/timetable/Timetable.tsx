@@ -14,8 +14,14 @@ type OwnProps = {
 };
 
 const MINUTE = 60 * 1000;
+const SECOND_SHIFT_START = 4;
 
 const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, cellSubgroup }) => {
+  const minLessonNumber = useMemo(() =>
+    (timetable?.reduce((min, item) => item.number < min ? item.number : min, 0) || 0) < SECOND_SHIFT_START
+      ? 0
+      : SECOND_SHIFT_START,
+  [timetable]);
   const maxLessonNumber = useMemo(() =>
     timetable?.reduce((max, item) => item.number > max ? item.number : max, 0) || 0,
   [timetable]);
@@ -24,7 +30,7 @@ const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, ce
   [timetable]);
 
   const timetableLessonsTimes = useMemo(() =>
-    lessonsTimes.slice(0, maxLessonNumber),
+    lessonsTimes.slice(minLessonNumber, maxLessonNumber),
   [maxLessonNumber]);
 
   const days = useMemo(() =>

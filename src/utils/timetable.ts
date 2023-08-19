@@ -13,14 +13,14 @@ const UPDATE_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 const lessonsComparator = (a: TimetableItem, b: TimetableItem) => a.subject === b.subject && a.lecturer === b.lecturer;
 
 export const lessonsTimes: ReadonlyArray<{ readonly start: string, readonly end: string }> = [
-  { start: '8:30', end: '10:05' },
-  { start: '10:20', end: '11:55' },
-  { start: '12:10', end: '13:45' },
-  { start: '14:15', end: '15:50' },
-  { start: '16:00', end: '17:35' },
-  { start: '17:40', end: '19:15' },
-  { start: '19:20', end: '20:55' },
-  { start: '21:00', end: '22:35' }
+  { start: '8:30', end: '9:50' },
+  { start: '10:05', end: '11:25' },
+  { start: '11:40', end: '13:00' },
+  { start: '13:15', end: '14:35' },
+  { start: '14:50', end: '16:10' },
+  { start: '16:25', end: '17:45' },
+  { start: '18:00', end: '19:20' },
+  { start: '19:30', end: '20:50' }
 ];
 
 export function mergeTimetables (timetables: Array<{ name: string, timetable: TimetableItem[] | undefined | null }>) {
