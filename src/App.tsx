@@ -16,7 +16,6 @@ import { Status } from './types/utils';
   - fix light theme
   - fix timetable-data to work even if something goes wrong (like institutes fetching)
   - github actions to commit only diff
-  - probably fix different horizontal spacing between lectures
  */
 
 const App = () => {

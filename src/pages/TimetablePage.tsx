@@ -137,7 +137,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
                       timetable={timetable ?? []}
                       isSecondWeek={isSecondWeek}
                       isSecondSubgroup={isSecondSubgroup}
-                      cellSubgroup={isLecturers}
+                      hasCellSubgroups={isLecturers}
                     />
                   : examsTimetable?.length === 0
                     ? <p>Розклад екзаменів пустий</p>
