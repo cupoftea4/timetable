@@ -2,9 +2,9 @@ import { type FC, memo, type ReactNode } from 'react';
 import TimetableLessonInfo from './TimetableLessonInfo';
 import { useDelayedProp } from '@/hooks/useDelayedProp';
 import { generateId, lessonsTimes } from '@/utils/timetable';
-import styles from './TimetableCell.module.scss';
 import { classes } from '@/styles/utils';
 import type { TimetableItem } from '@/types/timetable';
+import styles from './TimetableLesson.module.scss';
 
 type OwnProps = {
   lessons: TimetableItem[] | null

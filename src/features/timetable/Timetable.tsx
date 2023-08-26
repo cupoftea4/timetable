@@ -3,7 +3,7 @@ import TimetableLesson from './components/TimetableLesson';
 import useWindowDimensions from '@/hooks/useWindowDimensions';
 import { lessonsTimes, unique } from '@/utils/timetable';
 import { getCurrentUADate, stringToDate } from '@/utils/date';
-import { DEVELOP, TABLET_SCREEN_BREAKPOINT } from '@/utils/constants';
+import { DEVELOP, TIMETABLE_SCREEN_BREAKPOINT } from '@/utils/constants';
 import type { TimetableItem } from '@/types/timetable';
 import { classes } from '@/styles/utils';
 import styles from './Timetable.module.scss';
@@ -19,7 +19,7 @@ const MINUTE = 60 * 1000;
 
 const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, hasCellSubgroups }) => {
   const { width } = useWindowDimensions();
-  const isMobile = width < TABLET_SCREEN_BREAKPOINT;
+  const isMobile = width < TIMETABLE_SCREEN_BREAKPOINT;
   const maxLessonNumber = useMemo(() =>
     timetable?.reduce((max, item) => item.number > max ? item.number : max, 0) || 0,
   [timetable]);

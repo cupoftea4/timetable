@@ -14,6 +14,7 @@ $cell-border-radius: .625rem;
 
 .cell-container {
   position: relative;
+  margin-block: 0.5rem;
   --bg-alpha: 0.05;
 
   --lab-clr: #{hsl-list($timetable-lab-hsl)};
