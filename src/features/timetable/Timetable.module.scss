@@ -60,4 +60,8 @@
       z-index: 10 - $i;
     }
   }
+
+  &.lists {
+    display: flex;
+  }
 }

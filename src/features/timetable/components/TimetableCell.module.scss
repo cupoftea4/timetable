@@ -12,7 +12,7 @@ $cell-border-radius: .625rem;
   @return hsla($hsl, var(--bg-alpha));
 }
 
-.timetable-td {
+.cell-container {
   position: relative;
   --bg-alpha: 0.05;
 
@@ -87,8 +87,8 @@ $cell-border-radius: .625rem;
     @include timetable-mobile {
       width: calc(100% - 0.125rem * 2);
       height: $spacer-height;
-      position: relative;
-      transform: translateY(calc(#{$spacer-height} ));
+      // position: relative;
+      // transform: translateY(calc(#{$spacer-height} ));
       border-radius: $cell-border-radius $cell-border-radius 0 0;
       margin: 0 .125rem;
       z-index: 5;
@@ -139,7 +139,7 @@ $cell-border-radius: .625rem;
       display: flex;
       flex-direction: column;
       gap: 0.25rem;
-      padding: 0.625rem 0.5rem 0;
+      padding: 0.625rem 0.625rem 0.125rem;
       margin-left: $spacer-width;
       @include timetable-mobile {
         margin-left: 0;

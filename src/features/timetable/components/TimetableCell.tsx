@@ -40,7 +40,7 @@ const TimetableCell: FC<OwnProps> = ({ lessons, active, cellSubgroup, isAfterEmp
         ? (
           <td className={
               classes(
-                styles['timetable-td'],
+                styles['cell-container'],
                 active && styles.active,
                 styles[`color-${innerLessons.length}`],
                 !shouldAppear && !lessons ? styles.hide : styles.show

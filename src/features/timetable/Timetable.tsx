@@ -1,10 +1,13 @@
 import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
 import TimetableCell from './components/TimetableCell';
+import TimetableListItem from './components/TimetableListItem';
+import useWindowDimensions from '@/hooks/useWindowDimensions';
 import { lessonsTimes, unique } from '@/utils/timetable';
 import { getCurrentUADate, stringToDate } from '@/utils/date';
-import styles from './Timetable.module.scss';
+import { TABLET_SCREEN_BREAKPOINT } from '@/utils/constants';
 import type { TimetableItem } from '@/types/timetable';
 import { classes } from '@/styles/utils';
+import styles from './Timetable.module.scss';
 
 type OwnProps = {
   timetable: TimetableItem[]
@@ -16,6 +19,8 @@ type OwnProps = {
 const MINUTE = 60 * 1000;
 
 const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, cellSubgroup }) => {
+  const { width } = useWindowDimensions();
+  const isMobile = width < TABLET_SCREEN_BREAKPOINT;
   const maxLessonNumber = useMemo(() =>
     timetable?.reduce((max, item) => item.number > max ? item.number : max, 0) || 0,
   [timetable]);
@@ -84,17 +89,41 @@ const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, ce
     return table;
   }, [timetableLessonsTimes, timetable, days, getLessonsByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
 
+  const listsContent = useMemo(() => {
+    console.log('Running scary useMemo');
+    const lists = days.filter(Boolean).map((day, i) =>
+      <div key={i} className={styles.list}>
+        <h3>{day}</h3>
+        <ol className={styles.list}>{
+          timetableLessonsTimes.map((time, j) =>
+            <TimetableListItem
+              lessons={getLessonsByDayAndTime(j + 1, i + 1)}
+              active={currentLessonNumber === i && currentDay === j}
+              key={time.start + day}
+              cellSubgroup={cellSubgroup}
+            />
+          )
+        }</ol>
+      </div>
+    );
+    return lists;
+  }, []);
+
   return (
-    <table className={styles.timetable}>
-      <thead>
-        <tr>
-          {days.map((day, index) => <th key={index}>{day}</th>)}
-        </tr>
-      </thead>
-      <tbody>
-        {tableContent}
-      </tbody>
-     </table>
+    isMobile
+      ? <div className={classes(styles.timetable, styles.lists)}>
+          {listsContent}
+        </div>
+      : <table className={styles.timetable}>
+          <thead>
+            <tr>
+              {days.map((day, index) => <th key={index}>{day}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {tableContent}
+          </tbody>
+        </table>
   );
 };
 
