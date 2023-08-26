@@ -98,7 +98,7 @@ const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, ha
     if (DEVELOP) console.log('Running scary useMemo');
     const lists = days.filter(Boolean).map((day, i) =>
       <div key={i} className={styles.list}>
-        <h3>{day}</h3>
+        <h3 className={styles['day-title']}>{day}</h3>
         <ol className={styles.list}>{
           timetableLessonsTimes.map((time, j) =>
             <TimetableLesson
