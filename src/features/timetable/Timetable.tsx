@@ -66,6 +66,7 @@ const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, ce
   }, [timetable, isSecondSubgroup, isSecondWeek, cellSubgroup]);
 
   const tableContent = useMemo(() => {
+    if (isMobile) return null;
     console.log('Running scary useMemo');
     const table = timetableLessonsTimes.map((time, i) =>
       <tr key={time.start}>{
@@ -90,6 +91,7 @@ const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, ce
   }, [timetableLessonsTimes, timetable, days, getLessonsByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
 
   const listsContent = useMemo(() => {
+    if (!isMobile) return null;
     console.log('Running scary useMemo');
     const lists = days.filter(Boolean).map((day, i) =>
       <div key={i} className={styles.list}>
@@ -98,7 +100,7 @@ const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, ce
           timetableLessonsTimes.map((time, j) =>
             <TimetableListItem
               lessons={getLessonsByDayAndTime(j + 1, i + 1)}
-              active={currentLessonNumber === i && currentDay === j}
+              active={currentLessonNumber === j && currentDay === i + 1}
               key={time.start + day}
               cellSubgroup={cellSubgroup}
             />
@@ -107,7 +109,7 @@ const Timetable: FC<OwnProps> = ({ timetable, isSecondSubgroup, isSecondWeek, ce
       </div>
     );
     return lists;
-  }, []);
+  }, [timetableLessonsTimes, timetable, days, getLessonsByDayAndTime, currentLessonNumber, currentDay, cellSubgroup]);
 
   return (
     isMobile

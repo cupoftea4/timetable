@@ -168,8 +168,17 @@ $cell-border-radius: .625rem;
       }
     }
   }
-  td.active {
+}
+
+// Active lesson cell
+@include min-timetable-mobile {
+  .cell-container.active, .active {
     background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+@include timetable-mobile {
+  .cell-container.active .cell {
+    filter: brightness(150%);
   }
 }
 
