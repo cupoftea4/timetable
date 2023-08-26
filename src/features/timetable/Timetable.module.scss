@@ -60,4 +60,12 @@
       z-index: 10 - $i;
     }
   }
+
+  &.lists {
+    display: flex;
+    .day-title {
+      font-size: larger;
+      margin: 0 0 .5rem .625rem;
+    }
+  }
 }

@@ -41,4 +41,3 @@ $themes: (
 @mixin background-color($arguments...) {
   @include themify('background-color', $arguments...);
 }
-
