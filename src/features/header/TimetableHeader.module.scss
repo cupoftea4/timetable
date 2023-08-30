@@ -8,7 +8,7 @@
 
 .params {
   @include flex-center;
-  gap: 1rem;
+  gap: .5rem;
   flex-wrap: wrap;
   @include timetable-mobile {
     width: 100%;

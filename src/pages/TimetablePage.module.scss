@@ -27,7 +27,7 @@
       overflow-y: hidden;
       scroll-snap-type: x mandatory;
       max-width: 90vw;
-      td, th {
+      td, th, ol {
         $external-padding: calc(env(safe-area-inset-right) + env(safe-area-inset-left) + $main-padding * 2);
         min-width: min(90vw, 100vw - $external-padding);
         scroll-snap-align: center;
