@@ -79,8 +79,9 @@ class TimetableParser {
   public parseTimetable (html: string) {
     const table = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
     if (!table) throw Error('No table found');
-    const days = Array.from(table.children);
-    const timetable = days.map((day) => this.parseDay(day)).flat(1);
+    const timetable = this.parseTimetableV2(table);
+    // const days = Array.from(table.children);
+    // const timetable = days.map((day) => this.parseDay(day)).flat(1);
     if (timetable.length === 0) throw Error('Timetable is empty');
     return timetable;
   }
@@ -144,7 +145,37 @@ class TimetableParser {
     return (days.indexOf(day.toLowerCase()) + 1) || -1;
   }
 
+  private parseTimetableV2 (table: Element) {
+    const contentChildren = table.children ?? [];
+
+    let lessons: TimetableItem[] = [], currentLesson = 0, currentDay: number | undefined;
+
+    for (let i = 0; i < contentChildren.length; i++) {
+      const child = contentChildren[i];
+      if (child?.classList.contains('view-grouping-header')) {
+        currentDay = this.dayToNumber(child?.textContent ?? '');
+      } else if (child?.tagName === 'H3') {
+        currentLesson = Number.parseInt(child?.textContent ?? '0');
+      } else if (child?.classList.contains('stud_schedule')) {
+        const pairs = this.parsePair(child);
+        if (currentLesson === 0) console.warn('Lesson number is 0!', child);
+        if (currentDay === undefined) throw Error('Got wrong DOM structure for timetable: no day');
+
+        for (const lesson of pairs) {
+          lesson.day = currentDay;
+          lesson.number = currentLesson;
+        }
+
+        lessons = lessons.concat(pairs);
+      } else {
+        throw Error('Got wrong DOM structure for timetable: unknown child');
+      }
+    }
+    return lessons;
+  }
+
   private parseDay (day: Element) {
+    console.log(day);
     const dayText = day.querySelector('.view-grouping-header');
     if (!dayText) {
       throw Error('Got wrong DOM structure for day!');
@@ -186,7 +217,7 @@ class TimetableParser {
 
       const lesson: TimetableItem = {
         ...data,
-        type: this.tryToGetType(data.location),
+        type: this.tryToGetType(element.textContent ?? ''),
         ...meta,
         day: -1,
         number: -1
@@ -213,10 +244,16 @@ class TimetableParser {
         texts.push(node.textContent);
       }
     }
+
+    const parts = texts[1]!.split(',');
+    if (parts.length !== 3) {
+      parts[0] = texts[1]!;
+      parts[1] = '';
+    }
     return {
       subject: texts[0] ?? '',
-      lecturer: texts[1] ?? '',
-      location: texts[2] ?? '',
+      lecturer: parts[0] ?? '',
+      location: parts[1] ?? '',
       urls: lessonUrls
     };
   }

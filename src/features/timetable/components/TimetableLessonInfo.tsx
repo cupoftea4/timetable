@@ -3,6 +3,7 @@ import TimetableLink from '../ui/TimetableLink';
 import type { TimetableItem } from '@/types/timetable';
 import { classes } from '@/styles/utils';
 import styles from './TimetableLesson.module.scss';
+import { getDisplayType } from '@/utils/timetable';
 
 type OwnProps = {
   lesson: TimetableItem
@@ -12,6 +13,13 @@ type OwnProps = {
 
 const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) => {
   const isForBothSubgroups = lesson.isFirstSubgroup && lesson.isSecondSubgroup;
+
+  const cleanupInfoString = (str: string) => {
+    return str.replaceAll(/Лекція|Практична|Лабораторна/giu, '').trim().replace(/,$/, '');
+  };
+
+  const lecturer = cleanupInfoString(lesson.lecturer);
+  const location = cleanupInfoString(lesson.location);
 
   return (
     <>
@@ -25,10 +33,10 @@ const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) =
             </span>}
           <span className={styles.title}>
             <h2 className={styles.name}>{lesson.subject.replace('`', '’')}</h2>
-            {lesson.lecturer.trim().replace(/,$/, '')}
+            {lecturer + (location && ', ' + location)}
           </span>
           <span className={styles.extra}>
-            {lesson.location.replaceAll(/,./g, '').trim()}
+            {getDisplayType(lesson.type)}
             <TimetableLink urls={lesson.urls} type={lesson.type} />
           </span>
         </div>

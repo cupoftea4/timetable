@@ -5,6 +5,7 @@ import type {
   ExamsTimetableItem,
   MergedTimetableItem,
   TimetableItem,
+  TimetableItemType,
   TimetableType
 } from '@/types/timetable';
 
@@ -136,4 +137,15 @@ export function generateId (item: TimetableItem) {
   const data = fields.join('|');
   const hash = hashCode(data);
   return hash.toString();
+}
+
+const timetableItemDisplayTypes: Record<TimetableItemType, string> = {
+  lection: 'Лекція',
+  practical: 'Практична',
+  lab: 'Лабораторна',
+  consultation: 'Консультація'
+};
+
+export function getDisplayType (type: TimetableItemType) {
+  return timetableItemDisplayTypes[type];
 }

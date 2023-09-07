@@ -3,7 +3,10 @@ import Parser from './Parser';
 import type { LPNUTimetableType, TimetableType } from '@/types/timetable';
 
 const NULP_STUDENTS = 'https://student.lpnu.ua/';
+const NULP_STUDENTS_2023 = 'https://student2023.lpnu.ua/';
 const NULP_STAFF = 'https://staff.lpnu.ua/';
+const NULP_STAFF_2023 = 'https://staff2023.lpnu.ua/';
+const CURRENT_SEMESTER = '1';
 
 const PROXY: string = import.meta.env.VITE_PROXY;
 
@@ -29,16 +32,20 @@ const timetableSuffixes: Record<LPNUTimetableType, LPNURequestSuffix> = {
 };
 
 type StudentParams = {
-  departmentparent_abbrname_selective: string
-  studygroup_abbrname_selective?: string
+  departmentparent_abbrname_selective?: string
+
+  studygroup_abbrname?: string
+  semestr: '1' | '2'
   semestrduration?: '1' | '2' | '3'
 };
 
 type LecturerParams = {
   department_name_selective: string
-  teachername_selective?: string
   assetbuilding_name_selective?: 'весь семестр'
-  semestr_selective?: '1' | '2'
+
+  teachername?: string
+  semestr?: '1' | '2'
+  semestrduration?: '1' | '2' | '3'
 };
 
 type ExamsStudentParams = {
@@ -73,7 +80,11 @@ export default class LPNUData {
     params: LPNURequestParams = null,
     suffix: LPNURequestSuffix = TIMETABLE_SUFFIX
   ) {
-    const origin = isLecturer(suffix) ? NULP_STAFF : NULP_STUDENTS;
+    const isExams = suffix.includes('exam');
+    const origin = isLecturer(suffix)
+      ? isExams ? NULP_STAFF : NULP_STAFF_2023
+      : isExams ? NULP_STUDENTS : NULP_STUDENTS_2023;
+
     const built = buildURL(origin + suffix, params);
     const proxiedUrl = PROXY + built;
     return timeout(TIMEOUT, fetch(proxiedUrl)).then(response => {
@@ -106,6 +117,7 @@ export default class LPNUData {
 
   static getGroups (institute = 'All') {
     return this.fetchHTML({
+      semestr: CURRENT_SEMESTER,
       departmentparent_abbrname_selective: institute
     }).then(Parser.parseGroups.bind(Parser));
   }
@@ -114,6 +126,7 @@ export default class LPNUData {
     const semesterParam = semesterHalf === 1 ? '2' : '3';
     return this.fetchHTML({
       departmentparent_abbrname_selective: institute,
+      semestr: CURRENT_SEMESTER,
       semestrduration: semesterParam
     }, TIMETABLE_SUFFIX).then(Parser.parsePartialGroups.bind(Parser));
   }
@@ -122,15 +135,14 @@ export default class LPNUData {
     const suffix = timetableSuffixes[type];
     if (suffix === LECTURER_SUFFIX) {
       return this.fetchHTML({
-        department_name_selective: timetableCategory,
-        teachername_selective: timetableName,
-        semestr_selective: '2',
-        assetbuilding_name_selective: 'весь семестр'
+        teachername: timetableName,
+        semestr: CURRENT_SEMESTER,
+        semestrduration: '1' // Why, NULP?
       }, LECTURER_SUFFIX).then(Parser.parseTimetable.bind(Parser));
     }
     return this.fetchHTML({
-      departmentparent_abbrname_selective: timetableCategory,
-      studygroup_abbrname_selective: timetableName,
+      studygroup_abbrname: timetableName.toLowerCase(),
+      semestr: CURRENT_SEMESTER,
       semestrduration: '1' // Why, NULP?
     }, suffix).then(Parser.parseTimetable.bind(Parser));
   }
