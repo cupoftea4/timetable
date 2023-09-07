@@ -5,3 +5,7 @@
 [2.1.5] - 2023-08-27
 - Removed unnecessary vertical spacing between lessons on mobile view
 - Fixed active lesson highlight 
+
+[2.5.0] - 2023-09-08
+- Moved to 2023 lpnu.ua version
+- Some SEO
