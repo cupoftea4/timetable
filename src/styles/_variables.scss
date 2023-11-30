@@ -1,10 +1,11 @@
+@use '_utils.scss' as *;
 
 :root {
   --max-app-width: 90rem;
   --accent-clr: hsla(0, 0%, 100%, 0.15);
   --text-clr: hsla(0, 0%, 100%, 1);
   --border-clr: hsla(209, 94%, 94%, 0.139);
-  @media screen and (prefers-color-scheme: dark) {
+  @include dark-mode(":root") {
     --accent-clr: hsla(0, 0%, 100%, 0.15);
     --text-clr: hsla(0, 0%, 100%, 0.9);
   }
@@ -27,7 +28,7 @@ $bg-theme-dark-2: linear-gradient(45deg, hsl(231, 33%, 39%), hsl(240, 32%, 9%));
 $bg-theme-light-1: linear-gradient(45deg, hsl(230, 40%, 43%), hsl(162, 58%, 54%));
 $bg-theme-light-2: linear-gradient(45deg, hsl(292, 64%, 53%), hsl(212, 98%, 63%), hsl(54, 73%, 47%));
 $bg-theme-light-3: linear-gradient(110deg, hsl(227, 47%, 34%), hsl(0, 31%, 58%));
-$bg-theme-light-4: linear-gradient(145deg, #9B3838, #292F6A);
+$bg-theme-light-4: linear-gradient(145deg, hsl(0, 47%, 41%), hsl(234, 44%, 29%));
 
 $border-radius: .625rem;
 

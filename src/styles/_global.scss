@@ -1,4 +1,6 @@
+@use '_utils.scss' as *;
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,700;1,700&display=swap');
+
 
 :root {
   @include tablet {
@@ -46,22 +48,11 @@ body {
   
   font-weight: $regular-font;
   
-  @media screen and (prefers-color-scheme: dark) {
-    --background-start-rgb: 0, 00, 10;
-    --background-end-rgb: 0, 0, 10;
 
-    background: linear-gradient(
-        to bottom,
-        transparent,
-        rgb(var(--background-end-rgb))
-      )
-      rgb(var(--background-start-rgb)
-    );
-  }
   color: var(--text-clr);
   main {
     padding: $main-padding;
-    @media screen and (prefers-color-scheme: dark) {
+    @include dark-mode("main") {
       &::before {
         content: '';
         left: 50%;
@@ -80,7 +71,18 @@ body {
    
   }
 }
+@include dark-mode("body") {
+  --background-start-rgb: 0, 00, 10;
+  --background-end-rgb: 0, 0, 10;
 
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb)
+  );
+}
 .toast {
   font-size: 16px;
 }
