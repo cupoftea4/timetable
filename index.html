@@ -23,6 +23,7 @@
     <script>
       window.addEventListener("load", () => {
         if ("serviceWorker" in navigator) {
+          console.log("Registering service worker...", window.APP_VERSION);
           navigator.serviceWorker.register("/sw.js?v=" + window.APP_VERSION)
             .then(registration => {
               console.log("Service worker registered with scope:", registration.scope);
