@@ -220,7 +220,8 @@ class TimetableManager {
     }
 
     const fetchData: ActualPromise<ExamsTimetableItem[]> = LPNUData.getExamsTimetable(timetableType, groupName)
-      .catch(() => {
+      .catch((e) => {
+        console.warn('LPNU API is not working!', e);
         cacheData.then(t => this.saveExamsLocally(groupName, t));
         Toast.warn('Data is possibly outdated!');
         return null;

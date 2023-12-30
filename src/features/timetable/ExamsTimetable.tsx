@@ -4,6 +4,7 @@ import { LVIV_TIMEZONE } from '@/utils/date';
 import { classes } from '@/styles/utils';
 import styles from './ExamsTimetable.module.scss';
 import type { ExamsTimetableItem } from '@/types/timetable';
+import { lessonsTimes } from '@/utils/timetable';
 
 type OwnProps = {
   exams: ExamsTimetableItem[]
@@ -26,7 +27,7 @@ const ExamsTimetable: FC<OwnProps> = ({ exams }) => {
                 { timeZone: LVIV_TIMEZONE, weekday: 'long', day: 'numeric', month: 'long' }
               )}
             </p>
-            <p>{exam.number} пара</p>
+            <p>{exam.number} пара ({lessonsTimes[exam.number - 1]?.start})</p>
           </div>
           <h3>{exam.subject}</h3>
           <div className={styles.bottom}>

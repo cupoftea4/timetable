@@ -4,6 +4,7 @@ const DYNAMIC_CACHE_NAME_PREFIX  = "d-app-v";
 const urlParams = new URLSearchParams(location.search);
 const CURRENT_CACHE_VERSION = urlParams.get("v");
 const DYNAMIC_CACHE_NAME  = `${DYNAMIC_CACHE_NAME_PREFIX}${CURRENT_CACHE_VERSION}`;
+console.log(DYNAMIC_CACHE_NAME);
 const SERVER_FILE_NAME = "get.php";
 
 function shouldCache(request, response) {
@@ -15,6 +16,10 @@ function shouldCache(request, response) {
          url === location.origin  + '/manifest.json' ||
          ((url.startsWith(location.origin  + '/') && responseType.includes("text/html")) ? "home" : false);
 }
+
+self.addEventListener('install', function(event) {
+  event.waitUntil(self.skipWaiting()); // This will skip the waiting phase.
+});
 
 self.addEventListener('activate', event => {
   event.waitUntil(

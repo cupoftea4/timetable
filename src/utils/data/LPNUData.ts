@@ -2,9 +2,9 @@ import { timeout } from '@/utils/promises';
 import Parser from './Parser';
 import type { LPNUTimetableType, TimetableType } from '@/types/timetable';
 
-const NULP_STUDENTS = 'https://student.lpnu.ua/';
+// const NULP_STUDENTS = 'https://student.lpnu.ua/';
 const NULP_STUDENTS_2023 = 'https://student2023.lpnu.ua/';
-const NULP_STAFF = 'https://staff.lpnu.ua/';
+// const NULP_STAFF = 'https://staff.lpnu.ua/';
 const NULP_STAFF_2023 = 'https://staff2023.lpnu.ua/';
 const CURRENT_SEMESTER = '1';
 
@@ -49,13 +49,13 @@ type LecturerParams = {
 };
 
 type ExamsStudentParams = {
-  studygroup_abbrname_selective: string
-  departmentparent_abbrname_selective: string
+  studygroup_abbrname: string
+  departmentparent_abbrname_selective?: string
 };
 
 type ExamsLecturerParams = {
-  teachername_selective: string
-  namedepartment_selective: string
+  teachername: string
+  namedepartment_selective?: string
 };
 
 type LPNURequestParams = StudentParams | LecturerParams | ExamsStudentParams | ExamsLecturerParams | null;
@@ -80,10 +80,9 @@ export default class LPNUData {
     params: LPNURequestParams = null,
     suffix: LPNURequestSuffix = TIMETABLE_SUFFIX
   ) {
-    const isExams = suffix.includes('exam');
     const origin = isLecturer(suffix)
-      ? isExams ? NULP_STAFF : NULP_STAFF_2023
-      : isExams ? NULP_STUDENTS : NULP_STUDENTS_2023;
+      ? NULP_STAFF_2023
+      : NULP_STUDENTS_2023;
 
     const built = buildURL(origin + suffix, params);
     const proxiedUrl = PROXY + built;
@@ -149,9 +148,10 @@ export default class LPNUData {
 
   static getPartialTimetable (timetableName: string, semesterHalf: 1 | 2) {
     const semesterParam = semesterHalf === 1 ? '2' : '3';
+    // TODO: fix support for lecturer partial timetable
     return this.fetchHTML({
       departmentparent_abbrname_selective: 'All',
-      studygroup_abbrname_selective: timetableName,
+      studygroup_abbrname: timetableName,
       semestrduration: semesterParam
     }, TIMETABLE_SUFFIX).then(Parser.parseTimetable.bind(Parser));
   }
@@ -159,13 +159,11 @@ export default class LPNUData {
   static getExamsTimetable (type: TimetableType, group = 'All', institute = 'All') {
     if (type === 'lecturer') {
       return this.fetchHTML({
-        namedepartment_selective: institute,
-        teachername_selective: group
+        teachername: group
       }, LECTURER_EXAMS_SUFFIX).then(Parser.parseExamsTimetable.bind(Parser));
     }
     return this.fetchHTML({
-      departmentparent_abbrname_selective: institute,
-      studygroup_abbrname_selective: group
+      studygroup_abbrname: group
     }, TIMETABLE_EXAMS_SUFFIX).then(Parser.parseExamsTimetable.bind(Parser));
   }
 }
