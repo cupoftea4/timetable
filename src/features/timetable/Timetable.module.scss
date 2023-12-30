@@ -5,10 +5,9 @@
 .timetable {
   max-width: var(--max-app-width);
   border-collapse: collapse;
-  color: hsla(0, 0%, 100%, 0.9);
   
   td, th {
-    border: 1px solid hsla(0, 0%, 100%, 0.4);
+    border: 1px solid var(--border-clr);
     @include timetable-mobile {
       border: none;
     }

@@ -49,7 +49,7 @@ const App = () => {
        : <LoadingPage/>
       }
       <MessageToast
-        position="bottom-right" theme="colored" pauseOnFocusLoss={false} autoClose={TOAST_AUTO_CLOSE_TIME}
+        position="bottom-right" theme="colored" pauseOnFocusLoss={false} autoClose={TOAST_AUTO_CLOSE_TIME} limit={1}
       />
     </>
   );

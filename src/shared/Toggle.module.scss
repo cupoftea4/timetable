@@ -16,7 +16,7 @@
     height: 100%;
     z-index: -1;
     border-radius: 1rem;
-    background: var(--accent-clr);
+    background-color: var(--accent-clr);
     border: rgba(223,239,254,.139) solid 1px;
     transition: all .2s ease-in-out;
     &.right {
@@ -25,7 +25,7 @@
   }
   &:hover {
     span {
-      background-color: rgba(255, 255, 255, 0.3);
+      background-color: var(--accent-hover-clr);
     }
   }
 }
