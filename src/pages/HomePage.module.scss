@@ -27,7 +27,7 @@ $lecturers-second-layer-width: 20rem;
       position: relative;
       align-self: center;
       width: fit-content;
-      color: hsla(0, 0%, 100%, 0.5);
+      color: var(--extra-text-clr);
       white-space: nowrap;
       font-size: $small-font-size;
       > a {
@@ -133,11 +133,14 @@ $lecturers-second-layer-width: 20rem;
     .cat {
       width: 20rem;
       height: auto;
-      filter: invert(75%);
+      filter: contrast(0.65);
+      @include dark-mode {
+        filter: invert(75%);
+      }
     }
     .cat-text {
       text-align: center;
-      color: $extra-text-clr;
+      color: var(--extra-text-clr);
     }
 
   }
