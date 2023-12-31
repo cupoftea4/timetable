@@ -39,24 +39,30 @@ body {
   
 
   background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb)
+    var(--bg-clr-1),
+    var(--bg-clr-2)
   );
-  @media screen and (prefers-color-scheme: dark) {
-    background-color: black;
-    background-image: radial-gradient(
-      ellipse at left 20% top -70%,
-      rgba(96, 10, 255, .3) 0%,
-      transparent 60%
-    ), radial-gradient(
-      ellipse at left 110% top 110%,
-      rgba(255, 51, 211, 0.15) 0%,
-      transparent 60%
-    );
-  }
+
+  // background: linear-gradient(
+  //     to bottom,
+  //     transparent,
+  //     rgb(var(--background-end-rgb))
+  //   )
+  //   rgb(var(--background-start-rgb)
+  // );
+
+  // @media screen and (prefers-color-scheme: dark) {
+  //   background-color: black;
+  //   background-image: radial-gradient(
+  //     ellipse at left 20% top -70%,
+  //     rgba(96, 10, 255, .3) 0%,
+  //     transparent 60%
+  //   ), radial-gradient(
+  //     ellipse at left 110% top 110%,
+  //     rgba(255, 51, 211, 0.15) 0%,
+  //     transparent 60%
+  //   );
+  // }
 
   color: var(--text-clr);
   main {

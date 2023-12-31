@@ -11,9 +11,11 @@ import List from '@/shared/List';
 import catImage from '@/assets/cat.svg';
 import { classes } from '@/styles/utils';
 import styles from './HomePage.module.scss';
+import type { ThemeValue } from '@/utils/themes';
 
 type OwnProps = {
   timetableType: TimetableType
+  setTheme: React.Dispatch<React.SetStateAction<ThemeValue>>
 };
 
 const getHash = () => decodeURI(window.location.hash.slice(1));
@@ -23,7 +25,7 @@ const handleHashChange = (newHash: string) => {
   if (hash !== newHash) window.history.replaceState(newHash, 'custom', `#${newHash}`);
 };
 
-const HomePage: FC<OwnProps> = ({ timetableType }) => {
+const HomePage: FC<OwnProps> = ({ timetableType, setTheme }) => {
   const [firstLayer, setFirstLayer] = useState<string[]>([]); // institutes/alphabet
   const [secondLayer, setSecondLayer] = useState<string[]>([]); // majors/departments/selective
   const [thirdLayer, setThirdLayer] = useState<string[]>([]); // groups/lecturers
@@ -102,7 +104,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
 
   return (
     <div className={styles.wrapper}>
-      <HeaderPanel timetableType={timetableType} className={styles.header}/>
+      <HeaderPanel timetableType={timetableType} className={styles.header} setTheme={setTheme}/>
       <main className={styles.container}>
         <section className={classes(styles.selection, isTablet && selectedSecond && styles['one-column'])}
           data-attr={timetableType + '-groups'}>

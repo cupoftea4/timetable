@@ -12,7 +12,7 @@ $icon-size: 0.875rem;
 .saved-menu {
   animation: show-menu 0.1s ease-in-out forwards;
   position: absolute;
-  top: 105%;
+  top: 101%; // cool number
   left: -120%;
   width: 15rem;
   &.home {
@@ -85,6 +85,21 @@ $icon-size: 0.875rem;
     }
   }
 
+}
+
+
+.gradient-text {
+  background: linear-gradient(
+    to right,
+    red,
+    orange,
+    yellow,
+    green,
+    blue,
+    indigo,
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @keyframes show-menu {

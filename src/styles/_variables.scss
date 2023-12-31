@@ -1,5 +1,24 @@
+[data-theme^=dark] {
+  --border-clr: hsla(209, 94%, 94%, 0.139);
+  --accent-clr: hsla(0, 0%, 100%, 0.15);
+  --accent-hover-clr: hsla(0, 0%, 100%, 0.2);
+  --text-clr: hsla(0, 0%, 100%, 0.9);
+  --extra-text-clr: hsla(0, 0%, 100%, 0.7);
+  
+  --bg: rgb(206, 196, 248);
+  --background-start-rgb: 0, 0, 10;
+  --background-end-rgb: 0, 0, 10;
+  --background-glow: linear-gradient(
+      to bottom right,
+      rgba(1, 65, 255, 0),
+      hsla(210, 100%, 65%, .13),
+      rgba(1, 65, 255, 0.05)
+    )
+    rgb(var(--background-start-rgb)
+  );
+}
 
-:root {
+[data-theme^=light] {
   --max-app-width: 90rem;
   --accent-clr: hsla(0, 0%, 31%, 0.15);
   --accent-hover-clr: hsla(0, 0%, 5%, 0.15);
@@ -15,25 +34,6 @@
     rgba(1, 65, 255, 0),
     rgb(255, 255, 255)
   );
-  @media screen and (prefers-color-scheme: dark) {
-    --border-clr: hsla(209, 94%, 94%, 0.139);
-    --accent-clr: hsla(0, 0%, 100%, 0.15);
-    --accent-hover-clr: hsla(0, 0%, 100%, 0.2);
-    --text-clr: hsla(0, 0%, 100%, 0.9);
-    --extra-text-clr: hsla(0, 0%, 100%, 0.7);
-    
-    --bg: rgb(206, 196, 248);
-    --background-start-rgb: 0, 0, 10;
-    --background-end-rgb: 0, 0, 10;
-    --background-glow: linear-gradient(
-        to bottom right,
-        rgba(1, 65, 255, 0),
-        hsla(210, 100%, 65%, .13),
-        rgba(1, 65, 255, 0.05)
-      )
-      rgb(var(--background-start-rgb)
-    );
-  }
 }
 
 $timetable-lect-hsl: (205 81% 45%);
