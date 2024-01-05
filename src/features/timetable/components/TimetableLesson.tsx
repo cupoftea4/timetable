@@ -52,8 +52,8 @@ const TimetableLesson: FC<OwnProps> = ({ isListView, lessons, active, cellSubgro
               <div
                 className={classes(styles.spacer, innerLessons?.[0]?.type)}
                 data-time={
-                  `${lessonsTimes[innerLessons?.[0]?.number ?? 0 - 1]?.start}
-                  -${lessonsTimes[innerLessons?.[0]?.number ?? 0]?.end}`
+                  `${lessonsTimes[(innerLessons?.[0]?.number ?? 1) - 1]?.start}
+                  -${lessonsTimes[(innerLessons?.[0]?.number ?? 1) - 1]?.end}`
                 }
                 data-number={innerLessons?.[0]?.number}
               />

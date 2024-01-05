@@ -7,11 +7,14 @@
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="NULP Timetable"
+      content="Розклад занять для студентів та викладачів Національного університету 'Львівська політехніка'. Актуальні час й місце пар та екзаменів."
     />
+    <meta name="keywords" content="НУЛП, ЛПНУ, розклад, ЛП, lpnu timetable, lpnu, timetable, політехніка, політех, студенти, викладачі, лабораторні, лекції">
+    <meta property="og:title" content="Розклад НУЛП" />
+    <meta property="og:site_name" content="Timetable" />
+    <meta property="og:image" content="https://lpnu.pp.ua/images/logo-light.png" />
     <link rel="manifest" href="/manifest.json" />
-
-    <title>Timetable</title>
+    <title>Розклад НУЛП</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
@@ -20,6 +23,7 @@
     <script>
       window.addEventListener("load", () => {
         if ("serviceWorker" in navigator) {
+          console.log("Registering service worker...", window.APP_VERSION);
           navigator.serviceWorker.register("/sw.js?v=" + window.APP_VERSION)
             .then(registration => {
               console.log("Service worker registered with scope:", registration.scope);

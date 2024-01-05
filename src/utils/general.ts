@@ -85,3 +85,7 @@ export function hashCode (str: string) {
 export function getRandomValue<T> (array: T[]) {
   return array[Math.floor(Math.random() * array.length)]!;
 }
+
+export function isDarkMode () {
+  return window?.matchMedia('(prefers-color-scheme: dark)').matches;
+}

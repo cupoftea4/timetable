@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify';
 import { DEVELOP, TOAST_AUTO_CLOSE_TIME } from './constants';
-import { getRandomValue } from './general';
+import { getRandomValue, isDarkMode } from './general';
 
 const DEBOUNCE_TOAST_TIME = 500;
 
@@ -89,6 +89,6 @@ function showErrorToast (message: string) {
 function showWarningToast (message: string) {
   if (pendingToasts.has(message)) return;
   pendingToasts.add(message);
-  toast.warn(message, { theme: 'dark', hideProgressBar: true });
+  toast.warn(message, { theme: isDarkMode() ? 'dark' : 'light', hideProgressBar: true });
   setTimeout(() => pendingToasts.delete(message), TOAST_AUTO_CLOSE_TIME);
 }

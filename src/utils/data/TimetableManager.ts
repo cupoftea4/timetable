@@ -191,14 +191,17 @@ class TimetableManager {
         .catch(() => storage.getItem(TIMETABLE + groupName));
     }
 
-    const fetchData: ActualPromise<TimetableItem[]> = LPNUData.getTimetable(timetableType, groupName).catch(() => {
-      cacheData.then(t => this.saveTimetableLocally(groupName, t, data?.subgroup));
-      Toast.warn('Data is possibly outdated!');
-      return null;
-    });
+    const fetchData: ActualPromise<TimetableItem[]> = LPNUData.getTimetable(timetableType, groupName) // doesn't work
+      /* new Promise((resolve, reject) => {
+        reject(new Error('LPNU API is not working!'));
+      }) */.catch(() => {
+        cacheData.then(t => this.saveTimetableLocally(groupName, t, data?.subgroup));
+        Toast.warn('Data is possibly outdated!');
+        return null;
+      });
 
     fetchData.then(t => this.saveTimetableLocally(groupName, t, data?.subgroup));
-    return [cacheData, fetchData] as const;
+    return [cacheData, fetchData as any] as const;
   }
 
   getExamsTimetable (group: string, type?: TimetableType, checkCache = true): RenderPromises<ExamsTimetableItem[]> {
@@ -217,7 +220,8 @@ class TimetableManager {
     }
 
     const fetchData: ActualPromise<ExamsTimetableItem[]> = LPNUData.getExamsTimetable(timetableType, groupName)
-      .catch(() => {
+      .catch((e) => {
+        console.warn('LPNU API is not working!', e);
         cacheData.then(t => this.saveExamsLocally(groupName, t));
         Toast.warn('Data is possibly outdated!');
         return null;
@@ -348,6 +352,7 @@ class TimetableManager {
     if (this.selectiveGroups.some(compare)) return 'selective';
     if (this.lecturers.some(compare)) return 'lecturer';
     if (timetable === MERGED_TIMETABLE) return 'merged';
+    return 'timetable'; // FIXME temporary allow to fetch unknown groups
   }
 
   getCachedTimetables () {
@@ -388,9 +393,10 @@ class TimetableManager {
   }
 
   private async ifPartialTimetableExists (group: string, halfTerm: 1 | 2) {
-    if (!this.groups.includes(group)) return false;
-    const partialGroups = await this.getPartialGroups(halfTerm);
-    return partialGroups.includes(group);
+    // if (!this.groups.includes(group)) return false;
+    // const partialGroups = await this.getPartialGroups(halfTerm);
+    // return partialGroups.includes(group);
+    return false;
   }
 
   private async getPartialGroups (halfTerm: 1 | 2) {

@@ -69,9 +69,10 @@ class TimetableParser {
   }
 
   parseExamsTimetable (html: string) {
+    console.log('html', html);
     const content = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
-    const exams = Array.from(content?.children ?? [])
-      .map(this.parseExam);
+    if (!content) throw Error('No content found');
+    const exams = this.parseExamsTimetableV2(content);
     if (exams.length === 0) throw Error('Exams timetable is empty');
     return exams;
   }
@@ -79,8 +80,7 @@ class TimetableParser {
   public parseTimetable (html: string) {
     const table = this.parseAndGetFirstElBySelector(html, TIMETABLE_SELECTOR);
     if (!table) throw Error('No table found');
-    const days = Array.from(table.children);
-    const timetable = days.map((day) => this.parseDay(day)).flat(1);
+    const timetable = this.parseTimetableV2(table);
     if (timetable.length === 0) throw Error('Timetable is empty');
     return timetable;
   }
@@ -98,80 +98,89 @@ class TimetableParser {
 						a {exam.url}
 	*/
 
-  private parseExam (exam: Element) {
-    const dayText = exam.querySelector('.view-grouping-header');
-    if (!dayText) {
-      throw Error('Got wrong DOM structure for exam!');
-    }
-    const date = new Date(dayText.textContent ?? '');
-    let lecturer = '', subject = '', number = 0;
-    const urls: string[] = [];
-    const contentChildren = exam.querySelector('.view-grouping-content')?.children ?? [];
-
-    [...contentChildren].forEach(child => {
-      // it's h3 with lesson number
-      if (!child.classList.contains('stud_schedule')) {
-        number = parseInt(child.textContent ?? '0');
-        // it's stud_schedule with lesson info
-      } else {
-        const examContent = child.querySelector('.group_content');
-        if (!examContent) {
-          throw Error('Got wrong DOM structure for exam!');
-        }
-        [...examContent.childNodes].forEach(node => {
-          // lecturer and subject are in text nodes
-          if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent?.trim();
-            if (!text) return;
-            if (!subject) subject = text;
-            else if (!lecturer) lecturer = text;
-          }
-          // urls are in a tags
-          if (node.nodeType === Node.ELEMENT_NODE) {
-            const a = (node as Element).querySelector('a');
-            if (a) urls.push(a.href);
-          }
-        });
-      }
-    });
-
-    const result: ExamsTimetableItem = { date, lecturer, subject, number, urls };
-    return result;
-  }
-
   private dayToNumber (day: string) {
     const days = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'нд'];
     return (days.indexOf(day.toLowerCase()) + 1) || -1;
   }
 
-  private parseDay (day: Element) {
-    const dayText = day.querySelector('.view-grouping-header');
-    if (!dayText) {
-      throw Error('Got wrong DOM structure for day!');
-    }
+  private parseTimetableV2 (table: Element) {
+    const contentChildren = table.children ?? [];
 
-    const dayNumber = this.dayToNumber(dayText.textContent ?? '');
-    const contentChildren = day.querySelector('.view-grouping-content')?.children ?? [];
-
-    let dayLessons: TimetableItem[] = [], currentLessonNumber = 0;
+    let lessons: TimetableItem[] = [], currentLesson = 0, currentDay: number | undefined;
 
     for (let i = 0; i < contentChildren.length; i++) {
       const child = contentChildren[i];
-      if (child?.classList.contains('stud_schedule')) {
-        const lessons = this.parsePair(child);
-        if (currentLessonNumber === 0) console.warn('Lesson number is 0!', child);
+      if (child?.classList.contains('view-grouping-header')) {
+        currentDay = this.dayToNumber(child?.textContent ?? '');
+      } else if (child?.tagName === 'H3') {
+        currentLesson = Number.parseInt(child?.textContent ?? '0');
+      } else if (child?.classList.contains('stud_schedule')) {
+        const pairs = this.parsePair(child);
+        if (currentLesson === 0) console.warn('Lesson number is 0!', child);
+        if (currentDay === undefined) throw Error('Got wrong DOM structure for timetable: no day');
 
-        for (const lesson of lessons) {
-          lesson.day = dayNumber;
-          lesson.number = currentLessonNumber;
+        for (const lesson of pairs) {
+          lesson.day = currentDay;
+          lesson.number = currentLesson;
         }
 
-        dayLessons = dayLessons.concat(lessons);
+        lessons = lessons.concat(pairs);
       } else {
-        currentLessonNumber = Number.parseInt(child?.textContent ?? '0');
+        throw Error('Got wrong DOM structure for timetable: unknown child');
       }
     }
-    return dayLessons;
+    return lessons;
+  }
+
+  private parseExamsTimetableV2 (content: Element) {
+    const contentChildren = content.children ?? [];
+
+    const exams: ExamsTimetableItem[] = [];
+    let currentExam: Partial<ExamsTimetableItem> = { urls: [] }, firstLoop = true;
+
+    const saveExam = (exam: Partial<ExamsTimetableItem>) => {
+      if (
+        (!exam.date ||
+        !exam.number ||
+        !exam.subject ||
+        !exam.lecturer ||
+        !exam.urls)
+      ) {
+        console.error('Got wrong DOM structure for exam: not all fields are filled', exam);
+      } else {
+        exams.push(exam as ExamsTimetableItem);
+      }
+    };
+
+    for (let i = 0; i < contentChildren.length; i++) {
+      const child = contentChildren[i];
+      if (child?.classList.contains('view-grouping-header')) {
+        if (!child.textContent) continue; // don't ask me why 🫠
+        if (!firstLoop) {
+          saveExam(currentExam);
+        }
+        firstLoop = false;
+        currentExam = { urls: [] }; // golang style, sry
+        currentExam.date = new Date(child.textContent ?? '');
+      } else if (child?.tagName === 'H3') {
+        currentExam.number = Number.parseInt(child?.textContent ?? '0');
+      } else if (child?.classList.contains('stud_schedule')) {
+        const textContent = child.querySelector('.group_content');
+        console.log('textContent', textContent);
+        for (const element of textContent?.childNodes ?? []) {
+          if (element.nodeType !== Node.TEXT_NODE) continue;
+          if (!currentExam.subject) {
+            currentExam.subject = element.textContent ?? '';
+          } else if (!currentExam.lecturer) { // careful, last text element is empty in lecturers exams timetable
+            currentExam.lecturer = element.textContent ?? '';
+          }
+        }
+      } else {
+        throw Error('Got wrong DOM structure for timetable: unknown child');
+      }
+    }
+    saveExam(currentExam);
+    return exams;
   }
 
   private parsePair (pair: Element): TimetableItem[] {
@@ -186,7 +195,7 @@ class TimetableParser {
 
       const lesson: TimetableItem = {
         ...data,
-        type: this.tryToGetType(data.location),
+        type: this.tryToGetType(element.textContent ?? ''),
         ...meta,
         day: -1,
         number: -1
@@ -213,10 +222,16 @@ class TimetableParser {
         texts.push(node.textContent);
       }
     }
+
+    const parts = texts[1]!.split(',');
+    if (parts.length !== 3) {
+      parts[0] = texts[1]!;
+      parts[1] = '';
+    }
     return {
       subject: texts[0] ?? '',
-      lecturer: texts[1] ?? '',
-      location: texts[2] ?? '',
+      lecturer: parts[0] ?? '',
+      location: parts[1] ?? '',
       urls: lessonUrls
     };
   }
