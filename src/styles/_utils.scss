@@ -68,8 +68,8 @@
   }
 }
 
-@mixin dark-mode {
-  @media screen and (prefers-color-scheme: dark) {
+@mixin dark-mode($className) {
+  @at-root .dark-mode #{$className}{
     @content;
   }
 }

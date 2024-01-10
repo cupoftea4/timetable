@@ -35,7 +35,11 @@
         "@typescript-eslint/restrict-plus-operands": ["warn", {"allowNumberAndString": true}],
         "@typescript-eslint/restrict-template-expressions": "off",
         "eqeqeq": ["error", "always"],
-        "max-len": ["warn", { "code": 120, "ignoreComments": true }]
+        "max-len": ["warn", { "code": 120, "ignoreComments": true }],
+        "max-depth": ["warn", 3],
+        "max-statements": ["warn", 15],
+        "eol-last": ["error", "always"],
+        "max-params": ["warn", 4],
 
     },
     "ignorePatterns": [
