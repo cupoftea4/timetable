@@ -1,12 +1,13 @@
 import { timeout } from '@/utils/promises';
 import Parser from './Parser';
 import type { LPNUTimetableType, TimetableType } from '@/types/timetable';
+import { getCurrentSemester } from '../date';
 
 // const NULP_STUDENTS = 'https://student.lpnu.ua/';
 const NULP_STUDENTS_2023 = 'https://student2023.lpnu.ua/';
 // const NULP_STAFF = 'https://staff.lpnu.ua/';
 const NULP_STAFF_2023 = 'https://staff2023.lpnu.ua/';
-const CURRENT_SEMESTER = '1';
+const CURRENT_SEMESTER = getCurrentSemester();
 
 const PROXY: string = import.meta.env.VITE_PROXY;
 
@@ -140,7 +141,7 @@ export default class LPNUData {
       }, LECTURER_SUFFIX).then(Parser.parseTimetable.bind(Parser));
     }
     return this.fetchHTML({
-      studygroup_abbrname: timetableName.toLowerCase(),
+      studygroup_abbrname: timetableName.toUpperCase(),
       semestr: CURRENT_SEMESTER,
       semestrduration: '1' // Why, NULP?
     }, suffix).then(Parser.parseTimetable.bind(Parser));

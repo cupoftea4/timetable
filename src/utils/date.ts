@@ -36,3 +36,16 @@ export function getNULPWeek () {
   return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 -
         3 + (week1.getDay() + 6) % 7) / 7);
 }
+
+export function getCurrentSemester(): '1' | '2' {
+  const currentDate = new Date();
+  const currentMonth = currentDate.getMonth() + 1; // Month is 0-based, so we add 1
+  const currentDay = currentDate.getDate();
+
+  // Check if it's January 15 or later but before August 1
+  if ((currentMonth === 1 && currentDay >= 15) || (currentMonth > 1 && currentMonth < 8)) {
+    return '2'; // Second semester
+  } else {
+    return '1'; // First semester (assuming other months)
+  }
+}
