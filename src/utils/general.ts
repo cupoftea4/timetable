@@ -89,3 +89,13 @@ export function getRandomValue<T> (array: T[]) {
 export function isDarkMode () {
   return window?.matchMedia('(prefers-color-scheme: dark)').matches;
 }
+
+/**
+ * Removes all line breaks from a string and replaces them with spaces.
+ *
+ * @param str - The string to format
+ * @returns Formatted string
+ */
+export function removeLineBreaks (str: string) {
+  return str.replace(/[\r\n]+/g, ' ').trim();
+}

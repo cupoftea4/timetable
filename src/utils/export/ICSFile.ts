@@ -1,5 +1,6 @@
 import { formatLocationForGoogleMaps, lessonsTimes } from '../timetable';
 import type { ExamsTimetableItem, TimetableItem } from '@/types/timetable';
+import { removeLineBreaks } from '@/utils/general';
 
 function toTFormattedString (date: Date, time: string) {
   const [hours, minutes] = time.split(':');
@@ -143,11 +144,12 @@ END:VCALENDAR`;
     location?: string
     rrule?: string
   }) {
+    const cleanSummary = removeLineBreaks(summary);
     return `
 BEGIN:VEVENT
 DTSTART:${start}
 DTEND:${end}
-SUMMARY:${summary}
+SUMMARY:${cleanSummary}
 DESCRIPTION:${description}\
 ${location ? '\nLOCATION:' + location : ''}\
 ${rrule ? '\nRRULE:' + rrule : ''}
