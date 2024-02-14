@@ -93,7 +93,7 @@ export function isDarkMode () {
 /**
  * Removes all line breaks from a string and replaces them with spaces.
  *
- * @param str - The string to hash
+ * @param str - The string to format
  * @returns Formatted string
  */
 export function removeLineBreaks (str: string) {
