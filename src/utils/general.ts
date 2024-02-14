@@ -95,15 +95,7 @@ export function isDarkMode () {
  *
  * @param str - The string to hash
  * @returns Formatted string
- *
- * @description
- * 1. Replaces multiple line breaks with a single line break.
- * 2. Removes all line breaks at the start of the string.
- * 3. Replaces all line breaks with spaces.
  */
 export function removeLineBreaks (str: string) {
-  return str
-    .replace(/[\n\r]+/g, '\n')
-    .replace(/^[\n\r]+/, '')
-    .replace(/[\n\r]+/g, ' ');
+  return str.replace(/[\r\n]+/g, ' ').trim();
 }

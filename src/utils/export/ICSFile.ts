@@ -144,7 +144,7 @@ END:VCALENDAR`;
     location?: string
     rrule?: string
   }) {
-    const cleanSummary = removeLineBreaks(summary.trim());
+    const cleanSummary = removeLineBreaks(summary);
     return `
 BEGIN:VEVENT
 DTSTART:${start}
