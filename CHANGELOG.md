@@ -13,3 +13,6 @@
 [2.6.0] - 2024-01-05
 - Moved exams and lecturer timetables to 2023 lpnu.ua version
 - Added exams time
+
+[2.6.1] - 2024-02-14
+- Fixed missing event title in calendar / .ics file

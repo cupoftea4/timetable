@@ -89,3 +89,7 @@ export function getRandomValue<T> (array: T[]) {
 export function isDarkMode () {
   return window?.matchMedia('(prefers-color-scheme: dark)').matches;
 }
+
+export function removeLineBreaks (str: string) {
+  return str.replace(/\r?\n|\r/g, '');
+}
