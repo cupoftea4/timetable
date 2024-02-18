@@ -30,9 +30,10 @@ const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
       <span className={styles.search}>
         <VirtualizedDataList
           options={options}
-          onSelect={item => { navigate(`/${item.value}`); }}
+          onSelect={item => { navigate(`/${item.id}`); }}
           placeholder="Розклад..."
           ignoreSpecialCharacters
+          allowCustomValue
          />
       </span>
     </span>

@@ -17,6 +17,7 @@ type OwnProps = {
   className?: string
   initialDisplayedCount?: number
   autoFocus?: boolean
+  allowCustomValue?: boolean
 };
 
 const SPECIAL_CHARACTERS_REGEX = /[^\p{L}\p{N}]/gu;
@@ -31,7 +32,8 @@ const VirtualizedDataList: FC<OwnProps> = ({
   label = '',
   placeholder = '',
   initialDisplayedCount = 10,
-  autoFocus = false
+  autoFocus = false,
+  allowCustomValue = false
 }) => {
   const { value: inputValue, setValue: setInputValue } = useComboboxControls({ isExpanded: false });
   const [displayedCount, setDisplayedCount] = React.useState(initialDisplayedCount);
@@ -47,11 +49,17 @@ const VirtualizedDataList: FC<OwnProps> = ({
     return itemName.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase());
   };
 
-  const filterOptions = useCallback((datalistItems: DataListOption[], searchQuery?: string) =>
-    datalistItems
+  const filterOptions = useCallback((datalistItems: DataListOption[], searchQuery?: string) => {
+    const res = datalistItems
       .filter(item => matchesSearch(item.value, searchQuery))
-      .slice(0, displayedCount),
-  [options, inputValue, displayedCount]);
+      .slice(0, displayedCount);
+    
+    if (allowCustomValue && searchQuery && !res.some(item => item.value === searchQuery)) {
+      res.push({ id: searchQuery, value: `Відкрити «${searchQuery}»` });
+    }
+
+    return res;
+  }, [options, inputValue, displayedCount]);
 
   const showMoreOptions = () => {
     setDisplayedCount(displayedCount + initialDisplayedCount);

@@ -16,3 +16,6 @@
 
 [2.6.1] - 2024-02-14
 - Fixed missing event title in calendar / .ics file
+
+[2.6.2] - 2024-02-18
+- Allow unknown timetables of all types (it now tries to guess the type based on the name)

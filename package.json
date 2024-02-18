@@ -1,11 +1,10 @@
 {
   "name": "timetable",
-  "version": "2.6.1",
+  "version": "2.6.2",
   "homepage": "/",
   "private": true,
   "dependencies": {
     "idb": "^7.1.1",
-    "node-sass": "^8.0.0",
     "react": "^18.2.0",
     "react-datalist-input": "^3.2.1",
     "react-dom": "^18.2.0",

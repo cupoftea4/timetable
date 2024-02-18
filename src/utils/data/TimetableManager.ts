@@ -352,6 +352,15 @@ class TimetableManager {
     if (this.selectiveGroups.some(compare)) return 'selective';
     if (this.lecturers.some(compare)) return 'lecturer';
     if (timetable === MERGED_TIMETABLE) return 'merged';
+
+    // try to guess the type based on the name
+    const numberOfDashes = timetable.split('-').length - 1;
+    const containsNumbers = /\d/.test(timetable);
+
+    if (!containsNumbers) return 'lecturer';
+    if (numberOfDashes === 1) return 'timetable';
+    if (numberOfDashes === 2) return 'selective';
+
     return 'timetable'; // FIXME temporary allow to fetch unknown groups
   }
 
