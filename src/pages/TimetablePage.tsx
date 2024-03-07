@@ -32,13 +32,12 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const group = useParams().group?.trim() ?? '';
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
   const isSecondNULPWeek = () => getNULPWeek() % 2 === 0;
-  const [timetableGroup, setTimetableGroup] = useState<string | null>();
   const [timetable, setTimetable] = useState<TimetableItem[]>();
   const [examsTimetable, setExamsTimetable] = useState<ExamsTimetableItem[]>();
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup);
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
   const [partials, setPartials] = useState<HalfTerm[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showCreateMergedModal, setShowCreateMergedModal] = useState(false);
 
   const navigate = useNavigate();
@@ -56,7 +55,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   function onError (e: string, userError?: string) {
     Toast.error(e, userError);
-    setTimetableGroup(null);
+    navigate('/', { state: { force: true } });
   };
 
   useEffect(() => {
@@ -65,7 +64,6 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       return;
     }
     if (timetableType === 'selective' && isExamsTimetable) navigate('/' + group);
-    setTimetableGroup(group);
     setLoading(true);
     getTimetable(group, isExamsTimetable, timetableType)?.finally(() => { setLoading(false); });
     TimetableManager.updateLastOpenedTimetable(group);
@@ -117,9 +115,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   return (
     <>
-      {timetableGroup !== null
-        ? !isLoading
-            ? <div className={styles.wrapper}>
+      {!isLoading
+        ? <div className={styles.wrapper}>
             <TimetableHeader
               isExamsTimetable={isExamsTimetable}
               timetableType={timetableType}
@@ -129,7 +126,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
               weekState={[isSecondWeek, setIsSecondWeek]}
               updatePartialTimetable={getPartialTimetable}
               loading={loading}
-             />
+            />
             <main className={styles.container}>
               <section className={styles.timetable} ref={timetableRef}>
                 {!isExamsTimetable
@@ -162,8 +159,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
               />
             }
           </div>
-            : <LoadingPage/>
-        : <Navigate to="/" state={{ force: true }}/>}
+        : <LoadingPage/>
+      }
     </>
   );
 };
