@@ -339,7 +339,7 @@ class TimetableManager {
     this.mergedTimetable = {
       group: 'Мій розклад',
       time: Date.now(),
-      subgroup: 1,
+      subgroup: this.mergedTimetable?.subgroup ?? 1,
       timetables: timetablesToMerge
     };
     return storage.setItem(MERGED_TIMETABLE, this.mergedTimetable);

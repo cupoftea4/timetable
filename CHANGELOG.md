@@ -19,3 +19,6 @@
 
 [2.6.2] - 2024-02-18
 - Allow unknown timetables of all types (it now tries to guess the type based on the name)
+
+[2.6.3] - 2024-03-07
+- Fixed merged timetable subgroup not saving properly
