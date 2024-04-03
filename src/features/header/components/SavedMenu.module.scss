@@ -12,7 +12,7 @@ $icon-size: 0.875rem;
 .saved-menu {
   animation: show-menu 0.1s ease-in-out forwards;
   position: absolute;
-  top: 105%;
+  top: 101%; // cool number
   left: -120%;
   width: 15rem;
   &.home {
@@ -21,7 +21,10 @@ $icon-size: 0.875rem;
   @include tablet {
     width: 13rem;
   }
-  background: linear-gradient(190deg, var(--accent-clr) -8.75%, rgba(255, 255, 255, 0.07) 83.95%);
+  background-color: rgba(255, 255, 255, 0.064);
+  @include dark-mode {
+    background-color: hsla(0, 0%, 31%, 0.2);
+  }
   border: var(--border-clr) solid 1px;
   border-radius: $border-radius;
   box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
@@ -82,6 +85,21 @@ $icon-size: 0.875rem;
     }
   }
 
+}
+
+
+.gradient-text {
+  background: linear-gradient(
+    to right,
+    red,
+    orange,
+    yellow,
+    green,
+    blue,
+    indigo,
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @keyframes show-menu {
