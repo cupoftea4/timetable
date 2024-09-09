@@ -1,5 +1,5 @@
 import { type FC, useEffect, useMemo, useRef, useState } from 'react';
-import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import LoadingPage from './LoadingPage';
 import TimetableHeader from '@/features/header/TimetableHeader';
 import ExamsTimetable from '@/features/timetable/ExamsTimetable';

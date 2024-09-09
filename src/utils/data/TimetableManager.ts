@@ -54,11 +54,13 @@ class TimetableManager {
   private departments: string[] = [];
   private lecturers: string[] = [];
 
-  async init () {
+  async init() {
     // cache only data
     this.timetables = (await storage.getItem(TIMETABLES)) ?? [];
     this.mergedTimetable = (await storage.getItem(MERGED_TIMETABLE)) ?? null;
-    storage.getItem<CachedTimetable[]>(EXAMS_TIMETABLES).then(data => { this.examsTimetables = data ?? []; });
+    storage.getItem<CachedTimetable[]>(EXAMS_TIMETABLES).then((data) => {
+      this.examsTimetables = data ?? [];
+    });
 
     // request data from server if needed
     this.groups = await this.getData(GROUPS, FallbackData.getGroups);
@@ -66,11 +68,11 @@ class TimetableManager {
     this.lecturers = await this.getData(LECTURERS, FallbackData.getLecturers);
   }
 
-  isInited () {
+  isInited() {
     return this.institutes.length > 0 && this.groups.length > 0 && this.selectiveGroups.length > 0;
   }
 
-  async getFirstLayerSelectionByType (type: TimetableType) {
+  async getFirstLayerSelectionByType(type: TimetableType) {
     switch (type) {
       case 'selective': {
         const data = await this.getSelectiveGroups();
@@ -84,15 +86,15 @@ class TimetableManager {
     }
   }
 
-  firstLayerItemExists (type: TimetableType, query: string) {
+  firstLayerItemExists(type: TimetableType, query: string) {
     const isInstitute = this.institutes.includes(query);
     switch (type) {
       case 'selective':
-        return !isInstitute &&
-          this.selectiveGroups.some((group) => Util.startsWithLetters(group, query));
+        return !isInstitute && this.selectiveGroups.some((group) => Util.startsWithLetters(group, query));
       case 'lecturer':
-        return !isInstitute &&
-          this.departments.some((department) => Util.startsWithLetters(department, query));
+        return (
+          !isInstitute && this.departments.some((department) => Util.startsWithLetters(department, query))
+        );
       case 'timetable':
         return isInstitute;
       default:
@@ -100,7 +102,7 @@ class TimetableManager {
     }
   }
 
-  async getSecondLayerByType (type: TimetableType, query: string) {
+  async getSecondLayerByType(type: TimetableType, query: string) {
     switch (type) {
       case 'selective': {
         const data = await this.getSelectiveGroups();
@@ -116,49 +118,51 @@ class TimetableManager {
     }
   }
 
-  async getThirdLayerByType (type: TimetableType, query: string) {
+  async getThirdLayerByType(type: TimetableType, query: string) {
     switch (type) {
       case 'selective': {
         const data = await this.getSelectiveGroups();
-        return data.filter(group => Util.getGroupName(group, type) === query);
+        return data.filter((group) => Util.getGroupName(group, type) === query);
       }
       case 'lecturer':
         return await this.getLecturers(query);
       default: {
         const groups = await this.getTimetableGroups();
-        return groups.filter(group => Util.getGroupName(group, type) === query);
+        return groups.filter((group) => Util.getGroupName(group, type) === query);
       }
     }
   }
 
-  async getLastOpenedInstitute (): Promise<string | undefined> {
+  async getLastOpenedInstitute(): Promise<string | undefined> {
     if (this.lastOpenedInstitute) return this.lastOpenedInstitute;
-    return await (storage.getItem<string>(LAST_OPENED_INSTITUTE));
+    return await storage.getItem<string>(LAST_OPENED_INSTITUTE);
   }
 
-  async getLastOpenedTimetable (): Promise<string | undefined> {
+  async getLastOpenedTimetable(): Promise<string | undefined> {
     if (this.lastOpenedTimetable) return this.lastOpenedTimetable;
-    return await (storage.getItem<string>(LAST_OPENED_TIMETABLE));
+    return await storage.getItem<string>(LAST_OPENED_TIMETABLE);
   }
 
-  async updateLastOpenedInstitute (institute: string) {
+  async updateLastOpenedInstitute(institute: string) {
     this.lastOpenedInstitute = institute;
     return await storage.setItem(LAST_OPENED_INSTITUTE, institute);
   }
 
-  async updateLastOpenedTimetable (timetable: string) {
+  async updateLastOpenedTimetable(timetable: string) {
     this.lastOpenedTimetable = timetable;
     return await storage.setItem(LAST_OPENED_TIMETABLE, timetable);
   }
 
-  async getPartialTimetable (group: string, halfTerm: 1 | 2, checkCache = true) {
+  async getPartialTimetable(group: string, halfTerm: 1 | 2, checkCache = true) {
     if (!(await this.ifPartialTimetableExists(group, halfTerm))) {
       throw new Error(`Group ${group} does not exist or does't have ${halfTerm} term partial timetable`);
     }
 
     const key = PARTIAL_TIMETABLE + group + '_' + halfTerm;
 
-    if (checkCache) { return await this.getData(key, LPNUData.getPartialTimetable, group, halfTerm); }
+    if (checkCache) {
+      return await this.getData(key, LPNUData.getPartialTimetable, group, halfTerm);
+    }
 
     const data = await LPNUData.getPartialTimetable(group, halfTerm);
     if (!data) throw new Error(`Failed to get partial timetable! Group: ${group}, halfTerm: ${halfTerm}`);
@@ -166,15 +170,16 @@ class TimetableManager {
     return data;
   }
 
-  async getPartials (group: string): Promise<HalfTerm[]> {
-    const temp = await Promise.allSettled([HalfTerm.First, HalfTerm.Second]
-      .map((halfTerm) => this.ifPartialTimetableExists(group, halfTerm)));
+  async getPartials(group: string): Promise<HalfTerm[]> {
+    const temp = await Promise.allSettled(
+      [HalfTerm.First, HalfTerm.Second].map((halfTerm) => this.ifPartialTimetableExists(group, halfTerm))
+    );
     return temp
-      .map((el, i) => el.status === 'fulfilled' && el.value ? i + 1 : false)
-      .filter(el => el) as HalfTerm[];
+      .map((el, i) => (el.status === 'fulfilled' && el.value ? i + 1 : false))
+      .filter((el) => el) as HalfTerm[];
   }
 
-  getTimetable (group: string, type?: TimetableType, checkCache = true): RenderPromises<TimetableItem[]> {
+  getTimetable(group: string, type?: TimetableType, checkCache = true): RenderPromises<TimetableItem[]> {
     const groupName = group.trim();
     const timetableType = type ?? this.tryToGetType(groupName);
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${groupName}`);
@@ -182,60 +187,64 @@ class TimetableManager {
     if (timetableType === 'merged') return this.getMergedTimetable();
 
     let cacheData: OptimisticPromise<TimetableItem[]>;
-    const data = this.timetables.find(el => el.group.toUpperCase() === groupName.toUpperCase());
+    const data = this.timetables.find((el) => el.group.toLowerCase() === groupName.toLowerCase());
 
     if (checkCache && data && !Util.needsUpdate(data.time)) {
       cacheData = storage.getItem(TIMETABLE + groupName);
     } else {
-      cacheData = FallbackData.getTimetable(timetableType, groupName)
-        .catch(() => storage.getItem(TIMETABLE + groupName));
+      cacheData = FallbackData.getTimetable(timetableType, groupName).catch(() =>
+        storage.getItem(TIMETABLE + groupName)
+      );
     }
 
     const fetchData: ActualPromise<TimetableItem[]> = LPNUData.getTimetable(timetableType, groupName) // doesn't work
-      /* new Promise((resolve, reject) => {
-        reject(new Error('LPNU API is not working!'));
-      }) */.catch(() => {
-        cacheData.then(t => this.saveTimetableLocally(groupName, t, data?.subgroup));
+      .catch(() => {
+        cacheData.then((t) => this.saveTimetableLocally(groupName, t, data?.subgroup));
         Toast.warn('Data is possibly outdated!');
         return null;
       });
 
-    fetchData.then(t => this.saveTimetableLocally(groupName, t, data?.subgroup));
+    fetchData.then((t) => this.saveTimetableLocally(groupName, t, data?.subgroup));
     return [cacheData, fetchData as any] as const;
   }
 
-  getExamsTimetable (group: string, type?: TimetableType, checkCache = true): RenderPromises<ExamsTimetableItem[]> {
+  getExamsTimetable(
+    group: string,
+    type?: TimetableType,
+    checkCache = true
+  ): RenderPromises<ExamsTimetableItem[]> {
     const groupName = group.trim();
     const timetableType = type ?? this.tryToGetType(groupName);
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${groupName}`);
 
     let cacheData: OptimisticPromise<ExamsTimetableItem[]>;
-    const data = this.examsTimetables.find(el => el.group.toUpperCase() === groupName.toUpperCase());
+    const data = this.examsTimetables.find((el) => el.group.toLowerCase() === groupName.toLowerCase());
 
     if (checkCache && data && !Util.needsUpdate(data.time)) {
       cacheData = storage.getItem(EXAMS_TIMETABLE + groupName);
     } else {
-      cacheData = FallbackData.getExamsTimetable(timetableType, groupName)
-        .catch(() => storage.getItem(EXAMS_TIMETABLE + groupName));
+      cacheData = FallbackData.getExamsTimetable(timetableType, groupName).catch(() =>
+        storage.getItem(EXAMS_TIMETABLE + groupName)
+      );
     }
 
-    const fetchData: ActualPromise<ExamsTimetableItem[]> = LPNUData.getExamsTimetable(timetableType, groupName)
-      .catch((e) => {
-        console.warn('LPNU API is not working!', e);
-        cacheData.then(t => this.saveExamsLocally(groupName, t));
-        Toast.warn('Data is possibly outdated!');
-        return null;
-      });
+    const fetchData: ActualPromise<ExamsTimetableItem[]> = LPNUData.getExamsTimetable(
+      timetableType,
+      groupName
+    ).catch((e) => {
+      console.warn('LPNU API is not working!', e);
+      cacheData.then((t) => this.saveExamsLocally(groupName, t));
+      Toast.warn('Data is possibly outdated!');
+      return null;
+    });
 
-    fetchData.then(t => this.saveExamsLocally(groupName, t));
+    fetchData.then((t) => this.saveExamsLocally(groupName, t));
     return [cacheData, fetchData] as const;
   }
 
-  saveTimetableLocally (group: string, timetable?: TimetableItem[] | null, subgroup?: 1 | 2) {
+  saveTimetableLocally(group: string, timetable?: TimetableItem[] | null, subgroup?: 1 | 2) {
     if (!timetable) return;
-    this.timetables = this.timetables.filter(
-      el => el.group.toUpperCase() !== group.toUpperCase()
-    );
+    this.timetables = this.timetables.filter((el) => el.group.toLowerCase() !== group.toLowerCase());
     this.timetables.push({
       group,
       time: Date.now(),
@@ -246,10 +255,10 @@ class TimetableManager {
     return timetable;
   }
 
-  saveExamsLocally (group: string, timetable?: ExamsTimetableItem[] | null) {
+  saveExamsLocally(group: string, timetable?: ExamsTimetableItem[] | null) {
     if (!timetable) return;
     this.examsTimetables = this.examsTimetables.filter(
-      el => el.group.toUpperCase() !== group.toUpperCase()
+      (el) => el.group.toLowerCase() !== group.toLowerCase()
     );
     this.examsTimetables.push({ group, time: Date.now() });
     storage.setItem(EXAMS_TIMETABLE + group, timetable);
@@ -257,31 +266,38 @@ class TimetableManager {
     return timetable;
   }
 
-  getMergedTimetable (timetablesToMerge?: string[]): RenderPromises<TimetableItem[]> {
-    const timetableNames = timetablesToMerge ?? this.mergedTimetable?.timetables ??
-      (this.mergedTimetable as any)?.timetableNames as string[]; // for backward compatibility
+  getMergedTimetable(timetablesToMerge?: string[]): RenderPromises<TimetableItem[]> {
+    const timetableNames =
+      timetablesToMerge ??
+      this.mergedTimetable?.timetables ??
+      ((this.mergedTimetable as any)?.timetableNames as string[]); // for backward compatibility
     if (!timetableNames) throw Error("Merge doesn't exist!");
-    const timetables = timetableNames.map(el => ({ name: el, data: this.getTimetable(el) }));
-    const cachePromises = timetables.map(({ name, data }) => data[0].then(timetable => ({ timetable, name })));
-    const fetchPromises = timetables.map(({ name, data }) => data[1].then(timetable => ({ timetable, name })));
-    const cacheData: OptimisticPromise<TimetableItem[]> = Promise.all(cachePromises)
-      .then(timetables => Util.mergeTimetables(timetables));
+    const timetables = timetableNames.map((el) => ({ name: el, data: this.getTimetable(el) }));
+    const cachePromises = timetables.map(({ name, data }) =>
+      data[0].then((timetable) => ({ timetable, name }))
+    );
+    const fetchPromises = timetables.map(({ name, data }) =>
+      data[1].then((timetable) => ({ timetable, name }))
+    );
+    const cacheData: OptimisticPromise<TimetableItem[]> = Promise.all(cachePromises).then((timetables) =>
+      Util.mergeTimetables(timetables)
+    );
 
-    const fetchData: ActualPromise<TimetableItem[]> = Promise.all(fetchPromises).then(timetables => {
-      const merged = Util.mergeTimetables(timetables);
-      this.saveMergedTimetable(timetableNames);
-      return merged;
-    }).catch(() => {
-      cacheData.then(merged =>
-        (merged && this.saveMergedTimetable(timetableNames))
-      );
-      Toast.warn('Data is possibly outdated!');
-      return null;
-    });
+    const fetchData: ActualPromise<TimetableItem[]> = Promise.all(fetchPromises)
+      .then((timetables) => {
+        const merged = Util.mergeTimetables(timetables);
+        this.saveMergedTimetable(timetableNames);
+        return merged;
+      })
+      .catch(() => {
+        cacheData.then((merged) => merged && this.saveMergedTimetable(timetableNames));
+        Toast.warn('Data is possibly outdated!');
+        return null;
+      });
     return [cacheData, fetchData] as const;
   }
 
-  updateSubgroup (group?: string, subgroup: 1 | 2 = 1) {
+  updateSubgroup(group?: string, subgroup: 1 | 2 = 1) {
     if (!group) return;
     group = group.trim();
 
@@ -294,11 +310,11 @@ class TimetableManager {
       return storage.setItem(MERGED_TIMETABLE, this.mergedTimetable);
     }
 
-    const data = this.timetables.find(el => el.group === group);
+    const data = this.timetables.find((el) => el.group === group);
     if (!data) throw Error(`Failed to update subgroup! Group: ${group}`);
     if (data.subgroup === subgroup) return;
 
-    this.timetables = this.timetables.filter(el => el.group !== group); // remove previous timetable
+    this.timetables = this.timetables.filter((el) => el.group !== group); // remove previous timetable
     this.timetables.push({
       group,
       time: data.time,
@@ -307,7 +323,7 @@ class TimetableManager {
     return storage.setItem(TIMETABLES, this.timetables);
   }
 
-  getSubgroup (group?: string) {
+  getSubgroup(group?: string) {
     if (!group) return;
 
     if (Util.isMerged(group)) {
@@ -319,23 +335,23 @@ class TimetableManager {
     }
 
     group = group.trim();
-    const data = this.timetables.find(el => el.group === group);
+    const data = this.timetables.find((el) => el.group === group);
     if (!data) return;
     return data.subgroup;
   }
 
-  deleteTimetable (group: string) {
+  deleteTimetable(group: string) {
     if (Util.isMerged(group)) {
       this.mergedTimetable = null;
       return storage.deleteItem(MERGED_TIMETABLE);
     }
     group = group.trim();
-    this.timetables = this.timetables.filter(el => el.group !== group);
+    this.timetables = this.timetables.filter((el) => el.group !== group);
     storage.deleteItem(TIMETABLE + group);
     return storage.setItem(TIMETABLES, this.timetables);
   }
 
-  saveMergedTimetable (timetablesToMerge: string[]) {
+  saveMergedTimetable(timetablesToMerge: string[]) {
     this.mergedTimetable = {
       group: 'Мій розклад',
       time: Date.now(),
@@ -345,9 +361,9 @@ class TimetableManager {
     return storage.setItem(MERGED_TIMETABLE, this.mergedTimetable);
   }
 
-  tryToGetType (timetable: string): TimetableType | undefined {
+  tryToGetType(timetable: string): TimetableType | undefined {
     timetable = timetable.trim();
-    const compare = (el: string) => el.toUpperCase() === timetable.toUpperCase();
+    const compare = (el: string) => el.toLowerCase() === timetable.toLowerCase();
     if (this.groups.some(compare)) return 'timetable';
     if (this.selectiveGroups.some(compare)) return 'selective';
     if (this.lecturers.some(compare)) return 'lecturer';
@@ -364,51 +380,51 @@ class TimetableManager {
     return 'timetable'; // FIXME temporary allow to fetch unknown groups
   }
 
-  getCachedTimetables () {
+  getCachedTimetables() {
     return this.timetables;
   }
 
-  getCachedTime (group: string, isExams = false) {
+  getCachedTime(group: string, isExams = false) {
     if (isExams) {
-      return this.examsTimetables.find(el => el.group === group)?.time;
+      return this.examsTimetables.find((el) => el.group === group)?.time;
     }
-    return this.timetables.find(el => el.group === group)?.time;
+    return this.timetables.find((el) => el.group === group)?.time;
   }
 
-  get cachedInstitutes () {
+  get cachedInstitutes() {
     return this.institutes;
   }
 
-  get cachedGroups () {
+  get cachedGroups() {
     return this.groups;
   }
 
-  get cachedSelectiveGroups () {
+  get cachedSelectiveGroups() {
     return this.selectiveGroups;
   }
 
-  get cachedLecturers () {
+  get cachedLecturers() {
     return this.lecturers;
   }
 
-  get cachedMergedTimetable () {
+  get cachedMergedTimetable() {
     return this.mergedTimetable;
   }
 
-  private async getInstitutes (): Promise<CachedInstitute[]> {
+  private async getInstitutes(): Promise<CachedInstitute[]> {
     if (this.institutes.length > 0) return this.institutes;
     this.institutes = await this.getData(INSTITUTES, FallbackData.getInstitutes);
     return this.institutes;
   }
 
-  private async ifPartialTimetableExists (group: string, halfTerm: 1 | 2) {
+  private async ifPartialTimetableExists(group: string, halfTerm: 1 | 2) {
     // if (!this.groups.includes(group)) return false;
     // const partialGroups = await this.getPartialGroups(halfTerm);
     // return partialGroups.includes(group);
     return false;
   }
 
-  private async getPartialGroups (halfTerm: 1 | 2) {
+  private async getPartialGroups(halfTerm: 1 | 2) {
     if (halfTerm === 1) {
       if (this.firstHalfTermGroups.length !== 0) return this.firstHalfTermGroups;
       const data = await this.getData(PARTIAL_GROUPS_1, LPNUData.getPartialGroups, halfTerm);
@@ -422,8 +438,8 @@ class TimetableManager {
     }
   }
 
-  private async getTimetableGroups (institute?: string): Promise<string[]> {
-    const key = GROUPS + (institute ? ('_' + institute) : '');
+  private async getTimetableGroups(institute?: string): Promise<string[]> {
+    const key = GROUPS + (institute ? '_' + institute : '');
     if (!institute && this.groups.length > 0) return this.groups;
 
     const data = await this.getData(key, FallbackData.getGroups, institute);
@@ -431,13 +447,13 @@ class TimetableManager {
     return data;
   }
 
-  private async getSelectiveGroups (): Promise<string[]> {
+  private async getSelectiveGroups(): Promise<string[]> {
     if (this.selectiveGroups.length > 0) return this.selectiveGroups;
     this.selectiveGroups = await this.getData(SELECTIVE_GROUPS, FallbackData.getSelectiveGroups);
     return this.selectiveGroups;
   }
 
-  private async getLecturers (department?: string): Promise<string[]> {
+  private async getLecturers(department?: string): Promise<string[]> {
     if (this.lecturers.length > 0 && !department) return this.lecturers;
     const lecturers = await FallbackData.getLecturers(department);
     if (!department) {
@@ -447,7 +463,7 @@ class TimetableManager {
     return lecturers;
   }
 
-  private async getLecturerDepartments (): Promise<string[]> {
+  private async getLecturerDepartments(): Promise<string[]> {
     if (this.departments.length > 0) return this.departments;
     this.departments = await this.getData(DEPARTMENTS, FallbackData.getLecturerDepartments);
     return this.departments;
@@ -459,7 +475,7 @@ class TimetableManager {
     if (!Array.isArray(cached) && cached) return cached;
 
     if (DEVELOP) console.log('Getting data from server', cacheKey);
-    const binding = (cacheKey.includes('partial')) ? LPNUData : FallbackData; // TODO: fix this
+    const binding = cacheKey.includes('partial') ? LPNUData : FallbackData; // TODO: fix this
     const data: T = await fn.call(binding, ...args).catch(async () => {
       if (DEVELOP) console.log('Failed to get data from server', cacheKey);
       const cached = await this.getFromCache<T>(cacheKey, true);
@@ -476,7 +492,7 @@ class TimetableManager {
     if (cached && updated && (!Util.needsUpdate(updated) || force)) return cached as T;
   }
 
-  private updateCache (key: string, data: any) {
+  private updateCache(key: string, data: any) {
     storage.setItem(key, data);
     storage.setItem(key + UPDATED, Date.now());
   }

@@ -1,4 +1,6 @@
+import { ENABLE_SATURDAYS, FIRST_CLASS_DATE } from './constants';
 import TimetableManager from './data/TimetableManager';
+import { countDaysFrom } from './date';
 import { findAndConvertRomanNumeral, hashCode } from './general';
 import type {
   CachedTimetable,
@@ -148,4 +150,27 @@ const timetableItemDisplayTypes: Record<TimetableItemType, string> = {
 
 export function getDisplayType (type: TimetableItemType) {
   return timetableItemDisplayTypes[type];
+}
+
+export function generateSaturdayLessons(originalTimetable: TimetableItem[]) {
+  if (ENABLE_SATURDAYS) {
+    const dayCount = countDaysFrom(new Date(FIRST_CLASS_DATE));
+    const alreadyHasSaturdayLessons = originalTimetable.some((item) => item.day === 6);
+    if (dayCount < 0 || alreadyHasSaturdayLessons) return [];
+
+    const weeksFromStart = dayCount / 7;
+    const saturdayLessonsDay = (Math.floor(weeksFromStart) % 5) + 1;
+    const shouldHaveLessonsFromEvenWeek = weeksFromStart > 5; // Second 5 weeks
+    if (weeksFromStart > 10) return []; // No Saturday lessons after 10 weeks
+
+    const saturdayLessons = originalTimetable.filter(
+      (item) =>
+        item.day === saturdayLessonsDay &&
+        (shouldHaveLessonsFromEvenWeek ? item.isSecondWeek : item.isFirstWeek)
+    );
+
+    return saturdayLessons.map((item) => ({ ...item, day: 6 }));
+  } else {
+    return [];
+  }
 }
