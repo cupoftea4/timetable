@@ -15,7 +15,7 @@
   cursor: pointer;
   transition: background-color .2s ease-in-out;
   &:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--accent-hover-clr);
   }
 }
 

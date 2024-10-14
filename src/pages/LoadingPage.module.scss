@@ -5,7 +5,7 @@
   @include flex-center;
   height: 100vh;
   height: 100dvh;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.25);
   div {
     @include flex-center;
     gap: 1rem;

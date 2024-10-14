@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,700;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,500;0,600;0,700;1,700&display=swap');
 
 :root {
   @include tablet {
@@ -24,20 +24,22 @@
   overflow: overlay; // deprecated :(
 }
 
-:root {
-  --secondary-glow: linear-gradient(
-    to bottom right,
-    rgba(1, 65, 255, 0),
-    rgba(1, 65, 255, 0),
-    hsla(210, 100%, 65%, 0.3)
-  );
-} 
-
 html, body, #root {
  min-height: 100vh;
  min-height: 100dvh;
 }
  
+@property --bg-clr-1 {
+  syntax: '<color>';
+  initial-value: #101010;
+  inherits: false;
+}
+
+@property --bg-clr-2 {
+  syntax: '<color>';
+  initial-value: #070d21;
+  inherits: false;
+}
 
 body {
   background: $bg-light;
@@ -46,38 +48,16 @@ body {
   
   font-weight: $regular-font;
   
-  @media screen and (prefers-color-scheme: dark) {
-    --background-start-rgb: 0, 00, 10;
-    --background-end-rgb: 0, 0, 10;
+  background: linear-gradient(
+    var(--bg-clr-1),
+    var(--bg-clr-2)
+  );
+  transition: --bg-clr-1 0.5s, --bg-clr-2 0.5s;
 
-    background: linear-gradient(
-        to bottom,
-        transparent,
-        rgb(var(--background-end-rgb))
-      )
-      rgb(var(--background-start-rgb)
-    );
-  }
   color: var(--text-clr);
   main {
+    overflow-x: hidden;
     padding: $main-padding;
-    @media screen and (prefers-color-scheme: dark) {
-      &::before {
-        content: '';
-        left: 50%;
-        top: 50%;
-        position: absolute;
-        filter: blur(45px);
-        transform: translateZ(0);
-        background: var(--secondary-glow);
-        border-radius: 50%;
-        width: 70%;
-        height: 60%;
-        transform: translateX(-60%) translateY(-60%);
-        z-index: -1;
-      }
-    }
-   
   }
 }
 
@@ -113,4 +93,12 @@ a, button {
   &.practical:hover {
     background-color: $timetable-pract-hover-clr;
   }
+}
+
+svg:not(.stroke-based) path {
+  fill: var(--text-clr);
+}
+
+svg.stroke-based path {
+  stroke: var(--text-clr);
 }

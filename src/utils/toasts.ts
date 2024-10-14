@@ -89,6 +89,7 @@ function showErrorToast (message: string) {
 function showWarningToast (message: string) {
   if (pendingToasts.has(message)) return;
   pendingToasts.add(message);
-  toast.warn(message, { theme: isDarkMode() ? 'dark' : 'light', hideProgressBar: true });
+  // use inverted colors :D
+  toast.warn(message, { theme: !isDarkMode() ? 'dark' : 'light', hideProgressBar: true, icon: '🤔' });
   setTimeout(() => pendingToasts.delete(message), TOAST_AUTO_CLOSE_TIME);
 }

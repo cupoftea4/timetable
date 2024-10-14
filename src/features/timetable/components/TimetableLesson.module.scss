@@ -15,7 +15,10 @@ $cell-border-radius: .625rem;
 .cell-container {
   position: relative;
   margin-block: 0.5rem;
-  --bg-alpha: 0.05;
+  --bg-alpha: 0.2;
+  @include dark-mode {
+    --bg-alpha: 0.05;
+  }
 
   --lab-clr: #{hsl-list($timetable-lab-hsl)};
   --pract-clr: #{hsl-list($timetable-pract-hsl)};
@@ -93,7 +96,6 @@ $cell-border-radius: .625rem;
       z-index: 5;
       display: block;
       &::before, &::after {
-        color: white;
         font-size: $small-font-size;
         position: absolute;
         top: 50%;
@@ -121,8 +123,7 @@ $cell-border-radius: .625rem;
     font-size:  $small-font-size;
     @include timetable-mobile {
       border-radius: $cell-border-radius;
-      --bg-alpha: .5;
-      color: white;
+      --bg-alpha: .3;
       @include dark-mode {
         --bg-alpha: .3;
         color: var(--text-clr);
@@ -144,7 +145,7 @@ $cell-border-radius: .625rem;
         margin-left: 0;
       }
       .subgroup {
-        color: $extra-text-clr;
+        color: var(--extra-text-clr);
       }
       /* Name and lecturer */
       .title {
@@ -161,7 +162,7 @@ $cell-border-radius: .625rem;
         justify-content: space-between;
         flex-wrap: wrap;
         margin-bottom: .325rem;
-        color: $extra-text-clr;
+        color: var(--extra-text-clr);
         padding-right: .25rem;
         line-height: normal;
       }
@@ -177,7 +178,11 @@ $cell-border-radius: .625rem;
 }
 @include timetable-mobile {
   .cell-container.active .cell {
-    filter: brightness(150%);
+    filter: brightness(110%);
+    // TODO: Probably better would be `filter: drop-shadow(0 0 .5rem rgba(255, 255, 255, 0.4));`
+    @include dark-mode {
+      filter: brightness(150%);
+    }
   }
 }
 

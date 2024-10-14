@@ -69,7 +69,7 @@
 }
 
 @mixin dark-mode {
-  @media screen and (prefers-color-scheme: dark) {
+  @at-root [data-theme^=dark] & {
     @content;
   }
 }
