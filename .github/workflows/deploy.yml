@@ -22,7 +22,7 @@ jobs:
         run: npm install
 
       - name: Build project
-        run: npm run build
+        run: npm run build:prod
 
       - name: Deploy
         uses: SamKirkland/FTP-Deploy-Action@4.3.1
