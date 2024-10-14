@@ -1,0 +1,9 @@
+@use '../styles/utils' as *;
+@use '../styles/variables' as *;  
+
+.icon {
+  transition: transform 0.2s ease-in-out;
+  &:hover, &:focus {
+    transform: scale(1.05);
+  }
+}

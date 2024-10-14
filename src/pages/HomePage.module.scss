@@ -133,9 +133,10 @@ $lecturers-second-layer-width: 20rem;
     .cat {
       width: 20rem;
       height: auto;
-      filter: contrast(0.65);
+
+      filter: contrast(0.65) drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.468));
       @include dark-mode {
-        filter: invert(75%);
+        filter: invert(175%) drop-shadow(2px 4px 6px black);
       }
     }
     .cat-text {

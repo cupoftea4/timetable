@@ -29,6 +29,17 @@ html, body, #root {
  min-height: 100dvh;
 }
  
+@property --bg-clr-1 {
+  syntax: '<color>';
+  initial-value: #101010;
+  inherits: false;
+}
+
+@property --bg-clr-2 {
+  syntax: '<color>';
+  initial-value: #070d21;
+  inherits: false;
+}
 
 body {
   background: $bg-light;
@@ -37,32 +48,11 @@ body {
   
   font-weight: $regular-font;
   
-
   background: linear-gradient(
     var(--bg-clr-1),
     var(--bg-clr-2)
   );
-
-  // background: linear-gradient(
-  //     to bottom,
-  //     transparent,
-  //     rgb(var(--background-end-rgb))
-  //   )
-  //   rgb(var(--background-start-rgb)
-  // );
-
-  // @media screen and (prefers-color-scheme: dark) {
-  //   background-color: black;
-  //   background-image: radial-gradient(
-  //     ellipse at left 20% top -70%,
-  //     rgba(96, 10, 255, .3) 0%,
-  //     transparent 60%
-  //   ), radial-gradient(
-  //     ellipse at left 110% top 110%,
-  //     rgba(255, 51, 211, 0.15) 0%,
-  //     transparent 60%
-  //   );
-  // }
+  transition: --bg-clr-1 0.5s, --bg-clr-2 0.5s;
 
   color: var(--text-clr);
   main {
@@ -105,6 +95,10 @@ a, button {
   }
 }
 
-svg path {
+svg:not(.stroke-based) path {
   fill: var(--text-clr);
+}
+
+svg.stroke-based path {
+  stroke: var(--text-clr);
 }

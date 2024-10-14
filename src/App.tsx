@@ -39,11 +39,10 @@ const App = () => {
       Toast.error('Theme not found', 'Theme error');
       return;
     }
-    const rootStyle = document.documentElement.style;
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
-    rootStyle.setProperty('--bg-clr-1', currentTheme.color1);
-    rootStyle.setProperty('--bg-clr-2', currentTheme.color2);
+    document.body.style.setProperty('--bg-clr-1', currentTheme.color1);
+    document.body.style.setProperty('--bg-clr-2', currentTheme.color2);
   }, [theme]);
 
   useEffect(
