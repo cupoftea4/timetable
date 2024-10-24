@@ -1,0 +1,46 @@
+name: Deploy to FTP Server
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Cache node modules
+        id: node-caching
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            **/node_modules
+          key: ${{ runner.os }}-nodev20-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-nodev20-
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: npm install
+        if: steps.node-caching.outputs.cache-hit != 'true' 
+        run: npm install
+
+      - name: Build project
+        run: npm run build:hope
+
+      - name: Deploy
+        uses: SamKirkland/FTP-Deploy-Action@4.3.1
+        with:
+          server: '${{ secrets.FTP_SERVER }}'
+          username: '${{ secrets.DEV_FTP_USERNAME }}'
+          password: '${{ secrets.DEV_FTP_PASSWORD }}'
+          local-dir: ./build/
+          server-dir: /
