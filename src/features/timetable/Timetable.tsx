@@ -1,36 +1,36 @@
-import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
-import TimetableLesson from './components/TimetableLesson';
-import useWindowDimensions from '@/hooks/useWindowDimensions';
-import { generateSaturdayLessons, lessonsTimes, unique } from '@/utils/timetable';
-import { getCurrentUADate, stringToDate } from '@/utils/date';
-import { DEVELOP, TIMETABLE_SCREEN_BREAKPOINT } from '@/utils/constants';
-import type { TimetableItem } from '@/types/timetable';
-import { classes } from '@/styles/utils';
-import styles from './Timetable.module.scss';
+import useWindowDimensions from "@/hooks/useWindowDimensions";
+import { classes } from "@/styles/utils";
+import type { TimetableItem } from "@/types/timetable";
+import { DEVELOP, TIMETABLE_SCREEN_BREAKPOINT } from "@/utils/constants";
+import { getCurrentUADate, stringToDate } from "@/utils/date";
+import { generateSaturdayLessons, lessonsTimes, unique } from "@/utils/timetable";
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
+import styles from "./Timetable.module.scss";
+import TimetableLesson from "./components/TimetableLesson";
 
 type OwnProps = {
-  timetable: TimetableItem[]
-  isSecondSubgroup: boolean
-  isSecondWeek: boolean
-  hasCellSubgroups?: boolean
+  timetable: TimetableItem[];
+  isSecondSubgroup: boolean;
+  isSecondWeek: boolean;
+  hasCellSubgroups?: boolean;
 };
 
 const MINUTE = 60 * 1000;
+
+const forBothSubgroups = (item: TimetableItem) => item.isFirstSubgroup && item.isSecondSubgroup;
+const forAllWeeks = (item: TimetableItem) => item.isFirstWeek && item.isSecondWeek;
 
 const Timetable: FC<OwnProps> = ({
   timetable: originalTimetable,
   isSecondSubgroup,
   isSecondWeek,
-  hasCellSubgroups
+  hasCellSubgroups,
 }) => {
   const { width } = useWindowDimensions();
   const isMobile = width < TIMETABLE_SCREEN_BREAKPOINT;
 
   const timetable = useMemo(() => {
-    return [
-      ...originalTimetable,
-      ...generateSaturdayLessons(originalTimetable)
-    ];
+    return [...originalTimetable, ...generateSaturdayLessons(originalTimetable)];
   }, [originalTimetable]);
 
   const maxLessonNumber = useMemo(
@@ -46,10 +46,7 @@ const Timetable: FC<OwnProps> = ({
 
   const days = useMemo(
     () =>
-      [null, 'Понеділок', 'Вівторок', 'Середа', 'Четвер', "П'ятниця", 'Субота', 'Неділя'].slice(
-        0,
-        maxDayNumber + 1
-      ),
+      [null, "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"].slice(0, maxDayNumber + 1),
     [maxDayNumber]
   );
 
@@ -70,9 +67,6 @@ const Timetable: FC<OwnProps> = ({
     };
   }, [getCurrentLessonNumber]);
 
-  const forBothSubgroups = (item: TimetableItem) => item.isFirstSubgroup && item.isSecondSubgroup;
-  const forAllWeeks = (item: TimetableItem) => item.isFirstWeek && item.isSecondWeek;
-
   const getLessonsByDayAndTime = useCallback(
     (number: number, day: number) => {
       if (!timetable) return null;
@@ -81,28 +75,27 @@ const Timetable: FC<OwnProps> = ({
           item.day === day &&
           item.number === number &&
           (hasCellSubgroups || item.isSecondSubgroup === isSecondSubgroup || forBothSubgroups(item)) &&
-          ((item.isSecondWeek === isSecondWeek || forAllWeeks(item)) || item.day === 6)
+          (item.isSecondWeek === isSecondWeek || forAllWeeks(item) || item.day === 6)
       );
       return result.length === 0 ? null : unique(result);
     },
     [timetable, isSecondSubgroup, isSecondWeek, hasCellSubgroups]
   );
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: I have no idea why
   const tableContent = useMemo(() => {
     if (isMobile) return null;
-    if (DEVELOP) console.log('Running scary useMemo');
+    if (DEVELOP) console.log("Running scary useMemo");
     const table = timetableLessonsTimes.map((time, i) => (
       <tr key={time.start}>
         {days.map((day, j) =>
-          day === null
-            ? (
-            <th key={time.start} style={{ height: '5rem' }}>
+          day === null ? (
+            <th key={time.start} style={{ height: "5rem" }}>
               <span className={classes(styles.metadata, styles.start)}>{time.start}</span>
               <span className={classes(styles.metadata, styles.number)}>{i + 1}</span>
               <span className={classes(styles.metadata, styles.end)}>{time.end}</span>
             </th>
-              )
-            : (
+          ) : (
             <TimetableLesson
               isListView={false}
               isAfterEmpty={i !== 0 && getLessonsByDayAndTime(i, j) === null}
@@ -111,7 +104,7 @@ const Timetable: FC<OwnProps> = ({
               key={time.start + day}
               cellSubgroup={hasCellSubgroups}
             />
-              )
+          )
         )}
       </tr>
     ));
@@ -124,15 +117,16 @@ const Timetable: FC<OwnProps> = ({
     getLessonsByDayAndTime,
     currentLessonNumber,
     currentDay,
-    hasCellSubgroups
+    hasCellSubgroups,
   ]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: I have no idea why
   const listsContent = useMemo(() => {
     if (!isMobile) return null;
-    if (DEVELOP) console.log('Running scary useMemo');
+    if (DEVELOP) console.log("Running scary useMemo");
     const lists = days.filter(Boolean).map((day, i) => (
       <div key={i} className={styles.list}>
-        <h3 className={styles['day-title']}>{day}</h3>
+        <h3 className={styles["day-title"]}>{day}</h3>
         <ol className={styles.list}>
           {timetableLessonsTimes.map((time, j) => (
             <TimetableLesson
@@ -155,14 +149,12 @@ const Timetable: FC<OwnProps> = ({
     getLessonsByDayAndTime,
     currentLessonNumber,
     currentDay,
-    hasCellSubgroups
+    hasCellSubgroups,
   ]);
 
-  return isMobile
-    ? (
+  return isMobile ? (
     <div className={classes(styles.timetable, styles.lists)}>{listsContent}</div>
-      )
-    : (
+  ) : (
     <table className={styles.timetable}>
       <thead>
         <tr>
@@ -173,7 +165,7 @@ const Timetable: FC<OwnProps> = ({
       </thead>
       <tbody>{tableContent}</tbody>
     </table>
-      );
+  );
 };
 
 export default Timetable;

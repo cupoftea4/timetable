@@ -1,7 +1,7 @@
 declare global {
   interface Window {
-      APP_VERSION: string;
+    APP_VERSION: string;
   }
 }
 
-export { };
+export {};

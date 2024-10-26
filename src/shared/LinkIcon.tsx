@@ -1,14 +1,14 @@
-import React, { type FC } from 'react';
-import DefaultLink from '@/assets/links/DefaultLink';
-import DiscordIcon from '@/assets/links/DiscordIcon';
-import GoogleMeetsIcon from '@/assets/links/GoogleMeetsIcon';
-import SkypeIcon from '@/assets/links/SkypeIcon';
-import TeamsIcon from '@/assets/links/TeamsIcon';
-import YouTubeIcon from '@/assets/links/YouTubeIcon';
-import ZoomIcon from '@/assets/links/ZoomIcon';
+import DefaultLink from "@/assets/links/DefaultLink";
+import DiscordIcon from "@/assets/links/DiscordIcon";
+import GoogleMeetsIcon from "@/assets/links/GoogleMeetsIcon";
+import SkypeIcon from "@/assets/links/SkypeIcon";
+import TeamsIcon from "@/assets/links/TeamsIcon";
+import YouTubeIcon from "@/assets/links/YouTubeIcon";
+import ZoomIcon from "@/assets/links/ZoomIcon";
+import React, { type FC } from "react";
 
 type OwnProps = {
-  link: string
+  link: string;
 };
 
 const linkIcons: Readonly<Record<string, () => JSX.Element>> = {
@@ -17,20 +17,14 @@ const linkIcons: Readonly<Record<string, () => JSX.Element>> = {
   google: GoogleMeetsIcon,
   discord: DiscordIcon,
   youtube: YouTubeIcon,
-  'youtu.be': YouTubeIcon,
-  skype: SkypeIcon
+  "youtu.be": YouTubeIcon,
+  skype: SkypeIcon,
 };
 
 const LinkIcon: FC<OwnProps> = ({ link }) => {
   const linkIcon = Object.keys(linkIcons).find((key) => link.includes(key));
 
-  return (
-    <>
-      {
-        linkIcon ? React.createElement(linkIcons[linkIcon]!) : <DefaultLink />
-      }
-    </>
-  );
+  return <>{linkIcon && linkIcons[linkIcon] ? React.createElement(linkIcons[linkIcon]) : <DefaultLink />}</>;
 };
 
 export default LinkIcon;

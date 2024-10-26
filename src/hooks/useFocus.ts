@@ -1,10 +1,10 @@
-import { useRef } from 'react';
+import { useRef } from "react";
 
 const useFocus = <T extends HTMLElement>() => {
   const htmlElRef = useRef<T | null>(null);
-  const setFocus = (childInput: boolean = false) => {
+  const setFocus = (childInput = false) => {
     if (childInput) {
-      htmlElRef.current?.querySelector('input')?.focus();
+      htmlElRef.current?.querySelector("input")?.focus();
       return;
     }
     htmlElRef.current?.focus();

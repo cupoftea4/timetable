@@ -1,9 +1,9 @@
-export type IconStyles = { className?: string, style?: React.CSSProperties };
+export type IconStyles = { className?: string; style?: React.CSSProperties };
 
 export enum Status {
-  Loading,
-  Idle,
-  Failed
+  Loading = "loading",
+  Idle = "idle",
+  Failed = "failed",
 }
 
 export type OptimisticPromise<T> = Promise<T | null | undefined>;

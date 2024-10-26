@@ -1,4 +1,4 @@
-export const LVIV_TIMEZONE = 'Europe/Uzhgorod';
+export const LVIV_TIMEZONE = "Europe/Uzhgorod";
 
 export const getCurrentUADate = () => {
   const offset = new Date().getTimezoneOffset() * 60000;
@@ -7,7 +7,7 @@ export const getCurrentUADate = () => {
 };
 
 const getTimezoneOffset = (timeZone: string, date = new Date()) => {
-  const tz = date.toLocaleString('en', { timeZone, timeStyle: 'long' }).split(' ').slice(-1)[0];
+  const tz = date.toLocaleString("en", { timeZone, timeStyle: "long" }).split(" ").slice(-1)[0];
   const utc = date.toUTCString();
   const dateString = utc.substring(0, utc.length - 4);
   const offset = Date.parse(`${dateString} UTC`) - Date.parse(`${dateString} ${tz}`);
@@ -17,8 +17,8 @@ const getTimezoneOffset = (timeZone: string, date = new Date()) => {
 
 export const stringToDate = (time: string) => {
   const date = getCurrentUADate();
-  const [hours, minutes] = time.split(':');
-  if (!hours || !minutes) return 'Invalid time format';
+  const [hours, minutes] = time.split(":");
+  if (!hours || !minutes) return "Invalid time format";
   date.setHours(+hours);
   date.setMinutes(+minutes);
   date.setSeconds(0);
@@ -36,17 +36,16 @@ export function getNULPWeek() {
   return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
 }
 
-export function getCurrentSemester(): '1' | '2' {
+export function getCurrentSemester(): "1" | "2" {
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1; // Month is 0-based, so we add 1
   const currentDay = currentDate.getDate();
 
   // Check if it's January 15 or later but before August 1
   if ((currentMonth === 1 && currentDay >= 15) || (currentMonth > 1 && currentMonth < 8)) {
-    return '2'; // Second semester
-  } else {
-    return '1'; // First semester (assuming other months)
+    return "2"; // Second semester
   }
+  return "1"; // First semester (assuming other months)
 }
 
 export function countDaysFrom(startDate: Date): number {
