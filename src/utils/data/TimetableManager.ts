@@ -252,6 +252,7 @@ class TimetableManager {
     });
     storage.setItem(TIMETABLE + group, timetable);
     storage.setItem(TIMETABLES, this.timetables);
+    localStorage.setItem(TIMETABLES, JSON.stringify(this.timetables));
     return timetable;
   }
 
