@@ -91,7 +91,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     };
     try {
       return optimisticRender(renderTimetable, onError, TimetableManager.getTimetable(group, type, checkCache));
-    } catch (e) {
+    } catch (_e) {
       onError(Toast.NONEXISTING_TIMETABLE);
     }
   }

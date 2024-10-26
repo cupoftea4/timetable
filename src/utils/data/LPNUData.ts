@@ -142,7 +142,7 @@ export default class LPNUData {
     ).then(Parser.parsePartialGroups.bind(Parser));
   }
 
-  static getTimetable(type: LPNUTimetableType, timetableName = "All", timetableCategory = "All") {
+  static getTimetable(type: LPNUTimetableType, timetableName = "All", _timetableCategory = "All") {
     const suffix = timetableSuffixes[type];
     if (suffix === LECTURER_SUFFIX) {
       return LPNUData.fetchHTML(
@@ -187,7 +187,7 @@ export default class LPNUData {
     ).then(Parser.parseTimetable.bind(Parser));
   }
 
-  static getExamsTimetable(type: TimetableType, group = "All", institute = "All") {
+  static getExamsTimetable(type: TimetableType, group = "All", _institute = "All") {
     if (type === "lecturer") {
       return LPNUData.fetchHTML(
         {

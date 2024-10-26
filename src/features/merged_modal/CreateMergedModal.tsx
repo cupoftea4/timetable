@@ -88,7 +88,7 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
           <legend className={styles.legend}>Пошук</legend>
           <div className={styles.choice}>
             <span className={styles.selected}>
-              {timetablesToMerge.map((timetable, index) => (
+              {timetablesToMerge.map((timetable) => (
                 <span
                   key={timetable}
                   onClick={() => {

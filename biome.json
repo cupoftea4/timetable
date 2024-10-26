@@ -36,6 +36,13 @@
       },
       "suspicious": {
         "noArrayIndexKey": "info"
+      },
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error"
+      },
+      "style": {
+        "useConst": "error"
       }
     }
   },

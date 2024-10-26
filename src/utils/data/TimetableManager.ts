@@ -407,7 +407,7 @@ class TimetableManager {
     return this.institutes;
   }
 
-  private async ifPartialTimetableExists(group: string, halfTerm: 1 | 2) {
+  private async ifPartialTimetableExists(_group: string, _halfTerm: 1 | 2) {
     // if (!this.groups.includes(group)) return false;
     // const partialGroups = await this.getPartialGroups(halfTerm);
     // return partialGroups.includes(group);
