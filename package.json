@@ -18,7 +18,7 @@
     "dev": "env-cmd -f dev.env vite",
     "build:prod": "tsc && env-cmd -f .env vite build",
     "build:hope": "tsc && env-cmd -f hope.env vite build --mode development",
-    "lint": "eslint \"./src/**/*.{ts,tsx}\""
+    "lint": "biome lint"
   },
   "eslintConfig": {
     "extends": [
@@ -54,6 +54,7 @@
     "eslint-plugin-n": "^15.0.0 || ^16.0.0 ",
     "eslint-plugin-promise": "^6.0.0",
     "eslint-plugin-react": "^7.33.0",
+    "lefthook": "^1.8.1",
     "sass": "^1.55.0",
     "typescript": "^4.8.4",
     "vite": "^4.2.1",
