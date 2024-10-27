@@ -203,8 +203,7 @@ class TimetableManager {
       });
 
     fetchData.then((t) => this.saveTimetableLocally(groupName, t, data?.subgroup));
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    return [cacheData, fetchData as any] as const;
+    return [cacheData, fetchData] as const;
   }
 
   getExamsTimetable(group: string, type?: TimetableType, checkCache = true): RenderPromises<ExamsTimetableItem[]> {

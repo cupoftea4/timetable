@@ -34,7 +34,7 @@ const App = () => {
 
   return (
     <>
-      {status ? (
+      {status !== Status.Loading ? (
         <>
           <BrowserRouter>
             <Routes>
