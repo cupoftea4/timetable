@@ -25,7 +25,7 @@ const GROUPS = "groups";
 const LECTURERS = "lecturers";
 const DEPARTMENTS = "departments";
 const SELECTIVE_GROUPS = "selective_groups";
-const TIMETABLES = "cached_timetables";
+const SAVED_TIMETABLES = "cached_timetables";
 const EXAMS_TIMETABLES = "cached_exams_timetables";
 const TIMETABLE = "timetable_";
 const PARTIAL_GROUPS_1 = "partial_groups_1";
@@ -56,7 +56,7 @@ class TimetableManager {
 
   async init() {
     // cache only data
-    this.timetables = (await storage.getItem(TIMETABLES)) ?? [];
+    this.timetables = (await storage.getItem(SAVED_TIMETABLES)) ?? [];
     this.mergedTimetable = (await storage.getItem(MERGED_TIMETABLE)) ?? null;
     storage.getItem<CachedTimetable[]>(EXAMS_TIMETABLES).then((data) => {
       this.examsTimetables = data ?? [];
@@ -245,8 +245,8 @@ class TimetableManager {
       subgroup,
     });
     storage.setItem(TIMETABLE + group, timetable);
-    storage.setItem(TIMETABLES, this.timetables);
-    localStorage.setItem(TIMETABLES, JSON.stringify(this.timetables));
+    storage.setItem(SAVED_TIMETABLES, this.timetables);
+    localStorage.setItem(SAVED_TIMETABLES, JSON.stringify(this.timetables));
     return timetable;
   }
 
@@ -310,7 +310,8 @@ class TimetableManager {
       time: data.time,
       subgroup,
     });
-    return storage.setItem(TIMETABLES, this.timetables);
+    localStorage.setItem(SAVED_TIMETABLES, JSON.stringify(this.timetables));
+    return storage.setItem(SAVED_TIMETABLES, this.timetables);
   }
 
   getSubgroup(groupName?: string) {
@@ -338,7 +339,8 @@ class TimetableManager {
     const groupNameClean = groupName.trim();
     this.timetables = this.timetables.filter((el) => el.group !== groupNameClean);
     storage.deleteItem(TIMETABLE + groupNameClean);
-    return storage.setItem(TIMETABLES, this.timetables);
+    localStorage.setItem(SAVED_TIMETABLES, JSON.stringify(this.timetables));
+    return storage.setItem(SAVED_TIMETABLES, this.timetables);
   }
 
   saveMergedTimetable(timetablesToMerge: string[]) {
