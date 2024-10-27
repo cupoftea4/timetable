@@ -1,3 +1,4 @@
+import { useSearchBarFocus } from "@/context/searchBarFocus";
 import { classes } from "@/styles/utils";
 import { sortGroupsByYear } from "@/utils/timetable";
 import { type FC, useState } from "react";
@@ -19,9 +20,7 @@ type OwnProps = {
 const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) => {
   const groupsByYear = sortGroupsByYear(timetables);
   const [expandedYear, setExpandedYear] = useState<Year | null>(null); // for mobile onClick event and keyboard navigation
-  function handleClickOnSearch() {
-    document.querySelector("input")?.focus();
-  }
+  const { focus } = useSearchBarFocus();
 
   return (
     <div className={styles.timetables}>
@@ -64,12 +63,15 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) =>
         )}
         <div className={styles.timetablesInfo}>
           <p>
-             Не знайшли свою групу? Якщо ваша група не відображається у списку, введіть назву групи в полі{" "}
-            <span onClick={handleClickOnSearch}>пошуку</span>.
+            <span className="font-bold">Не знайшли свою групу?</span> Спробуйте ввести назву групи в{" "}
+            <span className={styles.link} onClick={() => focus()}>
+              полі пошуку
+            </span>
+            .
           </p>
           <p>
-            Альтернативно: ви також можете додати назву групи до посилання, як у цьому прикладі:
-            https://lpnu.pp.ua/ОІ-32
+            Альтернативно: ви також можете додати назву групи до посилання, як у цьому прикладі:{" "}
+            <span className="text-nowrap">{window.location.origin}/ОІ-32</span>
           </p>
         </div>
       </div>

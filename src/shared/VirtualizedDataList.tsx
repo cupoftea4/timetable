@@ -18,6 +18,7 @@ type OwnProps = {
   className?: string;
   initialDisplayedCount?: number;
   autoFocus?: boolean;
+  isExpanded?: boolean;
   allowCustomValue?: boolean;
 };
 
@@ -35,6 +36,7 @@ const VirtualizedDataList: FC<OwnProps> = ({
   initialDisplayedCount = 10,
   autoFocus = false,
   allowCustomValue = false,
+  isExpanded = false,
 }) => {
   const { value: inputValue, setValue: setInputValue } = useComboboxControls({ isExpanded: false });
   const [displayedCount, setDisplayedCount] = React.useState(initialDisplayedCount);
@@ -77,6 +79,7 @@ const VirtualizedDataList: FC<OwnProps> = ({
       items={options}
       filters={[filterOptions]}
       inputProps={{ autoFocus }}
+      isExpanded={isExpanded}
       onSelect={(item) => {
         onSelect(item);
         clearOnSelect && setInputValue("");

@@ -6,6 +6,7 @@ import { getAllTimetables } from "@/utils/timetable";
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import "react-datalist-input/dist/styles.css";
+import { useSearchBarFocus } from "@/context/searchBarFocus";
 import type { TimetableType } from "@/types/timetable";
 import styles from "./SearchBar.module.scss";
 
@@ -20,6 +21,7 @@ type OwnProps = {
 };
 
 const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
+  const { isFocused } = useSearchBarFocus();
   const options = getSearchBarOptions();
   const navigate = useNavigate();
   const ref = useOnClickOutside(() => {
@@ -42,6 +44,8 @@ const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
           placeholder="Розклад..."
           ignoreSpecialCharacters
           allowCustomValue
+          autoFocus
+          isExpanded={isFocused}
         />
       </span>
     </span>
