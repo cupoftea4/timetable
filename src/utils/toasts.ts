@@ -6,7 +6,7 @@ const DEBOUNCE_TOAST_TIME = 500;
 
 const initErrors = [
   "The creator run out of imagination, failed to initialize cache",
-  "Congratulations your first loading is a failure, like you.....",
+  "Congratulations your first loading is a failure",
   "Congrats, you won a lottery, your cache failed to initialize with a chance of 1 to 10000000000000",
   "The creator is a lazy bum, failed to initialize cache",
   "RIP cache, you will be missed",
@@ -27,7 +27,7 @@ const nonexistingGroupErrors = [
 ];
 
 export default class Toast {
-  static readonly FETCH_ERROR = "Due to failed fetch u have no lectures tomorrow, go to sleep 😴";
+  static readonly FETCH_ERROR = "Failed to fetch the data";
   static readonly FETCH_PENDING = "Fetching data";
   static readonly DELETE_TIMETABLE_ERROR = "Couldn't delete timetable, try again later";
   static readonly UPDATE_SUBGROUP_ERROR = "Couldn't update subgroup, try again later";
