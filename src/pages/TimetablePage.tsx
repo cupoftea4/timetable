@@ -11,7 +11,7 @@ import { getCurrentUADate, getNULPWeek } from "@/utils/date";
 import { optimisticRender } from "@/utils/general";
 import Toast from "@/utils/toasts";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import LoadingPage from "./LoadingPage";
 import styles from "./TimetablePage.module.scss";
 
@@ -55,6 +55,17 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
   const isLecturers = timetableType === "lecturer";
 
+  const { state }: { state: { source: string; isCustom?: boolean } | null } = useLocation();
+  const { source, isCustom } = state ?? {};
+
+  useEffect(() => {
+    window.gtag("event", "open_timetable", {
+      event_value: group,
+      event_custom: isCustom,
+      event_source: source ?? "url",
+    });
+  }, [source, isCustom, group]);
+
   function onError(e: string, userError?: string) {
     Toast.error(e, userError);
     navigate("/", { state: { force: true } });
@@ -66,7 +77,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       onError(`Group ${group} doesn't exist`, Toast.NONEXISTING_GROUP);
       return;
     }
-    if (timetableType === "selective" && isExamsTimetable) navigate(`/${group}`);
+    if (timetableType === "selective" && isExamsTimetable)
+      navigate(`/${group}`, { state: { source: "no-selective-exams" } });
     setLoading(true);
     getTimetable(group, isExamsTimetable, timetableType)?.finally(() => {
       setLoading(false);

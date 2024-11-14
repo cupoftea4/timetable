@@ -37,6 +37,7 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) =>
                 <li key={group}>
                   <Link
                     to={`/${group}`}
+                    state={{ source: "selection" }}
                     onFocus={() => {
                       setExpandedYear(year);
                     }}
@@ -52,7 +53,9 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) =>
         <ul>
           {timetables.map((lecturer) => (
             <li key={lecturer}>
-              <Link to={`/${lecturer}`}>{lecturer}</Link>
+              <Link to={`/${lecturer}`} state={{ source: "selection-lecturer" }}>
+                {lecturer}
+              </Link>
             </li>
           ))}
         </ul>

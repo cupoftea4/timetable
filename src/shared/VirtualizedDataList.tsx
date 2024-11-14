@@ -4,6 +4,7 @@ import DatalistInput, { useComboboxControls } from "react-datalist-input";
 type DataListOption = {
   id: string;
   value: string;
+  isCustom?: boolean;
 };
 
 type OwnProps = {
@@ -53,7 +54,7 @@ const VirtualizedDataList: FC<OwnProps> = ({
       const res = datalistItems.filter((item) => matchesSearch(item.value, searchQuery)).slice(0, displayedCount);
 
       if (allowCustomValue && searchQuery && !res.some((item) => item.value === searchQuery)) {
-        res.push({ id: searchQuery, value: `Відкрити «${searchQuery}»` });
+        res.push({ id: searchQuery, value: `Відкрити «${searchQuery}»`, isCustom: true });
       }
 
       return res;

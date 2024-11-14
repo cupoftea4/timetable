@@ -37,7 +37,7 @@ const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
         <VirtualizedDataList
           options={options}
           onSelect={(item) => {
-            navigate(`/${item.id}`);
+            navigate(`/${item.id}`, { state: { source: "search-bar", isCustom: item.isCustom } });
           }}
           placeholder="Розклад..."
           ignoreSpecialCharacters

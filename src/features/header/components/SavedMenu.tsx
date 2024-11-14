@@ -66,7 +66,7 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
       e.preventDefault();
       if (savedGroups[selectedItem]) {
         // biome-ignore lint/style/noNonNullAssertion: ideally, this should be fixed
-        navigate(`/${savedGroups[selectedItem]!}`);
+        navigate(`/${savedGroups[selectedItem]!}`, { state: { source: "saved-enter" } });
       }
     } else if (e.key === "Escape") {
       closeMenu();
@@ -103,6 +103,7 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
               <li key={index} className={selectedItem === index ? styles.selected : ""}>
                 <Link
                   to={`/${group}`}
+                  state={{ source: "saved" }}
                   className={styles["list-item"]}
                   onFocus={() => {
                     setSelectedItem(index);
