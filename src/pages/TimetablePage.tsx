@@ -60,9 +60,11 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   useEffect(() => {
     window.gtag("event", "open_timetable", {
-      event_value: group,
-      event_custom: isCustom,
-      event_source: source ?? "url",
+      event_category: "User Interaction",
+      event_label: group,
+      source: source ?? "url",
+      isCustom,
+      group,
     });
   }, [source, isCustom, group]);
 
