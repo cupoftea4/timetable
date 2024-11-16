@@ -4,6 +4,7 @@ import TimetableHeader from "@/features/header/TimetableHeader";
 import CreateMergedModal from "@/features/merged_modal/CreateMergedModal";
 import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
+import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
 import type { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
 import TimetableManager from "@/utils/data/TimetableManager";
@@ -58,15 +59,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const { state }: { state: { source: string; isCustom?: boolean } | null } = useLocation();
   const { source, isCustom } = state ?? {};
 
-  useEffect(() => {
-    window.gtag("event", "open_timetable", {
-      event_category: "User Interaction",
-      event_label: group,
-      source: source ?? "url",
-      isCustom,
-      group,
-    });
-  }, [source, isCustom, group]);
+  useGTagTimetableEvents(group, source ?? "url", isCustom);
 
   function onError(e: string, userError?: string) {
     Toast.error(e, userError);
