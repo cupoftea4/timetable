@@ -24,6 +24,14 @@ const HeaderPanel: FC<OwnProps> = ({ timetableType, className }) => {
   const [showSearchBar, setShowSearchBar] = useState(!shouldShrinkSearchBar || isFocused);
 
   useEffect(() => {
+    const onPopstate = () => setShowSearchBar(false);
+    window.addEventListener("popstate", onPopstate);
+    return () => {
+      window.removeEventListener("popstate", onPopstate);
+    };
+  }, []);
+
+  useEffect(() => {
     if (isFocused) {
       setShowSearchBar(true);
     }

@@ -59,11 +59,12 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
         t && navigate(t);
       });
     }
-    window.onpopstate = () => {
+    const onPopstate = () => {
       setSelectedSecond(null);
     };
+    window.addEventListener("popstate", onPopstate);
     return () => {
-      window.onpopstate = null;
+      window.removeEventListener("popstate", onPopstate);
     };
   }, [force, navigate, timetableType]);
 
