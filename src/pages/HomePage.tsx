@@ -1,5 +1,5 @@
 import catImage from "@/assets/cat.svg";
-import { SearchBarFocusProvider } from "@/context/searchBarFocus";
+import { DatalistFocusProvider } from "@/context/datalistFocus";
 import HeaderPanel from "@/features/header/HomeHeader";
 import TimetablesSelection from "@/features/home/TimetablesSelection";
 import useWindowDimensions from "@/hooks/useWindowDimensions";
@@ -110,7 +110,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
   };
 
   return (
-    <SearchBarFocusProvider>
+    <DatalistFocusProvider>
       <div className={styles.wrapper}>
         <HeaderPanel timetableType={timetableType} className={styles.header} />
         <main className={styles.container}>
@@ -134,7 +134,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
           </p>
         </main>
       </div>
-    </SearchBarFocusProvider>
+    </DatalistFocusProvider>
   );
 };
 

@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 export default function useOnClickOutside<T extends HTMLElement>(handle: () => void) {
   const ref: React.MutableRefObject<T | null> = useRef(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: I have no idea why
   useEffect(() => {
     function handleClickOutside({ target }: MouseEvent) {
       if (ref?.current && target instanceof HTMLElement && !ref.current.contains(target)) {
@@ -14,7 +13,7 @@ export default function useOnClickOutside<T extends HTMLElement>(handle: () => v
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [handle, ref]);
+  }, [handle]);
 
   return ref;
 }

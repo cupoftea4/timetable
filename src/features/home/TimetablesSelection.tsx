@@ -1,4 +1,4 @@
-import { useSearchBarFocus } from "@/context/searchBarFocus";
+import { useDatalistFocus } from "@/context/datalistFocus";
 import { classes } from "@/styles/utils";
 import { sortGroupsByYear } from "@/utils/timetable";
 import { type FC, useState } from "react";
@@ -20,7 +20,7 @@ type OwnProps = {
 const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) => {
   const groupsByYear = sortGroupsByYear(timetables);
   const [expandedYear, setExpandedYear] = useState<Year | null>(null); // for mobile onClick event and keyboard navigation
-  const { focus } = useSearchBarFocus();
+  const { focus } = useDatalistFocus();
 
   return (
     <div className={styles.timetables}>

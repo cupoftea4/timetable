@@ -1,4 +1,4 @@
-import useFocus from "@/hooks/useFocus";
+import useInputFocus from "@/hooks/useFocus";
 import useOnClickOutside from "@/hooks/useOnOutsideClick";
 import VirtualizedDataList from "@/shared/VirtualizedDataList";
 import type { TimetableItem } from "@/types/timetable";
@@ -45,7 +45,13 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
   }, [timetablesToMerge]);
 
   const ref = useOnClickOutside<HTMLDivElement>(onClose);
-  const [datalistRef, setInputFocus] = useFocus<HTMLDivElement>();
+  const {
+    ref: datalistRef,
+    focus,
+    isFocused,
+  } = useInputFocus<HTMLDivElement>({
+    initFocus: true,
+  });
   const navigate = useNavigate();
 
   function addTimetableToMerge(timetable: string) {
@@ -82,7 +88,7 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
         <fieldset
           className={styles.fieldset}
           onClick={() => {
-            setInputFocus(true);
+            focus();
           }}
         >
           <legend className={styles.legend}>Пошук</legend>
@@ -110,6 +116,7 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
                 }}
                 options={options}
                 ignoreSpecialCharacters
+                isExpanded={isFocused}
               />
             )}
           </div>

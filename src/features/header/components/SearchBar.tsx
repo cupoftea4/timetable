@@ -6,7 +6,7 @@ import { getAllTimetables } from "@/utils/timetable";
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import "react-datalist-input/dist/styles.css";
-import { useSearchBarFocus } from "@/context/searchBarFocus";
+import { useDatalistFocus } from "@/context/datalistFocus";
 import type { TimetableType } from "@/types/timetable";
 import styles from "./SearchBar.module.scss";
 
@@ -21,7 +21,7 @@ type OwnProps = {
 };
 
 const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
-  const { isFocused } = useSearchBarFocus();
+  const { isFocused, ref: datalistRef } = useDatalistFocus();
   const options = getSearchBarOptions();
   const navigate = useNavigate();
   const ref = useOnClickOutside(() => {
@@ -46,6 +46,7 @@ const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
           allowCustomValue
           autoFocus
           isExpanded={isFocused}
+          containerRef={datalistRef}
         />
       </span>
     </span>
