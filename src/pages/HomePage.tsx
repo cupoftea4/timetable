@@ -1,4 +1,5 @@
 import catImage from "@/assets/cat.svg";
+import { DatalistFocusProvider } from "@/context/datalistFocus";
 import HeaderPanel from "@/features/header/HomeHeader";
 import TimetablesSelection from "@/features/home/TimetablesSelection";
 import useWindowDimensions from "@/hooks/useWindowDimensions";
@@ -109,29 +110,31 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
   };
 
   return (
-    <div className={styles.wrapper}>
-      <HeaderPanel timetableType={timetableType} className={styles.header} />
-      <main className={styles.container}>
-        <section
-          className={classes(styles.selection, isTablet && selectedSecond && styles["one-column"])}
-          data-attr={`${timetableType}-groups`}
-        >
-          {showFirstLayer && <List items={firstLayer} selectedState={[selectedFirst, handleInstituteChange]} />}
-          {showSecondLayer && <List items={secondLayer} selectedState={[selectedSecond, handleSecondSelect]} />}
-          {showThirdLayer ? (
-            <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"} />
-          ) : (
-            <div className={styles["no-selection"]}>
-              <img className={styles.cat} src={catImage} draggable="false" alt="cat" width="800" height="800" />
-              <p className={styles["cat-text"]}>Оберіть спецільність, щоб продовжити</p>
-            </div>
-          )}
-        </section>
-        <p className={styles.feedback}>
-          Bug report: <a href="https://t.me/lpnu_timetable">@lpnu_timetable</a>
-        </p>
-      </main>
-    </div>
+    <DatalistFocusProvider>
+      <div className={styles.wrapper}>
+        <HeaderPanel timetableType={timetableType} className={styles.header} />
+        <main className={styles.container}>
+          <section
+            className={classes(styles.selection, isTablet && selectedSecond && styles["one-column"])}
+            data-attr={`${timetableType}-groups`}
+          >
+            {showFirstLayer && <List items={firstLayer} selectedState={[selectedFirst, handleInstituteChange]} />}
+            {showSecondLayer && <List items={secondLayer} selectedState={[selectedSecond, handleSecondSelect]} />}
+            {showThirdLayer ? (
+              <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"} />
+            ) : (
+              <div className={styles["no-selection"]}>
+                <img className={styles.cat} src={catImage} draggable="false" alt="cat" width="800" height="800" />
+                <p className={styles["cat-text"]}>Оберіть спецільність, щоб продовжити</p>
+              </div>
+            )}
+          </section>
+          <p className={styles.feedback}>
+            Bug report: <a href="https://t.me/lpnu_timetable">@lpnu_timetable</a>
+          </p>
+        </main>
+      </div>
+    </DatalistFocusProvider>
   );
 };
 

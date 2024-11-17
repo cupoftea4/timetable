@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./styles/main.scss";
 import "react-toastify/dist/ReactToastify.css";
+import "./index.css";
 
 window.APP_VERSION = APP_VERSION;
 

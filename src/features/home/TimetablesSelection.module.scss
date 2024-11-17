@@ -4,125 +4,147 @@
 @use '../../styles/variables' as *;
 
 @mixin expand-year {
-  li {
-    opacity: 1;
-  }
-  &::after {  
-    display: none;
-  }
-  max-height: 60rem; // it could go wrong any time...
-  a {
-    pointer-events: auto;
-  }
+	li {
+		opacity: 1;
+	}
+	&::after {
+		display: none;
+	}
+	max-height: 60rem; // it could go wrong any time...
+	a {
+		pointer-events: auto;
+	}
 }
 
 .timetables {
-  flex-basis: 100%;
-  height: fit-content;
-  display: grid;
-  gap: 1rem;
-  font-size: $medium-font-size;
-  
-  @include timetable-mobile {
-    padding: 0rem;
-  }
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+	justify-content: start;
+	gap: 1.6rem;
 
-  button.back {
-    justify-self: flex-start;
-  }
-  &:not(.with-years) {
-    ul {
-      padding: 1rem;
-      padding-top: 0;
-      li {
-        a {
-          display: inline-block;
-          padding: .25rem;
-          transition: background-color .2s ease-in;
-          border-radius: .625rem;
-          &:hover {
-            background-color: var(--accent-clr);
-          }
-        }
-      }
-    }
-    @include desktop {
-      ul {
-        max-height: $main-height;;
-        @include scroll-on-hover(y, thin, transparent);
-      }      
-    }
-  }
-  
-  &.with-years {
-    grid-template-columns: repeat(2, 1fr);
-    padding: 0 3rem;
-    @include timetable-mobile {
-      grid-template-columns: 1fr;
-      padding: 0 1rem;
-    }
+	.timetablesInfo {
+		padding-inline: 0.5rem;
+		font-size: 0.75rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.375rem;
+		color: rgba(255, 255, 255, 0.75);
+		grid-column: 1 / -1;
+		.link {
+			cursor: pointer;
+			text-decoration: underline;
+		}
+	}
 
-    .year {
-      animation: slideUp .2s ease forwards;
-      transition: max-height .8s ease-in-out;
-      min-height: 5rem;
-      max-height: 5rem;
-      overflow: hidden;
-      
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: .5rem;
-      background: linear-gradient(145.37deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.1) 73.95%);
-      border: var(--border-clr) solid 1px;
-      border-radius: $border-radius;
-      padding: 1rem;
+	.timetablesList {
+		height: fit-content;
+		display: grid;
+		gap: 1rem;
+		font-size: $medium-font-size;
 
-      &.expanded {
-        @include expand-year;
-      }
+		@include timetable-mobile {
+			padding: 0rem;
+		}
 
-      @include can-hover {
-        &:hover {
-          @include expand-year;
-        }
-      }
+		button.back {
+			justify-self: flex-start;
+		}
+		&:not(.with-years) {
+			ul {
+				padding: 1rem;
+				padding-top: 0;
+				li {
+					a {
+						display: inline-block;
+						padding: 0.25rem;
+						transition: background-color 0.2s ease-in;
+						border-radius: 0.625rem;
+						&:hover {
+							background-color: var(--accent-clr);
+						}
+					}
+				}
+			}
+			@include desktop {
+				ul {
+					max-height: $main-height;
+					@include scroll-on-hover(y, thin, transparent);
+				}
+			}
+		}
 
-      &::after {
-        content: attr(data-value);
-        font-size: $medium-font-size;
-        margin: .125em;
-        position: absolute;
-        animation: slideUp .2s ease forwards;
-      }
+		&.with-years {
+			grid-template-columns: repeat(2, 1fr);
+			padding: 0 3rem;
+			@include timetable-mobile {
+				grid-template-columns: 1fr;
+				padding: 0 1rem;
+			}
 
-      a {
-        pointer-events: none;
-      }
+			.year {
+				animation: slideUp 0.2s ease forwards;
+				transition: max-height 0.8s ease-in-out;
+				min-height: 5rem;
+				max-height: 5rem;
+				overflow: hidden;
 
-      li {
-        opacity: 0;
-        padding: .125rem;;
-        transition: opacity .2s ease-in-out;
-        @include desktop {
-          @include animated-underline;
-        }
-        
-      }
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				background: linear-gradient(
+					145.37deg,
+					rgba(255, 255, 255, 0.2) 0,
+					rgba(255, 255, 255, 0.1) 73.95%
+				);
+				border: var(--border-clr) solid 1px;
+				border-radius: $border-radius;
+				padding: 1rem;
 
-    }
-  }
-  
+				&.expanded {
+					@include expand-year;
+				}
+
+				@include can-hover {
+					&:hover {
+						@include expand-year;
+					}
+				}
+
+				&::after {
+					content: attr(data-value);
+					font-size: $medium-font-size;
+					margin: 0.125em;
+					position: absolute;
+					animation: slideUp 0.2s ease forwards;
+				}
+
+				a {
+					pointer-events: none;
+				}
+
+				li {
+					opacity: 0;
+					padding: 0.125rem;
+					transition: opacity 0.2s ease-in-out;
+					@include desktop {
+						@include animated-underline;
+					}
+				}
+			}
+		}
+	}
 }
 
 @keyframes slideUp {
-  0% {
-    transform: translateY(50%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0%);
-    opacity: 1;
-  }
+	0% {
+		transform: translateY(50%);
+		opacity: 0;
+	}
+	100% {
+		transform: translateY(0%);
+		opacity: 1;
+	}
 }
