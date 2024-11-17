@@ -2,17 +2,16 @@ import { useEffect } from "react";
 
 const useGTagTimetableEvents = (group: string, source: string, isCustomSource?: boolean) => {
   useEffect(() => {
-    window.gtag("event", `open_${group}`, {
+    window.gtag("event", "open_timetable", {
       event_category: "Timetable",
       event_label: group,
     });
   }, [group]);
 
   useEffect(() => {
-    window.gtag("event", `open_timetable_from_${source ?? "url"}`, {
+    window.gtag("event", "open_timetable_from", {
       event_category: "Timetable",
-      event_label: group,
-      source: source ?? "url",
+      event_label: source ?? "url",
       isCustomSource,
       group,
     });
