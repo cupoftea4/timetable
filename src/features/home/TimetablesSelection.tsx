@@ -56,7 +56,9 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) =>
           <ul>
             {timetables.map((lecturer) => (
               <li key={lecturer}>
-                <Link to={`/${lecturer}`} state={{ source: "selection-lecturer" }}>{lecturer}</Link>
+                <Link to={`/${lecturer}`} state={{ source: "selection-lecturer" }}>
+                  {lecturer}
+                </Link>
               </li>
             ))}
           </ul>
@@ -64,9 +66,9 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) =>
         <div className={styles.timetablesInfo}>
           <p>
             <span className="font-bold">Не знайшли свою групу?</span> Спробуйте ввести назву групи в{" "}
-            <span className={styles.link} onClick={() => focus()}>
+            <button className={styles.link} onClick={() => focus()} type="button">
               полі пошуку
-            </span>
+            </button>
             .
           </p>
           <p>

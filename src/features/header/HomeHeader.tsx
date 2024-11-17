@@ -1,8 +1,9 @@
+import { useDatalistFocus } from "@/context/datalistFocus";
 import useWindowDimensions from "@/hooks/useWindowDimensions";
 import { classes } from "@/styles/utils";
 import type { TimetableType } from "@/types/timetable";
 import { NARROW_SCREEN_BREAKPOINT, TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
-import { type FC, useMemo, useState } from "react";
+import { type FC, useEffect, useMemo, useState } from "react";
 import styles from "./HeaderPanel.module.scss";
 import Navigation from "./components/Navigation";
 import SavedMenu from "./components/SavedMenu";
@@ -19,7 +20,22 @@ const HeaderPanel: FC<OwnProps> = ({ timetableType, className }) => {
     () => width < TABLET_SCREEN_BREAKPOINT && width > NARROW_SCREEN_BREAKPOINT,
     [width]
   );
-  const [showSearchBar, setShowSearchBar] = useState(!shouldShrinkSearchBar);
+  const { isFocused, blur, focus } = useDatalistFocus();
+  const [showSearchBar, setShowSearchBar] = useState(!shouldShrinkSearchBar || isFocused);
+
+  useEffect(() => {
+    if (isFocused) {
+      setShowSearchBar(true);
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    if (!showSearchBar) {
+      blur();
+    } else {
+      focus();
+    }
+  }, [showSearchBar, blur, focus]);
 
   const toggleSearchBar = (state = !showSearchBar) => {
     if (shouldShrinkSearchBar) {

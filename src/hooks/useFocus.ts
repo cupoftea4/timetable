@@ -25,14 +25,21 @@ const useInputFocus = <T extends HTMLElement>({
     setIsFocused(true);
   }, []);
 
+  const blur = useCallback(() => {
+    setIsFocused(false);
+  }, []);
+
   useEffect(() => {
     const input = isChildInput ? ref.current?.querySelector("input") : ref.current;
 
     if (isFocused) {
-      input?.focus();
+      // FIXME
+      setTimeout(() => {
+        input?.focus();
+      }, 50);
     }
   }, [isFocused, isChildInput]);
-  return { ref, isFocused, focus } as const;
+  return { ref, isFocused, focus, blur } as const;
 };
 
 export default useInputFocus;

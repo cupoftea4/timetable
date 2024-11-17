@@ -15,7 +15,7 @@
     "start": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",
-    "dev": "env-cmd -f dev.env vite",
+    "dev": "env-cmd -f dev.env vite --host",
     "build:prod": "tsc && env-cmd -f .env vite build",
     "build:hope": "tsc && env-cmd -f hope.env vite build --mode development",
     "lint": "biome lint"
