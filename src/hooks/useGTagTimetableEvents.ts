@@ -5,6 +5,7 @@ const useGTagTimetableEvents = (group: string, source: string, isCustomSource?: 
     window.gtag("event", "open_timetable", {
       event_category: "Timetable",
       event_label: group,
+      group,
     });
   }, [group]);
 
