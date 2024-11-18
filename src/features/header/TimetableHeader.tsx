@@ -1,4 +1,5 @@
 import HomeIcon from "@/assets/HomeIcon";
+import usePageTitle from "@/hooks/usePageTitle";
 import useWindowDimensions from "@/hooks/useWindowDimensions";
 import Toggle from "@/shared/Toggle";
 import { classes } from "@/styles/utils";
@@ -42,6 +43,8 @@ const TimetableHeader: FC<OwnProps> = ({
   const group = useParams().group?.trim() ?? "";
   const { width } = useWindowDimensions();
   const isMobile = width < MOBILE_SCREEN_BREAKPOINT;
+  const groupTitle = timetableType === "merged" ? "Мій розклад" : group;
+  usePageTitle(groupTitle);
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
     const path =
@@ -68,7 +71,7 @@ const TimetableHeader: FC<OwnProps> = ({
           <HomeIcon />
         </Link>
         <SavedMenu timetableChanged={loading} />
-        <h1 className={styles.title}>{timetableType === "merged" ? "Мій розклад" : group}</h1>
+        <h1 className={styles.title}>{groupTitle}</h1>
         {timetableType !== "selective" && (
           <button
             type="button"
