@@ -5,6 +5,7 @@ import CreateMergedModal from "@/features/merged_modal/CreateMergedModal";
 import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
+import usePageTitle from "@/hooks/usePageTitle";
 import type { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
 import TimetableManager from "@/utils/data/TimetableManager";
@@ -44,6 +45,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   const navigate = useNavigate();
   const timetableRef = useRef<HTMLElement>(null);
+  usePageTitle(group);
 
   const iscFile = useTimetableISCFile(
     (!isExamsTimetable && timetable) || (isExamsTimetable && examsTimetable),
