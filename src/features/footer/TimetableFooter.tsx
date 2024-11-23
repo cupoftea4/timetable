@@ -1,6 +1,6 @@
 import DownloadIcon from "@/assets/DownloadIcon";
-import LoadingIcon from "@/assets/LoadingIcon";
 import MergeIcon from "@/assets/MergeIcon";
+import RefreshIcon from "@/assets/RefreshIcon";
 import { classes } from "@/styles/utils";
 import type { FC } from "react";
 import { useParams } from "react-router-dom";
@@ -41,13 +41,13 @@ const TimetableFooter: FC<OwnProps> = ({
         <button
           type="button"
           disabled={loading}
-          className={classes(styles.update, loading && styles.loading, styles.button)}
+          className={classes(styles.update, styles.button, loading && styles.pending)}
           title="Оновити дані"
           onClick={() => {
             updateTimetable();
           }}
         >
-          <LoadingIcon />
+          <RefreshIcon isPending={loading} />
         </button>
         <a
           className={classes(styles.download, styles.button)}

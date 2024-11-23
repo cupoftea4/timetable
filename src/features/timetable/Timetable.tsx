@@ -3,7 +3,7 @@ import { classes } from "@/styles/utils";
 import type { TimetableItem } from "@/types/timetable";
 import { DEVELOP, TIMETABLE_SCREEN_BREAKPOINT } from "@/utils/constants";
 import { getCurrentUADate, stringToDate } from "@/utils/date";
-import { generateSaturdayLessons, lessonsTimes, unique } from "@/utils/timetable";
+import { generateSaturdayLessons, lessonsTimes, skeletonTimetable, unique } from "@/utils/timetable";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./Timetable.module.scss";
 import TimetableLesson from "./components/TimetableLesson";
@@ -13,6 +13,7 @@ type OwnProps = {
   isSecondSubgroup: boolean;
   isSecondWeek: boolean;
   hasCellSubgroups?: boolean;
+  isLoading?: boolean;
 };
 
 const MINUTE = 60 * 1000;
@@ -25,6 +26,7 @@ const Timetable: FC<OwnProps> = ({
   isSecondSubgroup,
   isSecondWeek,
   hasCellSubgroups,
+  isLoading,
 }) => {
   const { width } = useWindowDimensions();
   const isMobile = width < TIMETABLE_SCREEN_BREAKPOINT;
@@ -49,6 +51,9 @@ const Timetable: FC<OwnProps> = ({
       [null, "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця", "Субота", "Неділя"].slice(0, maxDayNumber + 1),
     [maxDayNumber]
   );
+
+  const tableDays = isLoading ? skeletonTimetable.days : days;
+  const tableLessonsTimes = isLoading ? skeletonTimetable.lessonsTimes : timetableLessonsTimes;
 
   const getCurrentLessonNumber = useCallback(() => {
     const curDate = getCurrentUADate();
@@ -86,16 +91,16 @@ const Timetable: FC<OwnProps> = ({
   const tableContent = useMemo(() => {
     if (isMobile) return null;
     if (DEVELOP) console.log("Running scary useMemo");
-    const table = timetableLessonsTimes.map((time, i) => (
+    const table = tableLessonsTimes.map((time, i) => (
       <tr key={time.start}>
-        {days.map((day, j) =>
+        {tableDays.map((day, j) =>
           day === null ? (
             <th key={time.start} style={{ height: "5rem" }}>
               <span className={classes(styles.metadata, styles.start)}>{time.start}</span>
               <span className={classes(styles.metadata, styles.number)}>{i + 1}</span>
               <span className={classes(styles.metadata, styles.end)}>{time.end}</span>
             </th>
-          ) : (
+          ) : !isLoading ? (
             <TimetableLesson
               isListView={false}
               isAfterEmpty={i !== 0 && getLessonsByDayAndTime(i, j) === null}
@@ -103,6 +108,14 @@ const Timetable: FC<OwnProps> = ({
               active={currentLessonNumber === i && currentDay === j}
               key={time.start + day}
               cellSubgroup={hasCellSubgroups}
+            />
+          ) : (
+            <td
+              key={time.start + day}
+              className={classes(
+                "h-10 w-60",
+                skeletonTimetable.lessons.has(`${j}-${i + 1}`) && "bg-neutral-500 animate-pulse"
+              )}
             />
           )
         )}
@@ -124,19 +137,25 @@ const Timetable: FC<OwnProps> = ({
   const listsContent = useMemo(() => {
     if (!isMobile) return null;
     if (DEVELOP) console.log("Running scary useMemo");
-    const lists = days.filter(Boolean).map((day, i) => (
+    const lists = tableDays.filter(Boolean).map((day, i) => (
       <div key={i} className={styles.list}>
         <h3 className={styles["day-title"]}>{day}</h3>
         <ol className={styles.list}>
-          {timetableLessonsTimes.map((time, j) => (
-            <TimetableLesson
-              isListView={true}
-              lessons={getLessonsByDayAndTime(j + 1, i + 1)}
-              active={currentLessonNumber === j && currentDay === i + 1}
-              key={time.start + day}
-              cellSubgroup={hasCellSubgroups}
-            />
-          ))}
+          {!isLoading
+            ? timetableLessonsTimes.map((time, j) => (
+                <TimetableLesson
+                  isListView={true}
+                  lessons={getLessonsByDayAndTime(j + 1, i + 1)}
+                  active={currentLessonNumber === j && currentDay === i + 1}
+                  key={time.start + day}
+                  cellSubgroup={hasCellSubgroups}
+                />
+              ))
+            : Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="px-0.5">
+                  <div className="rounded-xl h-[85.7px] w-full bg-neutral-500 animate-pulse mb-2" />
+                </div>
+              ))}
         </ol>
       </div>
     ));
@@ -158,7 +177,7 @@ const Timetable: FC<OwnProps> = ({
     <table className={styles.timetable}>
       <thead>
         <tr>
-          {days.map((day, index) => (
+          {tableDays.map((day, index) => (
             <th key={index}>{day}</th>
           ))}
         </tr>

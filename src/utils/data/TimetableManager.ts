@@ -191,9 +191,11 @@ class TimetableManager {
     if (checkCache && data && !Util.needsUpdate(data.time)) {
       cacheData = storage.getItem(TIMETABLE + groupName);
     } else {
-      cacheData = FallbackData.getTimetable(timetableType, groupName).catch(() =>
-        storage.getItem(TIMETABLE + groupName)
-      );
+      // TODO: implement server cache
+      // cacheData = FallbackData.getTimetable(timetableType, groupName).catch(() =>
+      //   storage.getItem(TIMETABLE + groupName)
+      // );
+      cacheData = Promise.resolve(null);
     }
 
     const fetchData: ActualPromise<TimetableItem[]> = LPNUData.getTimetable(timetableType, groupName) // doesn't work
