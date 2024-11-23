@@ -105,3 +105,9 @@ export function isDarkMode() {
 export function removeLineBreaks(str: string) {
   return str.replace(/[\r\n]+/g, " ").trim();
 }
+
+export function doOnce(id: string, fn: () => void) {
+  if (localStorage.getItem(id)) return;
+  fn();
+  localStorage.setItem(id, "true");
+}

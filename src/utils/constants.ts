@@ -14,3 +14,8 @@ if (ENABLE_SATURDAYS && !import.meta.env.VITE_FIRST_CLASS_DATE) {
 }
 
 export const FIRST_CLASS_DATE = new Date(import.meta.env.VITE_FIRST_CLASS_DATE);
+
+export const RECEIVED_DONATION_NOTIFICATION = "received-donation-notification";
+
+export const DONATION_LINK = "https://send.monobank.ua/jar/AR9WWgQGpz";
+export const BUG_REPORT_LINK = "https://t.me/lpnu_timetable";

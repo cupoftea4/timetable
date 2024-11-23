@@ -5,8 +5,9 @@ import HomePage from "./pages/HomePage";
 import LoadingPage from "./pages/LoadingPage";
 import TimetablePage from "./pages/TimetablePage";
 import { Status } from "./types/utils";
-import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
+import { RECEIVED_DONATION_NOTIFICATION, TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 import TimetableManager from "./utils/data/TimetableManager";
+import { doOnce } from "./utils/general";
 import Toast from "./utils/toasts";
 
 /* TODO:
@@ -25,6 +26,9 @@ const App = () => {
     TimetableManager.init()
       .then(() => {
         setStatus(Status.Idle);
+        doOnce(RECEIVED_DONATION_NOTIFICATION, () => {
+          Toast.donationNotification();
+        });
       })
       .catch((e) => {
         setStatus(Status.Failed);
