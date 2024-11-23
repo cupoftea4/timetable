@@ -1,3 +1,5 @@
+import BugIcon from "@/assets/BugIcon";
+import HeartIcon from "@/assets/HeartIcon";
 import catImage from "@/assets/cat.svg";
 import { DatalistFocusProvider } from "@/context/datalistFocus";
 import HeaderPanel from "@/features/header/HomeHeader";
@@ -6,7 +8,7 @@ import useWindowDimensions from "@/hooks/useWindowDimensions";
 import List from "@/shared/List";
 import { classes } from "@/styles/utils";
 import type { TimetableType } from "@/types/timetable";
-import { TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
+import { BUG_REPORT_LINK, DONATION_LINK, TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
 import TimetableManager from "@/utils/data/TimetableManager";
 import Toast from "@/utils/toasts";
 import { type FC, useCallback, useEffect, useState } from "react";
@@ -130,9 +132,28 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
               </div>
             )}
           </section>
-          <p className={styles.feedback}>
-            Bug report: <a href="https://t.me/lpnu_timetable">@lpnu_timetable</a>
-          </p>
+          <div className={classes(styles.feedback, "flex gap-2")}>
+            <a
+              href={DONATION_LINK}
+              title="Support the project"
+              target="_blank"
+              rel="noreferrer"
+              className="flex gap-1 items-center"
+            >
+              <HeartIcon />
+              Support
+            </a>
+            <a
+              href={BUG_REPORT_LINK}
+              title="Bug report"
+              target="_blank"
+              rel="noreferrer"
+              className="flex gap-1 items-center"
+            >
+              <BugIcon />
+              Bug report
+            </a>
+          </div>
         </main>
       </div>
     </DatalistFocusProvider>

@@ -1,3 +1,4 @@
+import DonationToast from "@/shared/DonationToast";
 import { toast } from "react-toastify";
 import { DEVELOP, TOAST_AUTO_CLOSE_TIME } from "./constants";
 import { getRandomValue, isDarkMode } from "./general";
@@ -54,6 +55,14 @@ export default class Toast {
     return promise;
   }
 
+  static donationNotification() {
+    toast(DonationToast, {
+      autoClose: false,
+      className: "!bg-cyan-900 text-white dark:!bg-gray-800 border border-gray-600 rounded-lg",
+      delay: 500,
+    });
+  }
+
   static hideAllMessages() {
     toast.dismiss();
   }
@@ -79,20 +88,32 @@ function showPromiseToast(promise: Promise<unknown>, params: PromiseToastParams)
   setTimeout(() => {
     if (pendingToasts.has(params.pending) || isPromiseResolved) return;
     pendingToasts.add(params.pending);
-    toast.promise(promise, params).finally(() => pendingToasts.delete(params.pending));
+    toast
+      .promise(promise, params, {
+        theme: isDarkMode() ? "dark" : "light",
+        className: "border border-gray-600 rounded-lg",
+      })
+      .finally(() => pendingToasts.delete(params.pending));
   }, DEBOUNCE_TOAST_TIME);
 }
 
 function showErrorToast(message: string) {
   if (pendingToasts.has(message)) return;
   pendingToasts.add(message);
-  toast.error(message);
+  toast.error(message, {
+    className: "!bg-red-700 text-white dark:!bg-red-900 border border-gray-600 rounded-lg",
+    hideProgressBar: true,
+  });
   setTimeout(() => pendingToasts.delete(message), TOAST_AUTO_CLOSE_TIME);
 }
 
 function showWarningToast(message: string) {
   if (pendingToasts.has(message)) return;
   pendingToasts.add(message);
-  toast.warn(message, { theme: isDarkMode() ? "dark" : "light", hideProgressBar: true });
+  toast.warn(message, {
+    theme: isDarkMode() ? "dark" : "light",
+    className: "border border-gray-600 rounded-lg",
+    hideProgressBar: true,
+  });
   setTimeout(() => pendingToasts.delete(message), TOAST_AUTO_CLOSE_TIME);
 }
