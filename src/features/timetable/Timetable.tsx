@@ -137,7 +137,7 @@ const Timetable: FC<OwnProps> = ({
   const listsContent = useMemo(() => {
     if (!isMobile) return null;
     if (DEVELOP) console.log("Running scary useMemo");
-    const lists = days.filter(Boolean).map((day, i) => (
+    const lists = tableDays.filter(Boolean).map((day, i) => (
       <div key={i} className={styles.list}>
         <h3 className={styles["day-title"]}>{day}</h3>
         <ol className={styles.list}>
