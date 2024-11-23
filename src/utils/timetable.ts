@@ -178,3 +178,12 @@ export function generateSaturdayLessons(originalTimetable: TimetableItem[]) {
   }
   return [];
 }
+
+export function sortGroups(groups: string[]) {
+  return groups.toSorted((g1, g2) => {
+    const r = /^(.*-\d)(\d+).*$/;
+    const [, year1 = "", groupNumber1 = ""] = g1.split(r);
+    const [, year2 = "", groupNumber2 = ""] = g2.split(r);
+    return `${year1}${groupNumber1.padStart(2, "0")}`.localeCompare(`${year2}${groupNumber2.padStart(2, "0")}`);
+  });
+}
