@@ -187,3 +187,9 @@ export function sortGroups(groups: string[]) {
     return `${year1}${groupNumber1.padStart(2, "0")}`.localeCompare(`${year2}${groupNumber2.padStart(2, "0")}`);
   });
 }
+
+export const skeletonTimetable = {
+  days: [null, "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця"],
+  lessonsTimes: lessonsTimes.slice(0, 6),
+  lessons: new Set(["1-3", "1-4", "1-5", "2-1", "2-2", "2-4", "3-1", "3-2", "4-3", "4-2", "5-3", "5-6"]),
+};

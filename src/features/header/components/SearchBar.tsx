@@ -30,11 +30,15 @@ const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
 
   return (
     <span className={classes(styles.bar, !show && styles["hidden-search"])} ref={ref}>
-      <SearchIcon
+      <button
         onClick={() => {
           toggleSearchBar();
         }}
-      />
+        type="button"
+        className={styles["search-icon"]}
+      >
+        <SearchIcon />
+      </button>
       <span className={styles.search}>
         <VirtualizedDataList
           options={options}

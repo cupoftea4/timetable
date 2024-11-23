@@ -13,7 +13,6 @@ import { optimisticRender } from "@/utils/general";
 import Toast from "@/utils/toasts";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import LoadingPage from "./LoadingPage";
 import styles from "./TimetablePage.module.scss";
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => {
@@ -99,6 +98,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     try {
       return optimisticRender(renderTimetable, onError, TimetableManager.getTimetable(group, type, checkCache));
     } catch (_e) {
+      console.error(_e);
       onError(Toast.NONEXISTING_TIMETABLE);
     }
   }
@@ -131,58 +131,55 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   return (
     <>
-      {!isLoading ? (
-        <div className={styles.wrapper}>
-          <TimetableHeader
-            isExamsTimetable={isExamsTimetable}
-            timetableType={timetableType}
-            isLecturers={isLecturers}
-            partials={partials}
-            subgroupState={[isSecondSubgroup, setIsSecondSubgroup]}
-            weekState={[isSecondWeek, setIsSecondWeek]}
-            updatePartialTimetable={getPartialTimetable}
-            loading={loading}
-          />
-          <main className={styles.container}>
-            <section className={styles.timetable} ref={timetableRef}>
-              {!isExamsTimetable ? (
-                <Timetable
-                  timetable={timetable ?? []}
-                  isSecondWeek={isSecondWeek}
-                  isSecondSubgroup={isSecondSubgroup}
-                  hasCellSubgroups={isLecturers}
-                />
-              ) : examsTimetable?.length === 0 ? (
-                <p>Розклад екзаменів пустий</p>
-              ) : (
-                <ExamsTimetable exams={examsTimetable ?? []} />
-              )}
-            </section>
-          </main>
-          <TimetableFooter
-            showCreateMergedModal={() => {
-              setShowCreateMergedModal(true);
+      <div className={styles.wrapper}>
+        <TimetableHeader
+          isExamsTimetable={isExamsTimetable}
+          timetableType={timetableType}
+          isLecturers={isLecturers}
+          partials={partials}
+          subgroupState={[isSecondSubgroup, setIsSecondSubgroup]}
+          weekState={[isSecondWeek, setIsSecondWeek]}
+          updatePartialTimetable={getPartialTimetable}
+          loading={loading}
+        />
+        <main className={styles.container}>
+          <section className={styles.timetable} ref={timetableRef}>
+            {!isExamsTimetable ? (
+              <Timetable
+                timetable={timetable ?? []}
+                isSecondWeek={isSecondWeek}
+                isSecondSubgroup={isSecondSubgroup}
+                hasCellSubgroups={isLecturers}
+                isLoading={isLoading}
+              />
+            ) : examsTimetable?.length === 0 ? (
+              <p>Розклад екзаменів пустий</p>
+            ) : (
+              <ExamsTimetable exams={examsTimetable ?? []} isLoading={isLoading} />
+            )}
+          </section>
+        </main>
+        <TimetableFooter
+          showCreateMergedModal={() => {
+            setShowCreateMergedModal(true);
+          }}
+          loading={loading}
+          updateTimetable={updateTimetable}
+          isExamsTimetable={isExamsTimetable}
+          isSecondSubgroup={isSecondSubgroup}
+          icsFILE={iscFile}
+          time={time}
+        />
+        {showCreateMergedModal && (
+          <CreateMergedModal
+            defaultTimetable={group}
+            onClose={() => {
+              setShowCreateMergedModal(false);
             }}
-            loading={loading}
-            updateTimetable={updateTimetable}
-            isExamsTimetable={isExamsTimetable}
-            isSecondSubgroup={isSecondSubgroup}
-            icsFILE={iscFile}
-            time={time}
+            showTimetable={renderTimetableFromPromises}
           />
-          {showCreateMergedModal && (
-            <CreateMergedModal
-              defaultTimetable={group}
-              onClose={() => {
-                setShowCreateMergedModal(false);
-              }}
-              showTimetable={renderTimetableFromPromises}
-            />
-          )}
-        </div>
-      ) : (
-        <LoadingPage />
-      )}
+        )}
+      </div>
     </>
   );
 };

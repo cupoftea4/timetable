@@ -14,26 +14,14 @@
     .merge {
       --icon-size: 1.625rem;
     }
-    .download {
-      --icon-size: 1.325rem;
-    }
+
     .update {
       --icon-size: 1.625rem;
-      &:disabled {
-        cursor: not-allowed;
-          svg path {
-          fill: hsla(0, 0%, 72%, 0.766);
-        }
-      }
-      &.loading {
-        transform-origin: 50% 42%;
-        animation: $spin-animation;
-      }
     }
   }
-  .button svg {
+  .button {
     transition: transform .2s ease-in-out;
-    &:hover {
+    &:not(.pending):hover {
       transform: scale(1.1);
     }
     width: var(--icon-size);
