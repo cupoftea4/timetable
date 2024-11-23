@@ -9,6 +9,7 @@ import {
   type TimetableType,
 } from "@/types/timetable";
 import type { ActualPromise, OptimisticPromise, RenderPromises } from "@/types/utils";
+import { sortGroups } from "@/utils/timetable";
 import { DEVELOP } from "../constants";
 import storage from "../storage";
 import * as Util from "../timetable";
@@ -63,8 +64,8 @@ class TimetableManager {
     });
 
     // request data from server if needed
-    this.groups = await this.getData(GROUPS, FallbackData.getGroups);
-    this.selectiveGroups = await this.getData(SELECTIVE_GROUPS, FallbackData.getSelectiveGroups);
+    this.groups = sortGroups(await this.getData(GROUPS, FallbackData.getGroups));
+    this.selectiveGroups = sortGroups(await this.getData(SELECTIVE_GROUPS, FallbackData.getSelectiveGroups));
     this.lecturers = await this.getData(LECTURERS, FallbackData.getLecturers);
   }
 
