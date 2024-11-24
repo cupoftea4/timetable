@@ -139,6 +139,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
               target="_blank"
               rel="noreferrer"
               className="flex gap-1 items-center"
+              onClick={() => Toast.info("Дуже дякую! 💖")}
             >
               <HeartIcon />
               Support

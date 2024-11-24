@@ -49,6 +49,11 @@ export default class Toast {
     showWarningToast(message);
   }
 
+  static info(message: string) {
+    if (DEVELOP) console.info(`[Handler] ${message}`);
+    showInfoToast(message);
+  }
+
   static promise<T>(promise: Promise<T>, pending: string = Toast.FETCH_PENDING, error?: string) {
     const params = error ? { pending, error } : { pending };
     showPromiseToast(promise, params);
@@ -116,4 +121,17 @@ function showWarningToast(message: string) {
     hideProgressBar: true,
   });
   setTimeout(() => pendingToasts.delete(message), TOAST_AUTO_CLOSE_TIME);
+}
+
+function showInfoToast(message: string) {
+  if (pendingToasts.has(message)) return;
+  pendingToasts.add(message);
+  toast.info(message, {
+    className: "!bg-cyan-900 text-white dark:!bg-gray-800 border border-gray-600 rounded-lg",
+    hideProgressBar: true,
+    autoClose: false,
+    onClose() {
+      pendingToasts.delete(message);
+    },
+  });
 }

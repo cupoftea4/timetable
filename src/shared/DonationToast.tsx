@@ -1,4 +1,5 @@
 import { DONATION_LINK } from "@/utils/constants";
+import Toast from "@/utils/toasts";
 
 const DonationToast = () => {
   return (
@@ -9,6 +10,7 @@ const DonationToast = () => {
         className="bg-cyan-700 dark:bg-gray-700 text-white px-2 py-2 rounded-md text-sm hover:bg-gray-600 text-nowrap"
         target="_blank"
         rel="noreferrer"
+        onClick={() => Toast.info("Дуже дякую! 💖")}
       >
         Підтримати
       </a>
