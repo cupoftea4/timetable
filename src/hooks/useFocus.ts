@@ -13,7 +13,12 @@ const useInputFocus = <T extends HTMLElement>({
 
   useEffect(() => {
     const input = isChildInput ? ref.current?.querySelector("input") : ref.current;
-    const onBlur = () => setIsFocused(false);
+    const onBlur = (e: Event) => {
+      const relatedTarget = (e as FocusEvent).relatedTarget as HTMLElement | null;
+      // Check if the focus is moving to a list item
+      if (relatedTarget?.role === "option") return;
+      setIsFocused(false);
+    };
     input?.addEventListener("blur", onBlur);
 
     return () => {
