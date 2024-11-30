@@ -55,7 +55,7 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
       });
   };
 
-  const arrowNavigation = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+  const arrowNavigation = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setSelectedItem((selectedItem + 1) % savedGroups.length);
@@ -73,65 +73,82 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
     }
   };
 
+  const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+    const currentTarget = e.currentTarget;
+    const relatedTarget = e.relatedTarget;
+
+    // Check if the focus is moving to a child element
+    if (currentTarget.contains(relatedTarget)) return;
+
+    closeMenu();
+  };
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      // Reset selected item when menu is opened
+      setSelectedItem(0);
+    }
+  }, [isMenuOpen]);
+
   return (
-    <button
+    <div
       className={styles.saved}
       tabIndex={0}
       onMouseEnter={openMenu}
       onMouseLeave={closeMenu}
       onFocusCapture={openMenu}
+      onBlur={handleBlur}
       onKeyDown={arrowNavigation}
       aria-expanded={isMenuOpen ? "true" : "false"}
       aria-controls="saved-menu"
       aria-label="Saved groups menu"
-      type="button"
     >
-      <HistoryIcon />
+      <button type="button" className={classes("icon-button", "transition duration-300")} tabIndex={-1}>
+        <HistoryIcon />
+      </button>
       {isMenuOpen && (
-        <div
-          className={classes(styles["saved-menu"], groupParam && styles.home)}
-          id="saved-menu"
-          aria-hidden={!isMenuOpen ? "true" : "false"}
-        >
-          <span className={styles.title}>
-            {savedGroups.length !== 0
-              ? "Збережені"
-              : "Немає збережених. Відкрийте будь-який розклад, щоб автоматично зберегти."}
-          </span>
-          <ul>
-            {savedGroups.map((group, index) => (
-              <li key={index} className={selectedItem === index ? styles.selected : ""}>
-                <Link
-                  to={`/${group}`}
-                  state={{ source: "saved" }}
-                  className={styles["list-item"]}
-                  onFocus={() => {
-                    setSelectedItem(index);
-                  }}
-                  onClick={() => {
-                    closeMenu();
-                  }}
-                >
-                  <span
-                    className={styles.name}
-                    title={isMerged(group) ? TimetableManager.cachedMergedTimetable?.timetables?.join("+") : group}
+        <div className={classes(styles["saved-menu-wrapper"], !groupParam && styles.home)}>
+          <div className={classes(styles["saved-menu"])} id="saved-menu" aria-hidden={!isMenuOpen ? "true" : "false"}>
+            <span className={styles.title}>
+              {savedGroups.length !== 0
+                ? "Збережені"
+                : "Немає збережених. Відкрийте будь-який розклад, щоб автоматично зберегти."}
+            </span>
+            <ul>
+              {savedGroups.map((group, index) => (
+                <li key={group} className={selectedItem === index ? styles.selected : ""}>
+                  <Link
+                    to={`/${group}`}
+                    state={{ source: "saved" }}
+                    className={styles["list-item"]}
+                    onFocus={() => {
+                      setSelectedItem(index);
+                    }}
+                    onClick={() => {
+                      closeMenu();
+                    }}
                   >
-                    {getTimetableName(group)}
-                    {groupParam === group ? <CheckMarkIcon className={styles["check-mark"]} /> : null}
-                  </span>
-                </Link>
-                <RemoveIcon
-                  onClick={() => {
-                    deleteItem(index);
-                  }}
-                  className={styles.remove}
-                />
-              </li>
-            ))}
-          </ul>
+                    <span
+                      className={styles.name}
+                      title={isMerged(group) ? TimetableManager.cachedMergedTimetable?.timetables?.join("+") : group}
+                    >
+                      {getTimetableName(group)}
+                      {groupParam === group ? <CheckMarkIcon className={styles["check-mark"]} /> : null}
+                    </span>
+                  </Link>
+                  <RemoveIcon
+                    onClick={() => {
+                      deleteItem(index);
+                    }}
+                    className={styles.remove}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
-    </button>
+    </div>
   );
 };
 

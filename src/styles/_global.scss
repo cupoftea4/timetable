@@ -114,3 +114,20 @@ a, button {
     background-color: $timetable-pract-hover-clr;
   }
 }
+
+.icon-button {
+  @include touchscreen {
+    &:hover,
+    &:focus {
+      background-color: var(--accent-clr);
+    }
+  }
+  border-radius: 50%;
+  padding: 0.325rem;
+  @include can-hover {
+    &:hover,
+    &:focus {
+      transform: scale(1.05);
+    }
+  }
+}

@@ -23,7 +23,7 @@ const Navigation: FC<OwnProps> = ({ timetableType }) => {
   const navigate = useNavigate();
 
   const onMobileSelectChange = (type: string) => {
-    navigate(`/${type === "timetable" ? "" : type}`);
+    navigate(`/${type === "timetable" ? "" : type}`, { state: { force: true } });
   };
 
   return (

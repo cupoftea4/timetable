@@ -3,94 +3,98 @@
 
 .saved {
   position: relative;
-  outline: none;
   @include flex-center;
 }
 
 $icon-size: 0.875rem;
 
-.saved-menu {
-  animation: show-menu 0.1s ease-in-out forwards;
+.saved-menu-wrapper {
   position: absolute;
-  top: 105%;
-  left: -120%;
+  top: 80%;
   width: 15rem;
+  left: -190%;
   &.home {
-    left: 80%;
+    left: auto;
+    right: -90%;
   }
   @include tablet {
     width: 13rem;
   }
-  background: linear-gradient(190deg, var(--accent-clr) -8.75%, rgba(255, 255, 255, 0.07) 83.95%);
-  border: var(--border-clr) solid 1px;
-  border-radius: $border-radius;
-  box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
   z-index: 100;
-  padding: 1.5rem 0;
-
-  .title {
-    font-weight: $semi-bold-font;
-    font-size: 0.875rem;
-    padding: 0 1.625rem;
-    display: inline-block;
-  }
-  ul {
-    list-style: none;
-    li {
-      display: flex;
-      font-size: 1.125rem;
-      padding: 0.375rem 1.5rem;
-      align-items: center;
-      position: relative;
-      &:hover, &.selected {
-        background-color: var(--accent-clr);
-        cursor: pointer;
+  padding-block: 1rem;
+  .saved-menu {
+    z-index: 101;
+    animation: show-menu 0.1s ease-in-out forwards;
+    background: linear-gradient(190deg, var(--accent-clr) -8.75%, rgba(255, 255, 255, 0.07) 83.95%);
+    border: var(--border-clr) solid 1px;
+    border-radius: $border-radius;
+    box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    padding: 1.5rem 0;
+  
+    .title {
+      font-weight: $semi-bold-font;
+      font-size: 0.875rem;
+      padding: 0 1.625rem;
+      display: inline-block;
+    }
+    ul {
+      list-style: none;
+      li {
+        display: flex;
+        font-size: 1.125rem;
+        padding: 0.375rem 1.5rem;
+        align-items: center;
+        position: relative;
+        &:hover, &.selected {
+          background-color: var(--accent-clr);
+          cursor: pointer;
+        }
+        /* Remove Item Icon */
+        .remove {
+          display: none;
+        }
+        &:hover .remove {
+          position: absolute;
+          right: 1.5rem;
+          display: block;
+          width: $icon-size;
+          height: $icon-size;
+          transition: transform 0.2s ease-in-out;
+          cursor: pointer;
+          &:hover, &:focus {
+            outline: none;
+            transform: scale(1.15);
+          }
+        }
       }
-      /* Remove Item Icon */
-      .remove {
-        display: none;
-      }
-      &:hover .remove {
-        position: absolute;
-        right: 1.5rem;
-        display: block;
-        width: $icon-size;
-        height: $icon-size;
-        transition: transform 0.2s ease-in-out;
-        cursor: pointer;
-        &:hover, &:focus {
-          outline: none;
-          transform: scale(1.15);
+      .list-item {
+        flex-grow: 1;
+        .name {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          width: calc(100% - $icon-size - .5rem);
+        }
+        .check-mark {
+          width: $icon-size;
+          min-width: $icon-size;
+          height: $icon-size;
         }
       }
     }
-    .list-item {
-      flex-grow: 1;
-      .name {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        width: calc(100% - $icon-size - .5rem);
-      }
-      .check-mark {
-        width: $icon-size;
-        min-width: $icon-size;
-        height: $icon-size;
-      }
-    }
+  
   }
-
 }
 
 @keyframes show-menu {
   0% {
     opacity: 0;
-    transform: translate(-50%, .5rem);
+    transform: translate(0, .5rem);
   }
   100% {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translate(0, 0);
   }
 }

@@ -38,8 +38,8 @@ const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
           </button>
           {showDropdown && (
             <ul className={styles.dropdown}>
-              {urls.map((url, index) => (
-                <li key={index}>
+              {urls.map((url) => (
+                <li key={url}>
                   <a href={url} target="_blank" rel="noreferrer" className={styles.link}>
                     <LinkIcon link={url} />
                     Join

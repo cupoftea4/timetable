@@ -67,10 +67,18 @@ const TimetableHeader: FC<OwnProps> = ({
   return (
     <header className={classes(generalStyles.header, styles.header)}>
       <nav className={generalStyles["right-buttons"]}>
-        <Link state={{ force: true }} to="/" aria-label="Home">
-          <HomeIcon />
-        </Link>
-        <SavedMenu timetableChanged={loading} />
+        <div className={"flex gap-1"}>
+          <Link
+            state={{ force: true }}
+            to="/"
+            aria-label="Home"
+            type="button"
+            className={classes("icon-button", "transition duration-300")}
+          >
+            <HomeIcon />
+          </Link>
+          <SavedMenu timetableChanged={loading} />
+        </div>
         <h1 className={styles.title}>{groupTitle}</h1>
         {timetableType !== "selective" && (
           <button
