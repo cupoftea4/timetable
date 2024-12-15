@@ -8,6 +8,7 @@ import { Status } from "./types/utils";
 import { RECEIVED_DONATION_NOTIFICATION, TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 import TimetableManager from "./utils/data/TimetableManager";
 import { doOnce } from "./utils/general";
+import { pathnameToType } from "./utils/timetable";
 import Toast from "./utils/toasts";
 
 /* TODO:
@@ -23,7 +24,7 @@ const App = () => {
   const [status, setStatus] = useState<Status>(Status.Loading);
 
   useEffect(() => {
-    TimetableManager.init()
+    TimetableManager.init(pathnameToType(window.location.pathname))
       .then(() => {
         setStatus(Status.Idle);
         doOnce(RECEIVED_DONATION_NOTIFICATION, () => {

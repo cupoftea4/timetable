@@ -108,7 +108,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       updateTimetable(true);
       return;
     }
-    Toast.promise(TimetableManager.getPartialTimetable(group, partial).then(setTimetable));
+    // TODO: remove partial timetables or fix them
+    // Toast.promise(TimetableManager.getPartialTimetable(group, partial).then(setTimetable));
   };
 
   const updateTimetable = (checkCache = false) => {

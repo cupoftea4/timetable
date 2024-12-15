@@ -42,3 +42,5 @@ export enum HalfTerm {
   First = 1,
   Second = 2,
 }
+
+export type TimetablePageType = "home" | "lecturer" | "selective" | "timetable";
