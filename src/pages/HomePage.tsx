@@ -12,18 +12,11 @@ import { BUG_REPORT_LINK, DONATION_LINK, TABLET_SCREEN_BREAKPOINT } from "@/util
 import TimetableManager from "@/utils/data/TimetableManager";
 import Toast from "@/utils/toasts";
 import { type FC, useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./HomePage.module.scss";
 
 type OwnProps = {
   timetableType: TimetableType;
-};
-
-const getHash = () => decodeURI(window.location.hash.slice(1));
-const handleHashChange = (newHash: string) => {
-  const hash = decodeURI(window.location.hash.slice(1));
-  if (hash === "") window.history.pushState(newHash, "custom", `#${newHash}`);
-  if (hash !== newHash) window.history.replaceState(newHash, "custom", `#${newHash}`);
 };
 
 const HomePage: FC<OwnProps> = ({ timetableType }) => {
@@ -43,38 +36,41 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
   const showSecondLayer = showFirstLayer && secondLayer.length > 0;
   const showThirdLayer = Boolean(selectedSecond);
 
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const handleSecondSelect = useCallback(
     (major: string | null) => {
       setSelectedSecond(major);
       if (!major) return;
-      handleHashChange(major);
+      setSearchParams({ institute: selectedFirst ?? "", major });
       Toast.promise(TimetableManager.getThirdLayerByType(timetableType, major), "Fetching timetables...")
         .then(setThirdLayer)
         .catch(Toast.error);
     },
-    [timetableType]
+    [timetableType, setSearchParams, selectedFirst]
   );
 
   useEffect(() => {
-    if (!force && timetableType === "timetable") {
+    if (!force && timetableType === "timetable" && searchParams.size === 0) {
       TimetableManager.getLastOpenedTimetable().then((t) => {
         t && navigate(t);
       });
     }
     const onPopstate = () => {
       setSelectedSecond(null);
+      setSearchParams({ institute: selectedFirst ?? "" });
     };
     window.addEventListener("popstate", onPopstate);
     return () => {
       window.removeEventListener("popstate", onPopstate);
     };
-  }, [force, navigate, timetableType]);
+  }, [force, timetableType, selectedFirst, searchParams.size, navigate, setSearchParams]);
 
   useEffect(() => {
-    if (secondLayer.includes(getHash())) {
-      handleSecondSelect(getHash());
+    if (secondLayer.includes(searchParams.get("major") || "")) {
+      handleSecondSelect(searchParams.get("major"));
     }
-  }, [secondLayer, handleSecondSelect]);
+  }, [secondLayer, handleSecondSelect, searchParams]);
 
   useEffect(() => {
     setThirdLayer([]);
@@ -110,6 +106,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
     setSelectedFirst(institute);
     if (!institute) return;
     updateSecondLayer(timetableType, institute);
+    setSearchParams({ institute });
   };
 
   return (
