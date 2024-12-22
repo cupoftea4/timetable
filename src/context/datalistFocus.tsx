@@ -1,6 +1,4 @@
 import useInputFocus from "@/hooks/useFocus";
-import useWindowDimensions from "@/hooks/useWindowDimensions";
-import { TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
 import type React from "react";
 import { type ReactNode, createContext, useContext } from "react";
 
@@ -14,10 +12,8 @@ interface DatalistFocusContextType {
 const DatalistFocusContext = createContext<DatalistFocusContextType | undefined>(undefined);
 
 const DatalistFocusProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { width } = useWindowDimensions();
   const { ref, isFocused, focus, blur } = useInputFocus<HTMLDivElement>({
     childInput: true,
-    initFocus: width > TABLET_SCREEN_BREAKPOINT,
   });
 
   return (

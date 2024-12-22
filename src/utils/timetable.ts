@@ -198,6 +198,6 @@ export const skeletonTimetable = {
 export const pathnameToType = (pathname: string): TimetablePageType => {
   if (pathname.includes("lecturer")) return "lecturer";
   if (pathname.includes("selective")) return "selective";
-  if (pathname === "/") return "home";
+  if (pathname.includes("home")) return "home";
   return "timetable";
 };

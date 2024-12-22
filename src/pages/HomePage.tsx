@@ -4,15 +4,15 @@ import catImage from "@/assets/cat.svg";
 import { DatalistFocusProvider } from "@/context/datalistFocus";
 import HeaderPanel from "@/features/header/HomeHeader";
 import TimetablesSelection from "@/features/home/TimetablesSelection";
-import useWindowDimensions from "@/hooks/useWindowDimensions";
+import { useIsTablet } from "@/hooks/useWindowDimensions";
 import List from "@/shared/List";
 import { classes } from "@/styles/utils";
 import type { TimetableType } from "@/types/timetable";
-import { BUG_REPORT_LINK, DONATION_LINK, TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
+import { BUG_REPORT_LINK, DONATION_LINK } from "@/utils/constants";
 import TimetableManager from "@/utils/data/TimetableManager";
 import Toast from "@/utils/toasts";
-import { type FC, useCallback, useEffect, useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { type FC, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import styles from "./HomePage.module.scss";
 
 type OwnProps = {
@@ -26,44 +26,45 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
   const [selectedFirst, setSelectedFirst] = useState<string | null>(null);
   const [selectedSecond, setSelectedSecond] = useState<string | null>(null);
 
-  const { state }: { state: { force: boolean } | null } = useLocation();
-  const { force } = state ?? {};
-
-  const { width } = useWindowDimensions();
-  const navigate = useNavigate();
-  const isTablet = width < TABLET_SCREEN_BREAKPOINT;
+  const isTablet = useIsTablet();
   const showFirstLayer = !isTablet || !selectedSecond;
   const showSecondLayer = showFirstLayer && secondLayer.length > 0;
   const showThirdLayer = Boolean(selectedSecond);
 
+  const timetableTypeRef = useRef(timetableType);
+
+  useEffect(() => {
+    timetableTypeRef.current = timetableType;
+  }, [timetableType]);
+
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const updateSecondLayer = useCallback(
-    (query: string) => {
-      TimetableManager.updateLastOpenedInstitute(query);
-      Toast.promise(TimetableManager.getSecondLayerByType(timetableType, query), "Fetching groups...")
-        .then(setSecondLayer)
-        .catch(Toast.error);
-    },
-    [timetableType]
-  );
+  const updateSecondLayer = useCallback((query: string) => {
+    TimetableManager.updateLastOpenedInstitute(query);
+    return Toast.promise(TimetableManager.getSecondLayerByType(timetableTypeRef.current, query), "Fetching groups...")
+      .then(setSecondLayer)
+      .catch(Toast.error);
+  }, []);
 
-  const updateThirdLayer = useCallback(
-    (major: string) => {
-      Toast.promise(TimetableManager.getThirdLayerByType(timetableType, major), "Fetching timetables...")
-        .then(setThirdLayer)
-        .catch(Toast.error);
-    },
-    [timetableType]
-  );
+  const updateThirdLayer = useCallback((major: string) => {
+    return Toast.promise(
+      TimetableManager.getThirdLayerByType(timetableTypeRef.current, major),
+      "Fetching timetables..."
+    )
+      .then(setThirdLayer)
+      .catch(Toast.error);
+  }, []);
+
+  const reset = useCallback(() => {
+    setSelectedFirst(null);
+    setSelectedSecond(null);
+    setThirdLayer([]);
+    setSecondLayer([]);
+  }, []);
 
   // Initial fetch
   useEffect(() => {
-    if (!force && timetableType === "timetable" && searchParams.size === 0) {
-      TimetableManager.getLastOpenedTimetable().then((t) => {
-        t && navigate(t);
-      });
-    }
+    reset();
 
     Toast.promise(TimetableManager.getFirstLayerSelectionByType(timetableType), "Fetching institutes...")
       .then(setFirstLayer)
@@ -73,11 +74,13 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
     return () => {
       Toast.hideAllMessages();
     };
-  }, [timetableType, force, navigate, searchParams]);
+  }, [timetableType, reset]);
 
   // On first layer change
   useEffect(() => {
-    if (!selectedFirst) return;
+    if (!selectedFirst) {
+      return;
+    }
     updateSecondLayer(selectedFirst);
   }, [selectedFirst, updateSecondLayer]);
 
@@ -98,13 +101,18 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
       setSelectedSecond(null);
       setThirdLayer([]);
     }
-    if (secondLayer.includes(selectedMajor)) {
+    if (firstLayer.includes(selectedInstitute) && secondLayer.includes(selectedMajor)) {
       setSelectedSecond(selectedMajor);
     }
+  }, [firstLayer, secondLayer, searchParams]);
+
+  useEffect(() => {
+    const selectedInstitute = searchParams.get("institute") || "";
+
     if (firstLayer.includes(selectedInstitute)) {
       setSelectedFirst(selectedInstitute);
     }
-  }, [secondLayer, searchParams, firstLayer]);
+  }, [firstLayer, searchParams]);
 
   const handleFirstChange = useCallback(
     (institute: string | null) => {

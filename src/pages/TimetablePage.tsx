@@ -62,7 +62,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   function onError(e: string, userError?: string) {
     Toast.error(e, userError);
-    navigate("/", { state: { force: true } });
+    navigate("/home");
   }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: I don't actually remember why but I don't want to break it

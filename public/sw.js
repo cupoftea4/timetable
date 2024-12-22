@@ -49,12 +49,12 @@ async function networkFirst(request) {
     const cacheRes = shouldCache(request, response);  
 
     if (cacheRes) {
-      cache.put(cacheRes === "home" ? "/" : request, response.clone());
+      cache.put(cacheRes === "home" ? "/home" : request, response.clone());
     }
 
     return response ?? await cache.match(request);
   } catch (error) {
-    return await cache.match(request).then(async res => res ?? await cache.match("/")); 
+    return await cache.match(request).then(async res => res ?? await cache.match("/home")); 
   }
   
 }

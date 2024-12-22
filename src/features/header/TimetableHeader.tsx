@@ -1,10 +1,9 @@
 import HomeIcon from "@/assets/HomeIcon";
 import usePageTitle from "@/hooks/usePageTitle";
-import useWindowDimensions from "@/hooks/useWindowDimensions";
+import { useIsMobile } from "@/hooks/useWindowDimensions";
 import Toggle from "@/shared/Toggle";
 import { classes } from "@/styles/utils";
 import type { HalfTerm } from "@/types/timetable";
-import { MOBILE_SCREEN_BREAKPOINT } from "@/utils/constants";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { isMerged } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
@@ -41,8 +40,7 @@ const TimetableHeader: FC<OwnProps> = ({
   const [isSecondWeek, setIsSecondWeek] = weekState;
   const navigate = useNavigate();
   const group = useParams().group?.trim() ?? "";
-  const { width } = useWindowDimensions();
-  const isMobile = width < MOBILE_SCREEN_BREAKPOINT;
+  const isMobile = useIsMobile();
   const groupTitle = timetableType === "merged" ? "Мій розклад" : group;
   usePageTitle(groupTitle);
 
@@ -70,7 +68,7 @@ const TimetableHeader: FC<OwnProps> = ({
         <div className={"flex gap-1"}>
           <Link
             state={{ force: true }}
-            to="/"
+            to="/home"
             aria-label="Home"
             type="button"
             className={classes("icon-button", "transition duration-300")}
