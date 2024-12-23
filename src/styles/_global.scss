@@ -61,6 +61,7 @@ body {
   color: var(--text-clr);
   main {
     padding: $main-padding;
+    padding-top: 0.125rem;
     @media screen and (prefers-color-scheme: dark) {
       &::before {
         content: '';
