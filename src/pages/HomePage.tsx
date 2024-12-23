@@ -1,5 +1,6 @@
 import BugIcon from "@/assets/BugIcon";
 import HeartIcon from "@/assets/HeartIcon";
+import LoadingIcon from "@/assets/LoadingIcon";
 import catImage from "@/assets/cat.svg";
 import { DatalistFocusProvider } from "@/context/datalistFocus";
 import HeaderPanel from "@/features/header/HomeHeader";
@@ -26,6 +27,8 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
   const [selectedFirst, setSelectedFirst] = useState<string | null>(null);
   const [selectedSecond, setSelectedSecond] = useState<string | null>(null);
 
+  const [isLoadingThirdLayer, setIsLoadingThirdLayer] = useState(false);
+
   const isTablet = useIsTablet();
   const showFirstLayer = !isTablet || !selectedSecond;
   const showSecondLayer = showFirstLayer && secondLayer.length > 0;
@@ -47,12 +50,14 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
   }, []);
 
   const updateThirdLayer = useCallback((major: string) => {
+    setIsLoadingThirdLayer(true);
     return Toast.promise(
       TimetableManager.getThirdLayerByType(timetableTypeRef.current, major),
       "Fetching timetables..."
     )
       .then(setThirdLayer)
-      .catch(Toast.error);
+      .catch(Toast.error)
+      .finally(() => setIsLoadingThirdLayer(false));
   }, []);
 
   const reset = useCallback(() => {
@@ -140,7 +145,18 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
             {showFirstLayer && <List items={firstLayer} selectedState={[selectedFirst, handleFirstChange]} />}
             {showSecondLayer && <List items={secondLayer} selectedState={[selectedSecond, handleSecondChange]} />}
             {showThirdLayer ? (
-              <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"} />
+              !isLoadingThirdLayer ? (
+                <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"} />
+              ) : (
+                <div
+                  className={`flex items-center gap-2 flex-col justify-center ${
+                    timetableType !== "lecturer" ? "max-h-[200px]" : ""
+                  }`}
+                >
+                  <LoadingIcon />
+                  <p>Loading...</p>
+                </div>
+              )
             ) : (
               <div className={styles["no-selection"]}>
                 <img className={styles.cat} src={catImage} draggable="false" alt="cat" width="800" height="800" />
