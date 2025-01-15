@@ -3,11 +3,13 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer as MessageToast } from "react-toastify";
 import HomePage from "./pages/HomePage";
 import LoadingPage from "./pages/LoadingPage";
+import NavigationSelector from "./pages/NavigationSelector";
 import TimetablePage from "./pages/TimetablePage";
 import { Status } from "./types/utils";
 import { RECEIVED_DONATION_NOTIFICATION, TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 import TimetableManager from "./utils/data/TimetableManager";
 import { doOnce } from "./utils/general";
+import { pathnameToType } from "./utils/timetable";
 import Toast from "./utils/toasts";
 
 /* TODO:
@@ -23,7 +25,7 @@ const App = () => {
   const [status, setStatus] = useState<Status>(Status.Loading);
 
   useEffect(() => {
-    TimetableManager.init()
+    TimetableManager.init(pathnameToType(window.location.pathname))
       .then(() => {
         setStatus(Status.Idle);
         doOnce(RECEIVED_DONATION_NOTIFICATION, () => {
@@ -42,7 +44,8 @@ const App = () => {
         <>
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<HomePage timetableType="timetable" />} />
+              <Route path="/" element={<NavigationSelector />} />
+              <Route path="home" element={<HomePage timetableType="timetable" />} />
               <Route path="selective" element={<HomePage timetableType="selective" />} />
               <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
               <Route path="/:group" element={<TimetablePage />} />

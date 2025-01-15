@@ -1,7 +1,7 @@
-import useWindowDimensions from "@/hooks/useWindowDimensions";
+import { useIsMobile } from "@/hooks/useWindowDimensions";
 import { classes } from "@/styles/utils";
 import type { TimetableItem } from "@/types/timetable";
-import { DEVELOP, TIMETABLE_SCREEN_BREAKPOINT } from "@/utils/constants";
+import { DEVELOP } from "@/utils/constants";
 import { getCurrentUADate, stringToDate } from "@/utils/date";
 import { generateSaturdayLessons, lessonsTimes, skeletonTimetable, unique } from "@/utils/timetable";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
@@ -28,8 +28,7 @@ const Timetable: FC<OwnProps> = ({
   hasCellSubgroups,
   isLoading,
 }) => {
-  const { width } = useWindowDimensions();
-  const isMobile = width < TIMETABLE_SCREEN_BREAKPOINT;
+  const isMobile = useIsMobile();
 
   const timetable = useMemo(() => {
     return [...originalTimetable, ...generateSaturdayLessons(originalTimetable)];

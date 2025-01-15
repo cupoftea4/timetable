@@ -15,7 +15,7 @@ const getSearchBarOptions = () => {
 };
 
 function getSavedTimetables() {
-  return TimetableManager.getCachedTimetables()
+  return TimetableManager.cachedTimetables
     .filter((group) => !isMerged(group.group))
     .map((timetable) => timetable.group);
 }

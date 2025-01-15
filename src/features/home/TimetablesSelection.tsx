@@ -1,4 +1,5 @@
 import { useDatalistFocus } from "@/context/datalistFocus";
+import { useIsMobile } from "@/hooks/useWindowDimensions";
 import { classes } from "@/styles/utils";
 import { sortGroupsByYear } from "@/utils/timetable";
 import { type FC, useState } from "react";
@@ -20,6 +21,7 @@ type OwnProps = {
 const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) => {
   const groupsByYear = sortGroupsByYear(timetables);
   const [expandedYear, setExpandedYear] = useState<Year | null>(null); // for mobile onClick event and keyboard navigation
+  const isMobile = useIsMobile();
   const { focus } = useDatalistFocus();
 
   return (
@@ -30,9 +32,10 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) =>
             groupsByYear[year]?.length && groupsByYear[year]?.length !== 0 ? (
               <ul
                 key={year}
-                className={classes(styles.year, expandedYear === year && styles.expanded)}
+                className={classes(styles.year, (expandedYear === year || isMobile) && styles.expanded)}
                 data-value={`${year} Курс`}
                 onClick={() => {
+                  if (isMobile) return;
                   expandedYear === year ? setExpandedYear(null) : setExpandedYear(year);
                 }}
               >

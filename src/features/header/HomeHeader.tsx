@@ -20,7 +20,7 @@ const HeaderPanel: FC<OwnProps> = ({ timetableType, className }) => {
     () => width < TABLET_SCREEN_BREAKPOINT && width > NARROW_SCREEN_BREAKPOINT,
     [width]
   );
-  const { isFocused, blur, focus } = useDatalistFocus();
+  const { isFocused, blur } = useDatalistFocus();
   const [showSearchBar, setShowSearchBar] = useState(!shouldShrinkSearchBar || isFocused);
 
   useEffect(() => {
@@ -40,10 +40,8 @@ const HeaderPanel: FC<OwnProps> = ({ timetableType, className }) => {
   useEffect(() => {
     if (!showSearchBar) {
       blur();
-    } else {
-      focus();
     }
-  }, [showSearchBar, blur, focus]);
+  }, [showSearchBar, blur]);
 
   const toggleSearchBar = (state = !showSearchBar) => {
     if (shouldShrinkSearchBar) {

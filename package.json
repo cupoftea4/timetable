@@ -1,6 +1,6 @@
 {
   "name": "timetable",
-  "version": "2.6.5",
+  "version": "2.6.7",
   "homepage": "/",
   "private": true,
   "dependencies": {

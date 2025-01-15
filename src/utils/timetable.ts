@@ -4,6 +4,7 @@ import type {
   MergedTimetableItem,
   TimetableItem,
   TimetableItemType,
+  TimetablePageType,
   TimetableType,
 } from "@/types/timetable";
 import { ENABLE_SATURDAYS, FIRST_CLASS_DATE } from "./constants";
@@ -33,7 +34,7 @@ export function mergeTimetables(timetables: Array<{ name: string; timetable: Tim
     }
     return acc;
   }, []);
-  if (!mergedTimetable?.length) throw new Error("Something went wrong");
+  if (!mergedTimetable?.length) throw new Error("Merged timetable is empty");
   return mergedTimetable;
 }
 
@@ -192,4 +193,11 @@ export const skeletonTimetable = {
   days: [null, "Понеділок", "Вівторок", "Середа", "Четвер", "П'ятниця"],
   lessonsTimes: lessonsTimes.slice(0, 6),
   lessons: new Set(["1-3", "1-4", "1-5", "2-1", "2-2", "2-4", "3-1", "3-2", "4-3", "4-2", "5-3", "5-6"]),
+};
+
+export const pathnameToType = (pathname: string): TimetablePageType => {
+  if (pathname.includes("lecturer")) return "lecturer";
+  if (pathname.includes("selective")) return "selective";
+  if (pathname.includes("home")) return "home";
+  return "timetable";
 };

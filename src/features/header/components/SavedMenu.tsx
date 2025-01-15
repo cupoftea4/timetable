@@ -23,7 +23,7 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
   const navigate = useNavigate();
 
   function getCachedGroups(): string[] {
-    const cachedGroups = TimetableManager.getCachedTimetables();
+    const cachedGroups = TimetableManager.cachedTimetables;
     const groups = cachedGroups.slice(Math.max(cachedGroups.length - MAX_SAVED_ITEMS, 0)).map((item) => item.group);
     const merged = TimetableManager.cachedMergedTimetable;
     if (merged) groups.push("my");
