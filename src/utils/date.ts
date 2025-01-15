@@ -37,6 +37,7 @@ export function getNULPWeek() {
 }
 
 export function getCurrentSemester(): "1" | "2" {
+  return "1";
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1; // Month is 0-based, so we add 1
   const currentDay = currentDate.getDate();
