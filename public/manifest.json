@@ -3,6 +3,12 @@
   "name": "NULP Timetable",
   "icons": [
     {
+      "src": "images/icon-monochrome.svg",
+      "sizes": "196x196",
+      "type": "image/svg+xml",
+      "purpose": "any monochrome"
+    },
+    {
       "purpose": "maskable",
       "sizes": "48x48",
       "src": "images/maskable_icon_x48.png",
