@@ -37,16 +37,15 @@ export function getNULPWeek() {
 }
 
 export function getCurrentSemester(): "1" | "2" {
-  return "2";
   const currentDate = new Date();
   const currentMonth = currentDate.getMonth() + 1; // Month is 0-based, so we add 1
   const currentDay = currentDate.getDate();
 
-  // Check if it's January 15 or later but before August 1
-  if ((currentMonth === 1 && currentDay >= 15) || (currentMonth > 1 && currentMonth < 8)) {
+  // Check if it's January 24 or later but before August 1
+  if ((currentMonth === 1 && currentDay >= 24) || (currentMonth > 1 && currentMonth < 8)) {
     return "2"; // Second semester
   }
-  return "1"; // First semester (assuming other months)
+  return "1"; // First semester
 }
 
 export function countDaysFrom(startDate: Date): number {
