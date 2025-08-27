@@ -14,6 +14,7 @@
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build",
+    "build:railway": "tsc && env-cmd -f railway.env vite build",
     "serve": "vite preview",
     "dev": "env-cmd -f dev.env vite --host",
     "build:prod": "tsc && env-cmd -f .env vite build",
