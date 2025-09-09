@@ -149,7 +149,7 @@ export default class LPNUData {
         {
           teachername: timetableName,
           semestr: CURRENT_SEMESTER,
-          semestrduration: "1", // Why, NULP?
+          // semestrduration: "1", // Why, NULP?
         },
         LECTURER_SUFFIX
       ).then(Parser.parseTimetable.bind(Parser));
@@ -168,7 +168,7 @@ export default class LPNUData {
       {
         studygroup_abbrname: timetableName.toLowerCase(),
         semestr: CURRENT_SEMESTER,
-        semestrduration: "1", // Why, NULP?
+        // semestrduration: "1", // Why, NULP?
       },
       suffix
     ).then(Parser.parseTimetable.bind(Parser));
