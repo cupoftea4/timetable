@@ -1,11 +1,45 @@
 /* eslint-disable no-restricted-globals */
 
-const DYNAMIC_CACHE_NAME_PREFIX  = "d-app-v";
 const urlParams = new URLSearchParams(location.search);
-const CURRENT_CACHE_VERSION = urlParams.get("v");
-const DYNAMIC_CACHE_NAME  = `${DYNAMIC_CACHE_NAME_PREFIX}${CURRENT_CACHE_VERSION}`;
-console.log(DYNAMIC_CACHE_NAME);
-const SERVER_FILE_NAME = "get.php";
+const CLEANUP_MODE = urlParams.get("cleanup") === "true";
+
+// If in cleanup mode, immediately clean up and unregister
+if (CLEANUP_MODE) {
+  console.log("Service worker in cleanup mode - clearing all caches and unregistering");
+  
+  self.addEventListener('install', event => {
+    event.waitUntil(
+      caches.keys().then(cacheNames => {
+        console.log("Deleting all caches:", cacheNames);
+        return Promise.all(cacheNames.map(cacheName => caches.delete(cacheName)));
+      }).then(() => {
+        console.log("All caches cleared, skipping waiting");
+        return self.skipWaiting();
+      })
+    );
+  });
+
+  self.addEventListener('activate', event => {
+    event.waitUntil(
+      Promise.resolve().then(() => {
+        console.log("Cleanup service worker activated, caches cleared");
+        return self.clients.claim();
+      })
+    );
+  });
+
+  // Don't intercept any requests in cleanup mode
+  self.addEventListener('fetch', event => {
+    // Let all requests go through normally
+  });
+
+} else {
+  // Original service worker code
+  const DYNAMIC_CACHE_NAME_PREFIX  = "d-app-v";
+  const CURRENT_CACHE_VERSION = urlParams.get("v");
+  const DYNAMIC_CACHE_NAME  = `${DYNAMIC_CACHE_NAME_PREFIX}${CURRENT_CACHE_VERSION}`;
+  console.log(DYNAMIC_CACHE_NAME);
+  const SERVER_FILE_NAME = "get.php";
 
 function shouldCache(request, response) {
   const url = request.url;
@@ -17,44 +51,44 @@ function shouldCache(request, response) {
          ((url.startsWith(location.origin  + '/') && responseType.includes("text/html")) ? "home" : false);
 }
 
-self.addEventListener('install', function(event) {
-  event.waitUntil(self.skipWaiting()); // This will skip the waiting phase.
-});
+  self.addEventListener('install', function(event) {
+    event.waitUntil(self.skipWaiting()); // This will skip the waiting phase.
+  });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.filter(cacheName => {
-          // Check if the cache name starts with the prefix and it's not the current version
-          return cacheName.startsWith(DYNAMIC_CACHE_NAME_PREFIX) && cacheName !== DYNAMIC_CACHE_NAME;
-        }).map(cacheName => {
-          // Delete the old cache
-          return caches.delete(cacheName);
-        })
-      );
-    })
-  );
-});
+  self.addEventListener('activate', event => {
+    event.waitUntil(
+      caches.keys().then(cacheNames => {
+        return Promise.all(
+          cacheNames.filter(cacheName => {
+            // Check if the cache name starts with the prefix and it's not the current version
+            return cacheName.startsWith(DYNAMIC_CACHE_NAME_PREFIX) && cacheName !== DYNAMIC_CACHE_NAME;
+          }).map(cacheName => {
+            // Delete the old cache
+            return caches.delete(cacheName);
+          })
+        );
+      })
+    );
+  });
 
-self.addEventListener('fetch', event => {
-  const {request} = event;
-  event.respondWith(networkFirst(request));
-})
+  self.addEventListener('fetch', event => {
+    const {request} = event;
+    event.respondWith(networkFirst(request));
+  })
 
-async function networkFirst(request) {
-  const cache = await caches.open(DYNAMIC_CACHE_NAME);
-  try {
-    const response = await fetch(request);
-    const cacheRes = shouldCache(request, response);  
+  async function networkFirst(request) {
+    const cache = await caches.open(DYNAMIC_CACHE_NAME);
+    try {
+      const response = await fetch(request);
+      const cacheRes = shouldCache(request, response);  
 
-    if (cacheRes) {
-      cache.put(cacheRes === "home" ? "/home" : request, response.clone());
+      if (cacheRes) {
+        cache.put(cacheRes === "home" ? "/home" : request, response.clone());
+      }
+
+      return response ?? await cache.match(request);
+    } catch (error) {
+      return await cache.match(request).then(async res => res ?? await cache.match("/home")); 
     }
-
-    return response ?? await cache.match(request);
-  } catch (error) {
-    return await cache.match(request).then(async res => res ?? await cache.match("/home")); 
   }
-  
 }

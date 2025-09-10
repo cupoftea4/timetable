@@ -22,19 +22,39 @@
   <div id="root"></div>
   <script type="module" src="/src/index.tsx"></script>
   <script>
-    // Service worker temporarily disabled for Railway migration
-    // window.addEventListener("load", () => {
-    //   if ("serviceWorker" in navigator) {
-    //     console.log("Registering service worker...", window.APP_VERSION);
-    //     navigator.serviceWorker.register("/sw.js?v=" + window.APP_VERSION)
-    //       .then(registration => {
-    //         console.log("Service worker registered with scope:", registration.scope);
-    //       })
-    //       .catch(error => {
-    //         console.error("Service worker registration failed:", error);
-    //       });
-    //   }
-    // });
+    window.addEventListener("load", () => {
+      if ("serviceWorker" in navigator) {
+        const lastCleanupVersion = localStorage.getItem('sw-cleanup-version');
+        
+        if (lastCleanupVersion !== window.APP_VERSION) {
+          console.log("Running service worker cleanup for version", window.APP_VERSION);
+          navigator.serviceWorker.register("/sw.js?cleanup=true")
+            .then(registration => {
+              console.log("Cleanup service worker registered");
+              registration.update();
+              
+              setTimeout(() => {
+                localStorage.setItem('sw-cleanup-version', window.APP_VERSION);
+                console.log("Migration cleanup completed, reloading for normal service worker...");
+                // Reload to get normal service worker
+                window.location.reload();
+              }, 2000);
+            })
+            .catch(error => {
+              console.error("Service worker cleanup failed:", error);
+            });
+        } else {
+          console.log("Registering service worker...", window.APP_VERSION);
+          navigator.serviceWorker.register("/sw.js?v=" + window.APP_VERSION)
+            .then(registration => {
+              console.log("Service worker registered with scope:", registration.scope);
+            })
+            .catch(error => {
+              console.error("Service worker registration failed:", error);
+            });
+        }
+      }
+    });
   </script>
   <!--
    ,-.       _,---._ __  / \
