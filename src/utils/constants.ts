@@ -5,4 +5,17 @@ export const NARROW_SCREEN_BREAKPOINT = 300;
 
 export const TOAST_AUTO_CLOSE_TIME = 5000;
 
-export const DEVELOP = import.meta.env.MODE === 'development';
+export const DEVELOP = import.meta.env.MODE === "development";
+
+export const ENABLE_SATURDAYS = import.meta.env.VITE_ENABLE_WORKING_SATURADAYS === "true";
+
+if (ENABLE_SATURDAYS && !import.meta.env.VITE_FIRST_CLASS_DATE) {
+  throw new Error("VITE_FIRST_CLASS_DATE is required when ENABLE_WORKING_SATURADAYS is true");
+}
+
+export const FIRST_CLASS_DATE = new Date(import.meta.env.VITE_FIRST_CLASS_DATE);
+
+export const RECEIVED_DONATION_NOTIFICATION = "received-donation-notification";
+
+export const DONATION_LINK = "https://send.monobank.ua/jar/AR9WWgQGpz";
+export const BUG_REPORT_LINK = "https://t.me/lpnu_timetable";

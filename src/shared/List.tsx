@@ -1,10 +1,10 @@
-import type React from 'react';
+import type React from "react";
 
 type OwnProps = {
-  items: string[]
+  items: string[];
   selectedState:
-  [string | null, React.Dispatch<React.SetStateAction<string | null>>]
-  | [string | null, ((state: string | null) => void)]
+    | [string | null, React.Dispatch<React.SetStateAction<string | null>>]
+    | [string | null, (state: string | null) => void];
 };
 
 const List = ({ items, selectedState }: OwnProps) => {
@@ -14,8 +14,11 @@ const List = ({ items, selectedState }: OwnProps) => {
       {items.map((item) => (
         <li key={item}>
           <button
-            onClick={() => { onSelect(item); }}
-            data-state={selected === item ? 'selected' : ''}
+            onClick={() => {
+              onSelect(item);
+            }}
+            type="button"
+            data-state={selected === item ? "selected" : ""}
           >
             {item}
           </button>

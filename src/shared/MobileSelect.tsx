@@ -1,9 +1,9 @@
-import React, { type FC } from 'react';
-import styles from './MobileSelect.module.scss';
+import React, { type FC } from "react";
+import styles from "./MobileSelect.module.scss";
 
 type OwnProps = {
-  items: Array<{ value: string, name: string }>
-  selectedState: [string, React.Dispatch<React.SetStateAction<string>> | ((state: string) => void)]
+  items: Array<{ value: string; name: string }>;
+  selectedState: [string, React.Dispatch<React.SetStateAction<string>> | ((state: string) => void)];
 };
 
 const MobileSelect: FC<OwnProps> = ({ items, selectedState }) => {
@@ -17,25 +17,38 @@ const MobileSelect: FC<OwnProps> = ({ items, selectedState }) => {
 
   return (
     <>
-      <button onClick={() => { setShowSelect(true); }} className={styles.selected}>
-        {items.find(item => item.value === selected)?.name}
+      <button
+        type="button"
+        onClick={() => {
+          setShowSelect(true);
+        }}
+        className={styles.selected}
+      >
+        {items.find((item) => item.value === selected)?.name}
       </button>
-      {
-        showSelect &&
-        <>
-          <div className={styles.select} onClick={() => { setShowSelect(false); }}>
-            <ul>
-              {items.map((item) => (
-                  <li key={item.value}>
-                    <button onClick={() => { onItemClicked(item.value); }}>
-                      {item.name}
-                    </button>
-                  </li>
-              ))}
-            </ul>
-          </div>
-        </>
-      }
+      {showSelect && (
+        <div
+          className={styles.select}
+          onClick={() => {
+            setShowSelect(false);
+          }}
+        >
+          <ul>
+            {items.map((item) => (
+              <li key={item.value}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    onItemClicked(item.value);
+                  }}
+                >
+                  {item.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </>
   );
 };

@@ -22,49 +22,49 @@
 
 @mixin mobile {
   @media only screen and (max-width: 480px) {
-      @content;
+    @content;
   }
 }
 
 @mixin tablet {
   @media only screen and (max-width: 768px) {
-      @content;
+    @content;
   }
 }
 
 @mixin desktop {
   @media (min-width: 768px) {
-      @content;
+    @content;
   }
 }
 
 @mixin large-screen {
   @media (min-width: 1860px) {
-      @content;
+    @content;
   }
 }
 
 @mixin screen-2k {
   @media (min-width: 2500px) {
-      @content;
+    @content;
   }
 }
 
 @mixin screen-4k {
   @media (min-width: 3600px) {
-      @content;
+    @content;
   }
 }
 
 @mixin touchscreen {
   @media (hover: none) {
-      @content;
+    @content;
   }
 }
 
 @mixin can-hover {
   @media (hover: hover) {
-      @content;
+    @content;
   }
 }
 
@@ -92,6 +92,18 @@
   background: linear-gradient($deg, $color-1 0%, $color-2 50%, $color-3 100%);
 }
 
-@mixin gradient-4($color-1, $color-2, $color-3, $color-4, $deg: var(--gradient-degree)) {
-  background: linear-gradient($deg, $color-1 0%, $color-2 33.33%, $color-3 66.66%, $color-4 100%);
+@mixin gradient-4(
+  $color-1,
+  $color-2,
+  $color-3,
+  $color-4,
+  $deg: var(--gradient-degree)
+) {
+  background: linear-gradient(
+    $deg,
+    $color-1 0%,
+    $color-2 33.33%,
+    $color-3 66.66%,
+    $color-4 100%
+  );
 }

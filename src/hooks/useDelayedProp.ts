@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-export function useDelayedProp<T> (prop: T, delay: number): [T, boolean] {
+export function useDelayedProp<T>(prop: T, delay: number): [T, boolean] {
   const [innerProp, setInnerProp] = useState(prop);
   const [shouldAppear, setShouldAppear] = useState(true);
 
@@ -10,7 +10,9 @@ export function useDelayedProp<T> (prop: T, delay: number): [T, boolean] {
       setInnerProp(prop);
       setShouldAppear(true);
     }, delay);
-    return () => { clearTimeout(id); };
+    return () => {
+      clearTimeout(id);
+    };
   }, [prop, delay]);
 
   return [innerProp, shouldAppear];

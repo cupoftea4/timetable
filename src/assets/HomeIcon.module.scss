@@ -1,11 +1,7 @@
-@use '../styles/utils' as *;
-@use '../styles/variables' as *;  
+@use "../styles/utils" as *;
+@use "../styles/variables" as *;
 
 .icon {
   max-width: $header-icon-size;
-  transition: transform 0.2s ease-in-out;
-  &:hover, &:focus {
-    transform: scale(1.05);
-  }
   @include flex-center;
 }

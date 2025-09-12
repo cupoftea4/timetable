@@ -52,6 +52,7 @@ body {
   color: var(--text-clr);
   main {
     padding: $main-padding;
+    padding-top: 0.125rem;
     @include dark-mode("main") {
       &::before {
         content: '';
@@ -114,5 +115,22 @@ a, button {
   }
   &.practical:hover {
     background-color: $timetable-pract-hover-clr;
+  }
+}
+
+.icon-button {
+  @include touchscreen {
+    &:hover,
+    &:focus {
+      background-color: var(--accent-clr);
+    }
+  }
+  border-radius: 50%;
+  padding: 0.325rem;
+  @include can-hover {
+    &:hover,
+    &:focus {
+      transform: scale(1.05);
+    }
   }
 }

@@ -1,77 +1,90 @@
-import { useState, type FC, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import DownloadIcon from '@/assets/DownloadIcon';
-import LoadingIcon from '@/assets/LoadingIcon';
-import MergeIcon from '@/assets/MergeIcon';
-import { classes } from '@/styles/utils';
-import styles from './TimetableFooter.module.scss';
-import { isDarkMode } from '@/utils/general';
-import SunIcon from '@/assets/SunIcon';
-import MoonIcon from '@/assets/MoonIcon';
+import DownloadIcon from "@/assets/DownloadIcon";
+import MergeIcon from "@/assets/MergeIcon";
+import MoonIcon from "@/assets/MoonIcon";
+import RefreshIcon from "@/assets/RefreshIcon";
+import SunIcon from "@/assets/SunIcon";
+import { classes } from "@/styles/utils";
+import { isDarkMode } from "@/utils/general";
+import { type FC, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import styles from "./TimetableFooter.module.scss";
 
 type OwnProps = {
-  loading: boolean
-  isExamsTimetable: boolean
-  isSecondSubgroup: boolean
-  showCreateMergedModal: () => void
-  updateTimetable: () => void
-  time?: number
-  icsFILE?: string
+  loading: boolean;
+  isExamsTimetable: boolean;
+  isSecondSubgroup: boolean;
+  showCreateMergedModal: () => void;
+  updateTimetable: () => void;
+  time?: number;
+  icsFILE?: string;
 };
 
 const TimetableFooter: FC<OwnProps> = ({
-  loading, isExamsTimetable, isSecondSubgroup, time, icsFILE,
-  showCreateMergedModal, updateTimetable
+  loading,
+  isExamsTimetable,
+  isSecondSubgroup,
+  time,
+  icsFILE,
+  showCreateMergedModal,
+  updateTimetable,
 }) => {
-  const group = useParams().group?.trim() ?? '';
+  const group = useParams().group?.trim() ?? "";
 
   const [isDarkTheme, setIsDarkTheme] = useState(isDarkMode());
 
   useEffect(() => {
     if (isDarkTheme) {
-      document.documentElement.classList.add('dark-mode');
+      document.documentElement.classList.add("dark-mode");
     } else {
-      document.documentElement.classList.remove('dark-mode');
+      document.documentElement.classList.remove("dark-mode");
     }
   }, [isDarkTheme]);
 
-  addEventListener('storage', (event) => {
-    if (event.key === 'color-mode') {
-      setIsDarkTheme(event.newValue === 'dark');
+  addEventListener("storage", (event) => {
+    if (event.key === "color-mode") {
+      setIsDarkTheme(event.newValue === "dark");
     }
   });
 
   function setThemePreference(mode: string) {
-    window.localStorage.setItem('color-mode', mode);
-    setIsDarkTheme(mode === 'dark');
+    window.localStorage.setItem("color-mode", mode);
+    setIsDarkTheme(mode === "dark");
   }
 
   return (
     <footer className={styles.bottom}>
       <span className={styles.container}>
         <button
-          title='Змінити тему'
+          title="Змінити тему"
           className={classes(styles.theme, styles.button)}
-          onClick={() => { setThemePreference(isDarkTheme ? 'light' : 'dark'); }}
+          onClick={() => {
+            setThemePreference(isDarkTheme ? "light" : "dark");
+          }}
         >
           {isDarkTheme ? <MoonIcon /> : <SunIcon />}
         </button>
         <button
-          title='Об`єднати кілька розкладів в одну таблицю'
-          onClick={showCreateMergedModal} className={classes(styles.merge, styles.button)}
+          title="Об`єднати кілька розкладів в одну таблицю"
+          onClick={showCreateMergedModal}
+          className={classes(styles.merge, styles.button)}
         >
           <MergeIcon />
         </button>
         <button
+          type="button"
           disabled={loading}
-          title='Оновити дані'
-          className={classes(styles.update, loading && styles.loading, styles.button)}
-          onClick={() => { updateTimetable(); }}
+          className={classes(styles.update, styles.button, loading && styles.pending)}
+          title="Оновити дані"
+          onClick={() => {
+            updateTimetable();
+          }}
         >
-          <LoadingIcon />
+          <RefreshIcon isPending={loading} />
         </button>
-        <a className={classes(styles.download, styles.button)}
-          title='Експортувати розклад для Google Calendar' href={icsFILE}
+        <a
+          className={classes(styles.download, styles.button)}
+          title="Експортувати розклад для Google Calendar"
+          href={icsFILE}
           download={isExamsTimetable ? `${group}-exams.ics` : `${group}-${isSecondSubgroup ? 2 : 1}.ics`}
         >
           <DownloadIcon />

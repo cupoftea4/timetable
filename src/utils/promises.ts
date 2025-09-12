@@ -1,15 +1,15 @@
-export function timeout<T> (ms: number, promise: Promise<T>): Promise<T> {
+export function timeout<T>(ms: number, promise: Promise<T>): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new Error('Promise timeout'));
+      reject(new Error("Promise timeout"));
     }, ms);
 
     promise
-      .then(value => {
+      .then((value) => {
         clearTimeout(timer);
         resolve(value);
       })
-      .catch(reason => {
+      .catch((reason) => {
         clearTimeout(timer);
         reject(reason);
       });
