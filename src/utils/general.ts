@@ -93,7 +93,8 @@ export function getRandomValue<T>(array: T[]) {
 }
 
 export function isDarkMode() {
-  return window?.matchMedia("(prefers-color-scheme: dark)").matches;
+  const theme = window.localStorage.getItem("color-mode");
+  return theme === null ? window.matchMedia("(prefers-color-scheme: dark)").matches : theme === "dark";
 }
 
 /**

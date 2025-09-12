@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer as MessageToast } from "react-toastify";
+import { useTheme } from "./hooks/useTheme";
 import HomePage from "./pages/HomePage";
 import LoadingPage from "./pages/LoadingPage";
 import NavigationSelector from "./pages/NavigationSelector";
@@ -22,6 +23,9 @@ import Toast from "./utils/toasts";
  */
 
 const App = () => {
+  // Initialize theme at the app level
+  useTheme();
+
   const [status, setStatus] = useState<Status>(Status.Loading);
 
   useEffect(() => {

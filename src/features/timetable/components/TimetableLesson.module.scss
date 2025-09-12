@@ -123,7 +123,7 @@ $cell-border-radius: .625rem;
       border-radius: $cell-border-radius;
       --bg-alpha: .5;
       color: white;
-      @include dark-mode {
+      @include dark-mode(".cell") {
         --bg-alpha: .3;
         color: var(--text-clr);
       } 

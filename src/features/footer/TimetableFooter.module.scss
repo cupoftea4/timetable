@@ -18,6 +18,34 @@
     .update {
       --icon-size: 1.625rem;
     }
+    
+    .theme {
+      --icon-size: 1.25rem;
+      position: relative;
+      
+      .themeIcon {
+        width: var(--icon-size);
+        height: var(--icon-size);
+        transition: all 0.15s ease-in-out;
+        
+        &.moonIcon {
+          position: absolute;
+          transform: scale(0) rotate(90deg);
+          
+          :global(.dark-mode) & {
+            transform: scale(1) rotate(0deg);
+          }
+        }
+        
+        &.sunIcon {
+          transform: scale(1) rotate(0deg);
+          
+          :global(.dark-mode) & {
+            transform: scale(0) rotate(-90deg);
+          }
+        }
+      }
+    }
   }
   .button {
     transition: transform 0.2s ease-in-out;
