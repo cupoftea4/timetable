@@ -3,9 +3,9 @@ import MergeIcon from "@/assets/MergeIcon";
 import MoonIcon from "@/assets/MoonIcon";
 import RefreshIcon from "@/assets/RefreshIcon";
 import SunIcon from "@/assets/SunIcon";
+import { useTheme } from "@/hooks/useTheme";
 import { classes } from "@/styles/utils";
-import { isDarkMode } from "@/utils/general";
-import { type FC, useEffect, useState } from "react";
+import type { FC } from "react";
 import { useParams } from "react-router-dom";
 import styles from "./TimetableFooter.module.scss";
 
@@ -29,27 +29,7 @@ const TimetableFooter: FC<OwnProps> = ({
   updateTimetable,
 }) => {
   const group = useParams().group?.trim() ?? "";
-
-  const [isDarkTheme, setIsDarkTheme] = useState(isDarkMode());
-
-  useEffect(() => {
-    if (isDarkTheme) {
-      document.documentElement.classList.add("dark-mode");
-    } else {
-      document.documentElement.classList.remove("dark-mode");
-    }
-  }, [isDarkTheme]);
-
-  addEventListener("storage", (event) => {
-    if (event.key === "color-mode") {
-      setIsDarkTheme(event.newValue === "dark");
-    }
-  });
-
-  function setThemePreference(mode: string) {
-    window.localStorage.setItem("color-mode", mode);
-    setIsDarkTheme(mode === "dark");
-  }
+  const { toggleTheme } = useTheme();
 
   return (
     <footer className={styles.bottom}>
@@ -57,13 +37,16 @@ const TimetableFooter: FC<OwnProps> = ({
         <button
           title="Змінити тему"
           className={classes(styles.theme, styles.button)}
-          onClick={() => {
-            setThemePreference(isDarkTheme ? "light" : "dark");
-          }}
+          onClick={toggleTheme}
+          aria-label="Змінити тему"
+          type="button"
         >
-          {isDarkTheme ? <MoonIcon /> : <SunIcon />}
+          <MoonIcon className={classes(styles.themeIcon, styles.moonIcon)} />
+          <SunIcon className={classes(styles.themeIcon, styles.sunIcon)} />
         </button>
         <button
+          type="button"
+          aria-label="Об`єднати кілька розкладів в одну таблицю"
           title="Об`єднати кілька розкладів в одну таблицю"
           onClick={showCreateMergedModal}
           className={classes(styles.merge, styles.button)}
@@ -75,6 +58,7 @@ const TimetableFooter: FC<OwnProps> = ({
           disabled={loading}
           className={classes(styles.update, styles.button, loading && styles.pending)}
           title="Оновити дані"
+          aria-label="Оновити дані"
           onClick={() => {
             updateTimetable();
           }}
@@ -86,6 +70,8 @@ const TimetableFooter: FC<OwnProps> = ({
           title="Експортувати розклад для Google Calendar"
           href={icsFILE}
           download={isExamsTimetable ? `${group}-exams.ics` : `${group}-${isSecondSubgroup ? 2 : 1}.ics`}
+          aria-label="Експортувати розклад для Google Calendar"
+          type="button"
         >
           <DownloadIcon />
         </a>
