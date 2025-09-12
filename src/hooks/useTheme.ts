@@ -35,7 +35,11 @@ export function useTheme(): UseThemeReturn {
   useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
       if (event.key === "color-mode") {
-        setIsDarkTheme(event.newValue === "dark");
+        setIsDarkTheme(
+          event.newValue === null
+            ? window.matchMedia("(prefers-color-scheme: dark)").matches
+            : event.newValue === "dark"
+        );
       }
     };
 
