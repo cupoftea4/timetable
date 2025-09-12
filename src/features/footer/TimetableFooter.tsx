@@ -71,7 +71,6 @@ const TimetableFooter: FC<OwnProps> = ({
           href={icsFILE}
           download={isExamsTimetable ? `${group}-exams.ics` : `${group}-${isSecondSubgroup ? 2 : 1}.ics`}
           aria-label="Експортувати розклад для Google Calendar"
-          type="button"
         >
           <DownloadIcon />
         </a>
