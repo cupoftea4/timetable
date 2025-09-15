@@ -15,6 +15,18 @@
   <meta property="og:image" content="https://lpnu.pp.ua/images/logo-light.png" />
   <link rel="manifest" href="/manifest.json" />
   <title>Розклад НУЛП</title>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('color-mode');
+      const prefersDark = theme === null 
+        ? window.matchMedia('(prefers-color-scheme: dark)').matches 
+        : theme === 'dark';
+      
+      if (prefersDark) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    })();
+  </script>
 </head>
 
 <body>
