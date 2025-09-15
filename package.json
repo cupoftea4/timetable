@@ -1,6 +1,6 @@
 {
   "name": "timetable",
-  "version": "2.6.7",
+  "version": "2.6.8",
   "homepage": "/",
   "private": true,
   "dependencies": {
@@ -9,10 +9,12 @@
     "react-datalist-input": "^3.2.1",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.4.3",
-    "react-toastify": "^9.1.1"
+    "react-toastify": "^9.1.1",
+    "serve": "^14.2.5"
   },
   "scripts": {
-    "start": "vite",
+    "start": "serve -s build -p ${PORT:-3000}",
+    "start:dev": "vite",
     "build": "tsc && vite build",
     "build:railway": "tsc && env-cmd -f railway.env vite build",
     "serve": "vite preview",
