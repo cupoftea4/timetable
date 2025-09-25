@@ -39,8 +39,8 @@ export default class Toast {
 
   static readonly PENDING_MERGED = "Merging your timetables. Wait a bit, please";
 
-  static error(error: string, userError: string = Toast.FETCH_ERROR) {
-    if (DEVELOP) console.error(`[Handler] ${error}`);
+  static error(error: unknown, userError: string = Toast.FETCH_ERROR) {
+    console.error(`[Handler] ${error}`, error);
     showErrorToast(userError);
   }
 
