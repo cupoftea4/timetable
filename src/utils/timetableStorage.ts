@@ -116,8 +116,8 @@ export default class LocalCache {
     );
   }
 
-  private static setRamCache<K extends keyof CacheData>({ key, data }: { key: K; data: CacheData[K] | undefined }) {
-    LocalCache.ramCache[key] = data;
+  private static setRamCache<K extends keyof CacheData>({ key, data }: { key: K; data: CacheData[K] | null }) {
+    LocalCache.ramCache[key] = data ?? undefined;
   }
 
   private static getCacheConfig(key: CacheKey): CacheConfig {
@@ -125,7 +125,7 @@ export default class LocalCache {
     return { key, storage: "indexedDB" };
   }
 
-  static async get<K extends CacheKey>(key: K, force = false): Promise<{ key: K; data: CacheData[K] | undefined }> {
+  static async get<K extends CacheKey>(key: K, force = false): Promise<{ key: K; data: CacheData[K] | null }> {
     if (isStandardKey(key) && LocalCache.ramCache[key]) return { key, data: LocalCache.ramCache[key] };
     const config = LocalCache.getCacheConfig(key);
     if (config.storage === "indexedDB") {
@@ -134,13 +134,17 @@ export default class LocalCache {
       if (cached && updated && (!Util.needsUpdate(updated) || force)) return { key, data: cached as CacheData[K] };
     }
     if (config.storage === "localStorage") {
-      const cached = JSON.parse(localStorage.getItem(config.key) ?? "null");
-      if (cached) return { key, data: cached as CacheData[K] };
+      try {
+        const cached = JSON.parse(localStorage.getItem(config.key) ?? "null");
+        if (cached) return { key, data: cached as CacheData[K] };
+      } catch (e) {
+        console.error(`Error parsing localStorage (${config.key})`, e);
+      }
     }
-    return { key, data: undefined };
+    return { key, data: null };
   }
 
-  static async set<K extends CacheKey>(key: K, data: CacheData[K] | undefined) {
+  static async set<K extends CacheKey>(key: K, data: CacheData[K] | null) {
     const config = LocalCache.getCacheConfig(key);
     if (!config) return;
     if (config.storage === "indexedDB") {

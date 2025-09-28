@@ -98,11 +98,11 @@ class TimetableManager {
     }
   }
 
-  async getLastOpenedInstitute(): Promise<string | undefined> {
+  async getLastOpenedInstitute(): Promise<string | null> {
     return LocalCache.get("lastOpenedInstitute").then((t) => t?.data);
   }
 
-  async getLastOpenedTimetable(): Promise<string | undefined> {
+  async getLastOpenedTimetable(): Promise<string | null> {
     return LocalCache.get("lastOpenedTimetable").then((t) => t?.data);
   }
 
@@ -270,15 +270,15 @@ class TimetableManager {
 
   async deleteTimetable(groupName: string) {
     if (Util.isMerged(groupName)) {
-      LocalCache.set("mergedTimetable", undefined);
+      LocalCache.set("mergedTimetable", null);
       return;
     }
     const groupNameClean = groupName.trim();
     await LocalCache.set(
       "savedTimetables",
-      LocalCache.sync.savedTimetables?.filter((el) => el.group !== groupNameClean)
+      LocalCache.sync.savedTimetables?.filter((el) => el.group !== groupNameClean) ?? null
     );
-    await LocalCache.set(`timetable_${groupNameClean}`, undefined);
+    await LocalCache.set(`timetable_${groupNameClean}`, null);
   }
 
   saveMergedTimetable(timetablesToMerge: string[]) {
@@ -378,14 +378,14 @@ class TimetableManager {
     binding: typeof LPNUData | typeof FallbackData,
     fn: (...params: P) => Promise<CacheData[K]>,
     ...args: P
-  ): Promise<CacheData[K] | undefined> {
+  ): Promise<CacheData[K] | null> {
     if (DEVELOP) console.log("Getting data", key);
     const cached = (await LocalCache.get(key)).data;
     if (Array.isArray(cached) && cached.length > 0) return cached;
     if (!Array.isArray(cached) && cached) return cached;
 
     if (DEVELOP) console.log("Getting data from server", cached);
-    const data: CacheData[K] | undefined = await fn.call(binding, ...args).catch(async () => {
+    const data: CacheData[K] | null = await fn.call(binding, ...args).catch(async () => {
       if (DEVELOP) console.log("Failed to get data from server", key);
       const cached = await LocalCache.get(key, true);
       if (cached) return cached.data;
