@@ -46,8 +46,11 @@ class TimetableManager {
         const tempGroups = new Set<string>(data.map((group) => Util.getGroupName(group, type)));
         return Util.getFirstLetters([...tempGroups]);
       }
-      case "lecturer":
-        return Util.getFirstLetters(await this.getLecturerDepartments());
+      case "lecturer": {
+        const lecturers = await this.getLecturers();
+        const tempLecturers = new Set<string>(lecturers.map((lecturer) => Util.getGroupName(lecturer, type)));
+        return Util.getFirstLetters([...tempLecturers]);
+      }
       default:
         return await this.getInstitutes();
     }
@@ -71,14 +74,19 @@ class TimetableManager {
     switch (type) {
       case "selective": {
         const data = await this.getSelectiveGroups();
-        const tempGroups = new Set<string>(data.map((group) => Util.getGroupName(group, type)));
-        return [...tempGroups].filter((group) => Util.startsWithLetters(group, query));
+        const names = [...new Set(data.map((group) => Util.getGroupName(group, type)))];
+        return names.filter((name) => Util.startsWithLetters(name, query));
       }
-      case "lecturer":
-        return (await this.getLecturerDepartments()).filter((group) => Util.startsWithLetters(group, query));
+      case "lecturer": {
+        const lecturers = await this.getLecturers();
+        const names = lecturers
+          .map((lecturer) => Util.getGroupName(lecturer, type))
+          .filter((name) => Util.startsWithLetters(name, query));
+        return Util.extractLecturerUniquePrefixes(names);
+      }
       default: {
         const groups = await this.getTimetableGroups(query);
-        return [...new Set<string>(groups.map((group) => Util.getGroupName(group, type)))];
+        return [...new Set(groups.map((group) => Util.getGroupName(group, type)))];
       }
     }
   }
@@ -89,8 +97,18 @@ class TimetableManager {
         const data = await this.getSelectiveGroups();
         return data.filter((group) => Util.getGroupName(group, type) === query);
       }
-      case "lecturer":
-        return await this.getLecturers(query);
+      case "lecturer": {
+        const lecturers = await this.getLecturers();
+        const normalizedQuery = query.trim();
+        const names = [
+          ...new Set(
+            lecturers
+              .map((lecturer) => Util.getGroupName(lecturer, type))
+              .filter((name) => Util.getLecturerPrefix(name) === normalizedQuery)
+          ),
+        ];
+        return names.sort((a, b) => a.localeCompare(b));
+      }
       default: {
         const groups = await this.getTimetableGroups();
         return groups.filter((group) => Util.getGroupName(group, type) === query);
@@ -165,9 +183,11 @@ class TimetableManager {
     if (checkCache && data && !Util.needsUpdate(data.time)) {
       cacheData = LocalCache.get(`exams_timetable_${groupName}`).then((t) => t?.data);
     } else {
-      cacheData = FallbackData.getExamsTimetable(timetableType, groupName).catch(() =>
-        LocalCache.get(`exams_timetable_${groupName}`).then((t) => t?.data)
-      );
+      // TODO: implement server cache
+      // cacheData = FallbackData.getExamsTimetable(timetableType, groupName).catch(() =>
+      //   LocalCache.get(`exams_timetable_${groupName}`).then((t) => t?.data)
+      // );
+      cacheData = Promise.resolve(null);
     }
 
     const fetchData: ActualPromise<ExamsTimetableItem[]> = LPNUData.getExamsTimetable(timetableType, groupName).catch(
@@ -365,8 +385,8 @@ class TimetableManager {
     return this.getData("selectiveGroups", FallbackData, FallbackData.getSelectiveGroups).then((g) => g ?? []);
   }
 
-  private getLecturers(department?: string): Promise<string[]> {
-    return this.getData("lecturers", FallbackData, FallbackData.getLecturers, department).then((l) => l ?? []);
+  private getLecturers(): Promise<string[]> {
+    return this.getData("lecturers", FallbackData, FallbackData.getLecturers).then((l) => l ?? []);
   }
 
   private getLecturerDepartments(): Promise<string[]> {

@@ -91,6 +91,19 @@ export function startsWithLetters(str: string, letters: string) {
   return Boolean(str[0] && str[0].localeCompare(start) >= 0 && str[0].localeCompare(end) <= 0);
 }
 
+export function getLecturerPrefix(name: string, length = 2): string {
+  return name.trim().slice(0, length);
+}
+
+export function extractLecturerUniquePrefixes(names: string[], prefixLength = 2): string[] {
+  const prefixes = new Set<string>();
+  for (const name of names) {
+    const prefix = getLecturerPrefix(name, prefixLength);
+    if (prefix) prefixes.add(prefix);
+  }
+  return [...prefixes].sort((a, b) => a.localeCompare(b));
+}
+
 export function needsUpdate(timestamp: number) {
   if (!timestamp) return true;
   return navigator.onLine && Date.now() - UPDATE_PERIOD > timestamp;
