@@ -40,7 +40,7 @@ $icon-size: 1em;
       color: white;
       background: linear-gradient(45.37deg, var(--accent-clr) 0.75%, rgba(255, 255, 255, 0.07) 83.95%);
       border: var(--border-clr) solid 1px;
-      border-radius: 2% 2% 2% $border-radius;
+      border-radius: 0.25rem 0.25rem $border-radius $border-radius;
       box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
       backdrop-filter: blur(40px);
       -webkit-backdrop-filter: blur(40px);

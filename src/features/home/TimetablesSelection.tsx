@@ -1,9 +1,9 @@
-import { useDatalistFocus } from "@/context/datalistFocus";
 import { useIsMobile } from "@/hooks/useWindowDimensions";
 import { classes } from "@/styles/utils";
 import { sortGroupsByYear } from "@/utils/timetable";
 import { type FC, useState } from "react";
 import { Link } from "react-router-dom";
+import MissingGroupTip from "./MissingGroupTip";
 import styles from "./TimetablesSelection.module.scss";
 
 enum Year {
@@ -22,7 +22,6 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) =>
   const groupsByYear = sortGroupsByYear(timetables);
   const [expandedYear, setExpandedYear] = useState<Year | null>(null); // for mobile onClick event and keyboard navigation
   const isMobile = useIsMobile();
-  const { focus } = useDatalistFocus();
 
   return (
     <div className={styles.timetables}>
@@ -66,19 +65,7 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) =>
             ))}
           </ul>
         )}
-        <div className={styles.timetablesInfo}>
-          <p>
-            <span className="font-bold">Не знайшли свою групу?</span> Спробуйте ввести назву групи в{" "}
-            <button className={styles.link} onClick={() => focus()} type="button">
-              полі пошуку
-            </button>
-            .
-          </p>
-          <p>
-            Альтернативно: ви також можете додати назву групи до посилання, як у цьому прикладі:{" "}
-            <span className="text-nowrap">{window.location.origin}/ОІ-32</span>
-          </p>
-        </div>
+        <MissingGroupTip />
       </div>
     </div>
   );
