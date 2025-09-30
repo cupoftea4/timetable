@@ -1,9 +1,6 @@
-import type { ExamsTimetableItem, LPNUTimetableType, TimetableItem, TimetableType } from "@/types/timetable";
 import { DEVELOP } from "../constants";
 
-const FALLBACK_URL = "https://raw.githubusercontent.com/cupoftea4/timetable-data/data/";
-
-type CachedExamsTimetableItem = Omit<ExamsTimetableItem, "date"> & { date: string };
+const FALLBACK_URL = import.meta.env.VITE_BACKEND_URL;
 
 export default class CachedData {
   private static async fetchData<T>(path: string) {
@@ -14,51 +11,24 @@ export default class CachedData {
   }
 
   static getInstitutes(): Promise<string[]> {
-    return CachedData.fetchData("institutes.json");
+    return CachedData.fetchData("/institutes");
   }
 
   static getGroups(institute?: string): Promise<string[]> {
-    const fallbackPath = institute ? `institutes/${institute}.json` : "groups.json";
+    const fallbackPath = institute ? `/institutes/${institute}/groups` : "/regular/groups";
     return CachedData.fetchData(fallbackPath);
   }
 
   static getSelectiveGroups(): Promise<string[]> {
-    return CachedData.fetchData("selective/groups.json");
+    return CachedData.fetchData("/selective/groups");
   }
 
-  static async getLecturers(department?: string): Promise<string[]> {
-    if (department) {
-      const data: Record<string, string[]> = await CachedData.fetchData("lecturers/grouped.json");
-      return data[department] ?? [];
-    }
-    const data: string[] = await CachedData.fetchData("lecturers/all.json");
+  static async getLecturers(): Promise<string[]> {
+    const data: string[] = await CachedData.fetchData("/lecturers/groups");
     return [...new Set(data)].sort((a, b) => a.localeCompare(b));
   }
 
   static getLecturerDepartments(): Promise<string[]> {
-    return CachedData.fetchData("lecturers/departments.json");
-  }
-
-  static getTimetable(type: LPNUTimetableType, timetableName: string): Promise<TimetableItem[]> {
-    let fallbackPath = `timetables/${timetableName}.json`;
-    if (type === "lecturer") {
-      fallbackPath = `lecturers/timetables/${timetableName}.json`;
-    }
-    if (type === "selective") {
-      fallbackPath = `selective/timetables/${timetableName}.json`;
-    }
-
-    return CachedData.fetchData(fallbackPath);
-  }
-
-  static getExamsTimetable(type: TimetableType, timetableName: string): Promise<ExamsTimetableItem[]> {
-    let fallbackPath = `exams/${timetableName}.json`;
-    if (type === "lecturer") {
-      fallbackPath = `exams/lecturers/${timetableName}.json`;
-    }
-
-    return CachedData.fetchData<CachedExamsTimetableItem[]>(fallbackPath).then((data: CachedExamsTimetableItem[]) =>
-      data.map((item) => ({ ...item, date: new Date(item.date) }))
-    );
+    return CachedData.fetchData("/lecturers/departments.json");
   }
 }

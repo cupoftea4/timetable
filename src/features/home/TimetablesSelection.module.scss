@@ -61,14 +61,14 @@
 						transition: background-color 0.2s ease-in;
 						border-radius: 0.625rem;
 						&:hover {
-							background-color: var(--accent-clr);
+							text-decoration: underline;
 						}
 					}
 				}
 			}
 			@include desktop {
+				max-height: $main-height;
 				ul {
-					max-height: $main-height;
 					@include scroll-on-hover(y, thin, transparent);
 				}
 			}
