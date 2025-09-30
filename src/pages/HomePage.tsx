@@ -4,6 +4,7 @@ import LoadingIcon from "@/assets/LoadingIcon";
 import catImage from "@/assets/cat.svg";
 import { DatalistFocusProvider } from "@/context/datalistFocus";
 import HeaderPanel from "@/features/header/HomeHeader";
+import MissingGroupTip from "@/features/home/MissingGroupTip";
 import TimetablesSelection from "@/features/home/TimetablesSelection";
 import { useIsTablet } from "@/hooks/useWindowDimensions";
 import List from "@/shared/List";
@@ -161,6 +162,9 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
               <div className={styles["no-selection"]}>
                 <img className={styles.cat} src={catImage} draggable="false" alt="cat" width="800" height="800" />
                 <p className={styles["cat-text"]}>Оберіть спецільність, щоб продовжити</p>
+                <div className="pt-6">
+                  <MissingGroupTip />
+                </div>
               </div>
             )}
           </section>
