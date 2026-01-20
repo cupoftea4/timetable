@@ -14,7 +14,6 @@
   },
   "scripts": {
     "start": "serve -s build -p ${PORT:-3000}",
-    "start:dev": "vite",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "dev": "env-cmd -f dev.env vite --host",

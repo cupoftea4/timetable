@@ -17,6 +17,7 @@ const TIMEOUT = 35000; // 35s
 const TIMETABLE_SUFFIX = "students_schedule";
 const SELECTIVE_SUFFIX = "schedule_selective";
 const LECTURER_SUFFIX = "lecturer_schedule";
+const PART_TIME_SUFFIX = "parttime_schedule";
 const TIMETABLE_EXAMS_SUFFIX = "students_exam";
 const LECTURER_EXAMS_SUFFIX = "lecturer_exam";
 
@@ -24,6 +25,7 @@ type LPNURequestSuffix =
   | typeof TIMETABLE_SUFFIX
   | typeof SELECTIVE_SUFFIX
   | typeof LECTURER_SUFFIX
+  | typeof PART_TIME_SUFFIX
   | typeof TIMETABLE_EXAMS_SUFFIX
   | typeof LECTURER_EXAMS_SUFFIX;
 
@@ -31,6 +33,7 @@ const timetableSuffixes: Record<LPNUTimetableType, LPNURequestSuffix> = {
   timetable: "students_schedule",
   selective: "schedule_selective",
   lecturer: "lecturer_schedule",
+  parttime: "parttime_schedule",
 };
 
 type StudentParams = {
