@@ -98,7 +98,7 @@ export default class LPNUData {
     const origin = isLecturer(suffix) ? NULP_STAFF_2023 : NULP_STUDENTS_2023;
 
     const built = buildURL(origin + suffix, params);
-    const proxiedUrl = PROXY + built;
+    const proxiedUrl = PROXY + encodeURIComponent(built);
     return timeout(TIMEOUT, fetch(proxiedUrl)).then((response) => {
       if (!response.ok) throw Error(response.statusText);
       return response.text();
