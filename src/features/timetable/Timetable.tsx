@@ -1,8 +1,8 @@
 import { useIsMobile } from "@/hooks/useWindowDimensions";
 import { classes } from "@/styles/utils";
-import type { TimetableItem } from "@/types/timetable";
+import type { TimetableItem, TimetableType } from "@/types/timetable";
 import { DEVELOP } from "@/utils/constants";
-import { getCurrentUADate, stringToDate } from "@/utils/date";
+import { getCurrentUADate, isDateInWeek, stringToDate } from "@/utils/date";
 import { generateSaturdayLessons, lessonsTimes, skeletonTimetable, unique } from "@/utils/timetable";
 import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import styles from "./Timetable.module.scss";
@@ -14,6 +14,8 @@ type OwnProps = {
   isSecondWeek: boolean;
   hasCellSubgroups?: boolean;
   isLoading?: boolean;
+  timetableType?: TimetableType;
+  selectedWeek?: Date;
 };
 
 const MINUTE = 60 * 1000;
@@ -27,8 +29,12 @@ const Timetable: FC<OwnProps> = ({
   isSecondWeek,
   hasCellSubgroups,
   isLoading,
+  timetableType,
+  selectedWeek,
 }) => {
   const isMobile = useIsMobile();
+
+  const isPartTime = timetableType === "parttime";
 
   const timetable = useMemo(() => {
     return [...originalTimetable, ...generateSaturdayLessons(originalTimetable)];
@@ -74,6 +80,19 @@ const Timetable: FC<OwnProps> = ({
   const getLessonsByDayAndTime = useCallback(
     (number: number, day: number) => {
       if (!timetable) return null;
+
+      if (isPartTime && selectedWeek) {
+        const result = timetable.filter(
+          (item) =>
+            item.date &&
+            isDateInWeek(item.date, selectedWeek) &&
+            item.day === day &&
+            item.number === number &&
+            (hasCellSubgroups || item.isSecondSubgroup === isSecondSubgroup || forBothSubgroups(item))
+        );
+        return result.length === 0 ? null : unique(result);
+      }
+
       const result = timetable.filter(
         (item) =>
           item.day === day &&
@@ -83,7 +102,7 @@ const Timetable: FC<OwnProps> = ({
       );
       return result.length === 0 ? null : unique(result);
     },
-    [timetable, isSecondSubgroup, isSecondWeek, hasCellSubgroups]
+    [timetable, isSecondSubgroup, isSecondWeek, hasCellSubgroups, isPartTime, selectedWeek]
   );
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: I have no idea why
@@ -137,7 +156,7 @@ const Timetable: FC<OwnProps> = ({
     if (!isMobile) return null;
     if (DEVELOP) console.log("Running scary useMemo");
     const lists = tableDays.filter(Boolean).map((day, i) => (
-      <div key={i} className={styles.list}>
+      <div key={day} className={styles.list}>
         <h3 className={styles["day-title"]}>{day}</h3>
         <ol className={styles.list}>
           {!isLoading
@@ -151,6 +170,7 @@ const Timetable: FC<OwnProps> = ({
                 />
               ))
             : Array.from({ length: 3 }).map((_, index) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: This is fine
                 <div key={index} className="px-0.5">
                   <div className="rounded-xl h-[85.7px] w-full bg-neutral-500 animate-pulse mb-2" />
                 </div>
@@ -176,8 +196,8 @@ const Timetable: FC<OwnProps> = ({
     <table className={styles.timetable}>
       <thead>
         <tr>
-          {tableDays.map((day, index) => (
-            <th key={index}>{day}</th>
+          {tableDays.map((day) => (
+            <th key={day}>{day}</th>
           ))}
         </tr>
       </thead>
