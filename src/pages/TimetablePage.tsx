@@ -58,19 +58,19 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   const availableWeeks = useMemo(() => {
     if (timetableType === "parttime" && timetable) {
-      return getAvailableWeeks(timetable);
+      const weeks = getAvailableWeeks(timetable);
+
+      if (weeks.length > 0 && !selectedWeek) {
+        const currentWeek = getCurrentWeek(weeks);
+        if (currentWeek) {
+          setSelectedWeek(currentWeek);
+        }
+      }
+
+      return weeks;
     }
     return [];
-  }, [timetableType, timetable]);
-
-  useEffect(() => {
-    if (timetableType === "parttime" && availableWeeks.length > 0 && !selectedWeek) {
-      const currentWeek = getCurrentWeek(availableWeeks);
-      if (currentWeek) {
-        setSelectedWeek(currentWeek);
-      }
-    }
-  }, [timetableType, availableWeeks, selectedWeek]);
+  }, [timetableType, timetable, selectedWeek]);
 
   const { state }: { state: { source: string; isCustom?: boolean } | null } = useLocation();
   const { source, isCustom } = state ?? {};
@@ -91,6 +91,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     if (timetableType === "selective" && isExamsTimetable)
       navigate(`/${group}`, { state: { source: "no-selective-exams" } });
     setLoading(true);
+    setSelectedWeek(undefined);
     getTimetable(group, isExamsTimetable, timetableType)?.finally(() => {
       setLoading(false);
     });
