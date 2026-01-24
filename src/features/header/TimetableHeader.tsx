@@ -10,6 +10,7 @@ import Toast from "@/utils/toasts";
 import type { FC } from "react";
 import type React from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import WeekNavigation from "../timetable/ui/WeekNavigation";
 import generalStyles from "./HeaderPanel.module.scss";
 import styles from "./TimetableHeader.module.scss";
 import SavedMenu from "./components/SavedMenu";
@@ -24,6 +25,9 @@ type OwnProps = {
   subgroupState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
   weekState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
   updatePartialTimetable: (partial: HalfTerm | 0) => void;
+  availableWeeks?: Date[];
+  selectedWeek?: Date;
+  onWeekChange?: (week: Date) => void;
 };
 
 const TimetableHeader: FC<OwnProps> = ({
@@ -35,6 +39,9 @@ const TimetableHeader: FC<OwnProps> = ({
   weekState,
   loading,
   updatePartialTimetable,
+  availableWeeks,
+  selectedWeek,
+  onWeekChange,
 }) => {
   const [isSecondSubgroup, setIsSecondSubgroup] = subgroupState;
   const [isSecondWeek, setIsSecondWeek] = weekState;
@@ -43,6 +50,9 @@ const TimetableHeader: FC<OwnProps> = ({
   const isMobile = useIsMobile();
   const groupTitle = timetableType === "merged" ? "Мій розклад" : group;
   usePageTitle(groupTitle);
+
+  const isPartTime = timetableType === "parttime";
+  const showWeekNavigation = isPartTime && availableWeeks && availableWeeks.length > 0 && selectedWeek && onWeekChange;
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
     const path =
@@ -78,7 +88,7 @@ const TimetableHeader: FC<OwnProps> = ({
           <SavedMenu timetableChanged={loading} />
         </div>
         <h1 className={styles.title}>{groupTitle}</h1>
-        {timetableType !== "selective" && (
+        {timetableType !== "selective" && timetableType !== "parttime" && (
           <button
             type="button"
             className={generalStyles.exams}
@@ -93,20 +103,23 @@ const TimetableHeader: FC<OwnProps> = ({
         {!isExamsTimetable && <TimetablePartials partials={partials} handlePartialClick={updatePartialTimetable} />}
       </nav>
       <span className={styles.params}>
-        {!isExamsTimetable && (
-          <>
-            {!isLecturers && (
+        {!isExamsTimetable &&
+          (showWeekNavigation ? (
+            <WeekNavigation weeks={availableWeeks} selectedWeek={selectedWeek} onWeekChange={onWeekChange} />
+          ) : (
+            <>
+              {!isLecturers && (
+                <Toggle
+                  toggleState={[isSecondSubgroup, changeIsSecondSubgroup]}
+                  states={isMobile ? ["I підг.", "II підг."] : ["I підгрупа", "II підгрупа"]}
+                />
+              )}
               <Toggle
-                toggleState={[isSecondSubgroup, changeIsSecondSubgroup]}
-                states={isMobile ? ["I підг.", "II підг."] : ["I підгрупа", "II підгрупа"]}
+                toggleState={[isSecondWeek, setIsSecondWeek]}
+                states={isMobile ? ["По чис.", "По знам."] : ["По чисельнику", "По знаменнику"]}
               />
-            )}
-            <Toggle
-              toggleState={[isSecondWeek, setIsSecondWeek]}
-              states={isMobile ? ["По чис.", "По знам."] : ["По чисельнику", "По знаменнику"]}
-            />
-          </>
-        )}
+            </>
+          ))}
       </span>
     </header>
   );

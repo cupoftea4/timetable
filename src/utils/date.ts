@@ -69,3 +69,77 @@ export function countDaysFrom(startDate: Date): number {
 
   return workingDaysCount;
 }
+
+export function getWeekStart(date: Date): Date {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  return d;
+}
+
+export function getWeekEnd(date: Date): Date {
+  const weekStart = getWeekStart(date);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  return weekEnd;
+}
+
+export function isDateInWeek(date: Date, weekStart: Date): boolean {
+  const start = getWeekStart(weekStart);
+  const end = getWeekEnd(weekStart);
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  return d >= start && d <= end;
+}
+
+export function getAvailableWeeks(items: { date?: Date }[]): Date[] {
+  const weekStarts = new Set<string>();
+
+  for (const item of items) {
+    if (item.date) {
+      const weekStart = getWeekStart(item.date);
+      weekStarts.add(weekStart.toISOString());
+    }
+  }
+
+  const weeks = Array.from(weekStarts)
+    .map((iso) => new Date(iso))
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  return weeks;
+}
+
+export function getCurrentWeek(weeks: Date[]): Date | undefined {
+  if (weeks.length === 0) return undefined;
+
+  const now = getCurrentUADate();
+  now.setHours(0, 0, 0, 0);
+  const currentWeekStart = getWeekStart(now);
+
+  const currentOrFuture = weeks.find((week) => week >= currentWeekStart);
+  if (currentOrFuture) return currentOrFuture;
+
+  return weeks[weeks.length - 1];
+}
+
+export function formatWeekRange(weekStart: Date, isCurrent: boolean): string {
+  const weekEnd = getWeekEnd(weekStart);
+
+  const months = ["січ", "лют", "бер", "кві", "тра", "чер", "лип", "сер", "вер", "жов", "лис", "гру"];
+
+  const startDay = weekStart.getDate();
+  const endDay = weekEnd.getDate();
+  const startMonth = months[weekStart.getMonth()];
+  const endMonth = months[weekEnd.getMonth()];
+
+  let range: string;
+  if (weekStart.getMonth() === weekEnd.getMonth()) {
+    range = `${startDay}-${endDay} ${startMonth}`;
+  } else {
+    range = `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
+  }
+
+  return isCurrent ? `Поточний тиждень (${range})` : range;
+}

@@ -1,0 +1,34 @@
+@use "../../../styles/mixins" as *;
+@use "../../../styles/utils" as *;
+
+.weeks {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.5rem;
+  
+  @include mobile {
+    flex-direction: column;
+    .week-tab:not(.active) {
+      display: none;
+    }
+  }
+  
+  .week-tab {
+    padding: 0.5rem 0.75rem;
+    border-radius: 1rem;
+    transition: transform 0.2s ease-in-out;
+    will-change: transform;
+    white-space: nowrap;
+    
+    &.active {
+      @include light-pillow-button;
+    }
+    
+    &:hover:not(.active) {
+      transform: scale(1.05);
+    }
+  }
+}
