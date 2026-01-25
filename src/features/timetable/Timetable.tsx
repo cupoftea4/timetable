@@ -155,29 +155,42 @@ const Timetable: FC<OwnProps> = ({
   const listsContent = useMemo(() => {
     if (!isMobile) return null;
     if (DEVELOP) console.log("Running scary useMemo");
-    const lists = tableDays.filter(Boolean).map((day, i) => (
-      <div key={day} className={styles.list}>
-        <h3 className={styles["day-title"]}>{day}</h3>
-        <ol className={styles.list}>
-          {!isLoading
-            ? timetableLessonsTimes.map((time, j) => (
-                <TimetableLesson
-                  isListView={true}
-                  lessons={getLessonsByDayAndTime(j + 1, i + 1)}
-                  active={currentLessonNumber === j && currentDay === i + 1}
-                  key={time.start + day}
-                  cellSubgroup={hasCellSubgroups}
-                />
-              ))
-            : Array.from({ length: 3 }).map((_, index) => (
+    const lists = tableDays.filter(Boolean).map((day, i) => {
+      const dayLessons = timetableLessonsTimes.map((_, j) => getLessonsByDayAndTime(j + 1, i + 1));
+      const hasAnyLessons = dayLessons.some((lessons) => lessons !== null);
+
+      return (
+        <div key={day} className={classes(styles.list, "flex flex-col min-h-64")}>
+          <h3 className={styles["day-title"]}>{day}</h3>
+          <ol className={classes(styles.list, "h-full")}>
+            {!isLoading ? (
+              hasAnyLessons ? (
+                timetableLessonsTimes.map((time, j) => (
+                  <TimetableLesson
+                    isListView={true}
+                    lessons={getLessonsByDayAndTime(j + 1, i + 1)}
+                    active={currentLessonNumber === j && currentDay === i + 1}
+                    key={time.start + day}
+                    cellSubgroup={hasCellSubgroups}
+                  />
+                ))
+              ) : (
+                <div className="flex items-center justify-center h-full">
+                  <p className="text-sm font-light opacity-60">Немає пар на цей день</p>
+                </div>
+              )
+            ) : (
+              Array.from({ length: 3 }).map((_, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: This is fine
                 <div key={index} className="px-0.5">
                   <div className="rounded-xl h-[85.7px] w-full bg-neutral-500 animate-pulse mb-2" />
                 </div>
-              ))}
-        </ol>
-      </div>
-    ));
+              ))
+            )}
+          </ol>
+        </div>
+      );
+    });
     return lists;
   }, [
     isMobile,
