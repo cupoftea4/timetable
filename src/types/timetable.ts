@@ -1,5 +1,6 @@
 export type TimetableItem = {
   day: number;
+  date?: Date;
   isFirstSubgroup: boolean;
   isFirstWeek: boolean;
   isSecondSubgroup: boolean;
@@ -23,7 +24,7 @@ export type ExamsTimetableItem = {
 };
 
 export type TimetableItemType = "lection" | "practical" | "lab" | "consultation";
-export type LPNUTimetableType = "timetable" | "selective" | "lecturer";
+export type LPNUTimetableType = "timetable" | "selective" | "lecturer" | "parttime";
 export type TimetableType = LPNUTimetableType | "merged";
 
 export type CachedTimetable = { group: string; time: number; subgroup?: 1 | 2 };

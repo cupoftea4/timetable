@@ -102,17 +102,38 @@ class TimetableParser {
     return days.indexOf(day.toLowerCase()) + 1 || -1;
   }
 
+  private parseDayOrDate(text: string): { day: number; date?: Date } {
+    const dayNumber = this.dayToNumber(text);
+    
+    if (dayNumber !== -1) {
+      return { day: dayNumber };
+    }
+    
+    const date = new Date(text);
+    if (!isNaN(date.getTime())) {
+      const dayOfWeek = date.getDay();
+      const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
+      return { day: adjustedDay, date };
+    }
+    
+    return { day: -1 };
+  }
+
   private parseTimetableV2(table: Element) {
     const contentChildren = table.children ?? [];
 
     let lessons: TimetableItem[] = [];
     let currentLesson = 0;
     let currentDay: number | undefined;
+    let currentDate: Date | undefined;
 
     for (let i = 0; i < contentChildren.length; i++) {
       const child = contentChildren[i];
       if (child?.classList.contains("view-grouping-header")) {
-        currentDay = this.dayToNumber(child?.textContent ?? "");
+        const parsed = this.parseDayOrDate(child?.textContent ?? "");
+        currentDay = parsed.day;
+        currentDate = parsed.date;
+        if (currentDay === -1) console.warn("Got wrong DOM structure for timetable: no day or date", child);
       } else if (child?.tagName === "H3") {
         currentLesson = Number.parseInt(child?.textContent ?? "0");
       } else if (child?.classList.contains("stud_schedule")) {
@@ -123,6 +144,9 @@ class TimetableParser {
         for (const lesson of pairs) {
           lesson.day = currentDay;
           lesson.number = currentLesson;
+          if (currentDate) {
+            lesson.date = currentDate;
+          }
         }
 
         lessons = lessons.concat(pairs);

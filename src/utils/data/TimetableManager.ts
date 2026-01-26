@@ -314,7 +314,10 @@ class TimetableManager {
   tryToGetType(timetableName: string): TimetableType | undefined {
     const timetable = timetableName.trim();
     const compare = (el: string) => el.toLowerCase() === timetable.toLowerCase();
-    if (LocalCache.sync.groups?.some(compare)) return "timetable";
+    if (LocalCache.sync.groups?.some(compare)) {
+      if (timetable.toLowerCase().endsWith("з")) return "parttime";
+      return "timetable";
+    }
     if (LocalCache.sync.selectiveGroups?.some(compare)) return "selective";
     if (LocalCache.sync.lecturers?.some(compare)) return "lecturer";
     if (timetable === MERGED_TIMETABLE) return "merged";
@@ -324,7 +327,10 @@ class TimetableManager {
     const containsNumbers = /\d/.test(timetable);
 
     if (!containsNumbers) return "lecturer";
-    if (numberOfDashes === 1) return "timetable";
+    if (numberOfDashes === 1) {
+      if (timetable.toLowerCase().endsWith("з")) return "parttime";
+      return "timetable";
+    }
     if (numberOfDashes === 2) return "selective";
 
     return "timetable"; // FIXME temporary allow to fetch unknown groups

@@ -8,7 +8,7 @@ import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
 import type { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
 import TimetableManager from "@/utils/data/TimetableManager";
-import { getCurrentUADate, getNULPWeek } from "@/utils/date";
+import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, getNULPWeek } from "@/utils/date";
 import { optimisticRender } from "@/utils/general";
 import Toast from "@/utils/toasts";
 import { type FC, useEffect, useMemo, useRef, useState } from "react";
@@ -40,6 +40,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const [partials, setPartials] = useState<HalfTerm[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateMergedModal, setShowCreateMergedModal] = useState(false);
+  const [selectedWeek, setSelectedWeek] = useState<Date | undefined>();
 
   const navigate = useNavigate();
   const timetableRef = useRef<HTMLElement>(null);
@@ -54,6 +55,22 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
   const isLecturers = timetableType === "lecturer";
+
+  const availableWeeks = useMemo(() => {
+    if (timetableType === "parttime" && timetable) {
+      const weeks = getAvailableWeeks(timetable);
+
+      if (weeks.length > 0 && !selectedWeek) {
+        const currentWeek = getCurrentWeek(weeks);
+        if (currentWeek) {
+          setSelectedWeek(currentWeek);
+        }
+      }
+
+      return weeks;
+    }
+    return [];
+  }, [timetableType, timetable, selectedWeek]);
 
   const { state }: { state: { source: string; isCustom?: boolean } | null } = useLocation();
   const { source, isCustom } = state ?? {};
@@ -74,6 +91,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     if (timetableType === "selective" && isExamsTimetable)
       navigate(`/${group}`, { state: { source: "no-selective-exams" } });
     setLoading(true);
+    setSelectedWeek(undefined);
     getTimetable(group, isExamsTimetable, timetableType)?.finally(() => {
       setLoading(false);
     });
@@ -142,6 +160,9 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
           weekState={[isSecondWeek, setIsSecondWeek]}
           updatePartialTimetable={getPartialTimetable}
           loading={loading}
+          availableWeeks={availableWeeks}
+          selectedWeek={selectedWeek}
+          onWeekChange={setSelectedWeek}
         />
         <main className={styles.container}>
           <section className={styles.timetable} ref={timetableRef}>
@@ -152,6 +173,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
                 isSecondSubgroup={isSecondSubgroup}
                 hasCellSubgroups={isLecturers}
                 isLoading={isLoading}
+                timetableType={timetableType}
+                selectedWeek={selectedWeek}
               />
             ) : examsTimetable?.length === 0 ? (
               <p>Розклад екзаменів пустий</p>
