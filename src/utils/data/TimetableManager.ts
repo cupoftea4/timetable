@@ -331,7 +331,7 @@ class TimetableManager {
       if (timetable.toLowerCase().endsWith("з")) return "parttime";
       return "timetable";
     }
-    if (numberOfDashes === 2) return "selective";
+    if (numberOfDashes >= 2) return "selective";
 
     return "timetable"; // FIXME temporary allow to fetch unknown groups
   }
