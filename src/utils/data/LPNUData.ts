@@ -169,12 +169,22 @@ export default class LPNUData {
 
     return LPNUData.fetchHTML(
       {
-        studygroup_abbrname: timetableName.toLowerCase(),
+        studygroup_abbrname: timetableName.toUpperCase(),
         semestr: CURRENT_SEMESTER,
         // semestrduration: "1", // Why, NULP?
       },
       suffix
-    ).then(Parser.parseTimetable.bind(Parser));
+    )
+      .then(Parser.parseTimetable.bind(Parser))
+      .catch(() =>
+        LPNUData.fetchHTML(
+          {
+            studygroup_abbrname: timetableName.toLowerCase(),
+            semestr: CURRENT_SEMESTER,
+          },
+          suffix
+        ).then(Parser.parseTimetable.bind(Parser))
+      );
   }
 
   static getPartialTimetable(timetableName: string, semesterHalf: 1 | 2) {
