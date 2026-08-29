@@ -1,3 +1,5 @@
+@use 'sass:list';
+
 @mixin flex-center {
   display: flex;
   align-items: center;
@@ -5,8 +7,8 @@
 }
 
 @mixin blur($radius: 1rem) {
-  backdrop-filter: blur($radius);
   -webkit-backdrop-filter: blur($radius);
+  backdrop-filter: blur($radius);
 }
 
 @mixin inset-0 {
@@ -76,12 +78,12 @@
 
 @function scss-hsla($hsl, $alpha: 1) {
   $hsl-list: $hsl;
-  @return hsla(nth($hsl-list, 1), nth($hsl-list, 2), nth($hsl-list, 3), $alpha);
+  @return hsla(list.nth($hsl-list, 1), list.nth($hsl-list, 2), list.nth($hsl-list, 3), $alpha);
 }
 
 @function hsl-list($hsl) {
   $list: $hsl;
-  @return nth($list, 1), nth($list, 2), nth($list, 3);
+  @return list.nth($list, 1), list.nth($list, 2), list.nth($list, 3);
 }
 
 @mixin gradient-2($color-1, $color-2, $deg: var(--gradient-degree)) {

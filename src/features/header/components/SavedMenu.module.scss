@@ -33,8 +33,7 @@ $icon-size: 0.875rem;
     border: var(--border-clr) solid 1px;
     border-radius: $border-radius;
     box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
+    @include blur(40px);
     padding: 1rem 0;
 
     .title {

@@ -1,4 +1,6 @@
-@use '_utils.scss' as *;
+@use 'mixins' as *;
+@use 'utils' as *;
+@use 'variables' as *;
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,700;1,700&display=swap');
 
 
@@ -88,22 +90,16 @@ body {
   font-size: 16px;
 }
 
-@function hsla-from-hsl($hsl, $alpha) {
-  $hsl-list: $hsl;
-  @return hsla(nth($hsl-list, 1), nth($hsl-list, 2), nth($hsl-list, 3), $alpha);
-}
-
-
 .lecture, .lection {
-  background-color: hsla-from-hsl($timetable-lect-hsl, var(--bg-alpha, 1));
+  background-color: scss-hsla($timetable-lect-hsl, var(--bg-alpha, 1));
 }
 
 .lab {
-  background-color: hsla-from-hsl($timetable-lab-hsl, var(--bg-alpha, 1));
+  background-color: scss-hsla($timetable-lab-hsl, var(--bg-alpha, 1));
 }
 
 .practical {  
-  background-color: hsla-from-hsl($timetable-pract-hsl, var(--bg-alpha, 1));
+  background-color: scss-hsla($timetable-pract-hsl, var(--bg-alpha, 1));
 }
 
 a, button {

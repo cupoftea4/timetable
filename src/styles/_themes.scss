@@ -1,3 +1,5 @@
+@use 'sass:map';
+
 // $text--light: black;
 // $text--dark: white;
 // $bg--light: white;
@@ -19,7 +21,7 @@ $themes: (
     //  ( `.media.theme-unicorn, .theme-unicorn .media`)
     &.theme-#{$theme},
     .theme-#{$theme} & {
-      #{$property}: map-get($colors, $key);
+      #{$property}: map.get($colors, $key);
     }
   }
 }
