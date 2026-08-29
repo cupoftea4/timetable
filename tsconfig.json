@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "esnext"],
-    "types": ["vite/client", "vite-plugin-svgr/client"],
+    "types": ["vite/client"],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -11,7 +11,7 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noUncheckedIndexedAccess": true,
