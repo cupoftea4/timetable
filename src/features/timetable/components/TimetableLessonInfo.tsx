@@ -25,23 +25,21 @@ const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) =
   const location = cleanupInfoString(lesson.location);
 
   return (
-    <>
-      <div className={classes(styles.cell, isMerged && styles.merged, !lesson ? styles.hide : styles.show)}>
-        <div className={styles.info}>
-          {cellSubgroup && !isForBothSubgroups && (
-            <span className={styles.subgroup}>{lesson.isSecondSubgroup ? "II" : "I"} підгрупа</span>
-          )}
-          <span className={styles.title}>
-            <h2 className={styles.name}>{lesson.subject.replace("`", "’")}</h2>
-            {lecturer + (location && `, ${location}`)}
-          </span>
-          <span className={styles.extra}>
-            {getDisplayType(lesson.type)}
-            <TimetableLink urls={lesson.urls} type={lesson.type} />
-          </span>
-        </div>
+    <div className={classes(styles.cell, isMerged && styles.merged, !lesson ? styles.hide : styles.show)}>
+      <div className={styles.info}>
+        {cellSubgroup && !isForBothSubgroups && (
+          <span className={styles.subgroup}>{lesson.isSecondSubgroup ? "II" : "I"} підгрупа</span>
+        )}
+        <span className={styles.title}>
+          <h2 className={styles.name}>{lesson.subject.replace("`", "’")}</h2>
+          {lecturer + (location && `, ${location}`)}
+        </span>
+        <span className={styles.extra}>
+          {getDisplayType(lesson.type)}
+          <TimetableLink urls={lesson.urls} type={lesson.type} />
+        </span>
       </div>
-    </>
+    </div>
   );
 };
 

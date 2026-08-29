@@ -110,7 +110,7 @@ class TimetableParser {
     }
     
     const date = new Date(text);
-    if (!isNaN(date.getTime())) {
+    if (!Number.isNaN(date.getTime())) {
       const dayOfWeek = date.getDay();
       const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
       return { day: adjustedDay, date };
@@ -135,7 +135,7 @@ class TimetableParser {
         currentDate = parsed.date;
         if (currentDay === -1) console.warn("Got wrong DOM structure for timetable: no day or date", child);
       } else if (child?.tagName === "H3") {
-        currentLesson = Number.parseInt(child?.textContent ?? "0");
+        currentLesson = Number.parseInt(child?.textContent ?? "0", 10);
       } else if (child?.classList.contains("stud_schedule")) {
         const pairs = this.parsePair(child);
         if (currentLesson === 0) console.warn("Lesson number is 0!", child);
@@ -183,7 +183,7 @@ class TimetableParser {
         currentExam = { urls: [] }; // golang style, sry
         currentExam.date = new Date(child.textContent ?? "");
       } else if (child?.tagName === "H3") {
-        currentExam.number = Number.parseInt(child?.textContent ?? "0");
+        currentExam.number = Number.parseInt(child?.textContent ?? "0", 10);
       } else if (child?.classList.contains("stud_schedule")) {
         const textContent = child.querySelector(".group_content");
         console.log("textContent", textContent);
@@ -247,11 +247,10 @@ class TimetableParser {
       }
     }
 
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const parts = texts[1]!.split(",");
+    const lessonInfo = texts[1] ?? "";
+    const parts = lessonInfo.split(",");
     if (parts.length !== 3) {
-      // biome-ignore lint/style/noNonNullAssertion: <explanation>
-      parts[0] = texts[1]!;
+      parts[0] = lessonInfo;
       parts[1] = "";
     }
     return {
@@ -265,13 +264,12 @@ class TimetableParser {
   private parseLessonId(id: string) {
     const split = id.split("_");
     let subgroup: number | "all" = "all";
-    let week = "full";
-    if (!split[1] || !split[split.length - 1]) throw Error("Got wrong lesson id!");
+    const subgroupValue = split[1];
+    const week = split.at(-1);
+    if (!subgroupValue || !week) throw Error("Got wrong lesson id!");
     if (id.includes("sub")) {
-      subgroup = Number.parseInt(split[1]);
+      subgroup = Number.parseInt(subgroupValue, 10);
     }
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    week = split[split.length - 1]!;
     return {
       isFirstWeek: week === "full" || week === "chys",
       isSecondWeek: week === "full" || week === "znam",

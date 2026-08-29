@@ -55,7 +55,7 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
       });
   };
 
-  const arrowNavigation = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const arrowNavigation = (e: React.KeyboardEvent<HTMLElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setSelectedItem((selectedItem + 1) % savedGroups.length);
@@ -73,7 +73,7 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
     }
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLDivElement>) => {
+  const handleBlur = (e: React.FocusEvent<HTMLElement>) => {
     const currentTarget = e.currentTarget;
     const relatedTarget = e.relatedTarget;
 
@@ -91,19 +91,22 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
   }, [isMenuOpen]);
 
   return (
-    <div
+    <nav
       className={styles.saved}
-      tabIndex={0}
+      aria-label="Saved groups"
       onMouseEnter={openMenu}
       onMouseLeave={closeMenu}
       onFocusCapture={openMenu}
       onBlur={handleBlur}
       onKeyDown={arrowNavigation}
-      aria-expanded={isMenuOpen ? "true" : "false"}
-      aria-controls="saved-menu"
-      aria-label="Saved groups menu"
     >
-      <button type="button" className={classes("icon-button", "transition duration-300")} tabIndex={-1}>
+      <button
+        type="button"
+        className={classes("icon-button", "transition duration-300")}
+        aria-expanded={isMenuOpen}
+        aria-controls="saved-menu"
+        aria-label="Saved groups menu"
+      >
         <HistoryIcon />
       </button>
       {isMenuOpen && (
@@ -148,7 +151,7 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
           </div>
         </div>
       )}
-    </div>
+    </nav>
   );
 };
 

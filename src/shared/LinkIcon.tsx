@@ -11,7 +11,7 @@ type OwnProps = {
   link: string;
 };
 
-const linkIcons: Readonly<Record<string, () => JSX.Element>> = {
+const linkIcons: Readonly<Record<string, FC>> = {
   zoom: ZoomIcon,
   teams: TeamsIcon,
   google: GoogleMeetsIcon,

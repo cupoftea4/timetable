@@ -149,8 +149,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   }
 
   return (
-    <>
-      <div className={styles.wrapper}>
+    <div className={styles.wrapper}>
         <TimetableHeader
           isExamsTimetable={isExamsTimetable}
           timetableType={timetableType}
@@ -203,8 +202,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
             showTimetable={renderTimetableFromPromises}
           />
         )}
-      </div>
-    </>
+    </div>
   );
 };
 

@@ -1,9 +1,6 @@
 name: Deploy to FTP Server
 
-on:
-  push:
-    branches:
-      - develop
+on: workflow_dispatch
 
 jobs:
   build-and-deploy:

@@ -13,16 +13,12 @@ const Toggle: FC<OwnProps> = ({ toggleState, states }) => {
     setActive(!active);
   };
 
-  const handleKeyToggle = (e: React.KeyboardEvent<HTMLSpanElement>) => {
-    if (e.key === "Enter" || e.key === " ") toggle();
-  };
-
   return (
-    <span onClick={toggle} tabIndex={0} className={styles.toggle} onKeyDown={handleKeyToggle}>
+    <button type="button" onClick={toggle} className={styles.toggle}>
       {states[0]}
       <span className={active ? styles.right : ""} />
       {states[1]}
-    </span>
+    </button>
   );
 };
 

@@ -163,8 +163,11 @@ class TimetableManager {
 
     const fetchData: ActualPromise<TimetableItem[]> = LPNUData.getTimetable(timetableType, groupName) // doesn't work
       .catch(() => {
-        cacheData.then((t) => this.saveTimetableLocally(groupName, t, data?.subgroup));
-        Toast.warn("Data is possibly outdated!");
+        cacheData.then((t) => {
+          if (!t) return;
+          this.saveTimetableLocally(groupName, t, data?.subgroup);
+          Toast.warn("Data is possibly outdated!");
+        });
         return null;
       });
 
@@ -193,8 +196,11 @@ class TimetableManager {
     const fetchData: ActualPromise<ExamsTimetableItem[]> = LPNUData.getExamsTimetable(timetableType, groupName).catch(
       (e) => {
         console.warn("LPNU API is not working!", e);
-        cacheData.then((t) => this.saveExamsLocally(groupName, t));
-        Toast.warn("Data is possibly outdated!");
+        cacheData.then((t) => {
+          if (!t) return;
+          this.saveExamsLocally(groupName, t);
+          Toast.warn("Data is possibly outdated!");
+        });
         return null;
       }
     );
@@ -239,8 +245,11 @@ class TimetableManager {
         return merged;
       })
       .catch(() => {
-        cacheData.then((merged) => merged && this.saveMergedTimetable(timetableNames));
-        Toast.warn("Data is possibly outdated!");
+        cacheData.then((merged) => {
+          if (!merged) return;
+          this.saveMergedTimetable(timetableNames);
+          Toast.warn("Data is possibly outdated!");
+        });
         return null;
       });
     return [cacheData, fetchData] as const;

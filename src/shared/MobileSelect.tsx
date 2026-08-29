@@ -29,6 +29,8 @@ const MobileSelect: FC<OwnProps> = ({ items, selectedState }) => {
       {showSelect && (
         <div
           className={styles.select}
+          role="dialog"
+          aria-modal="true"
           onClick={() => {
             setShowSelect(false);
           }}

@@ -20,8 +20,11 @@ const ExamsTimetable: FC<OwnProps> = ({ exams, isLoading }) => {
   return (
     <div className={styles.exams}>
       {!isLoading
-        ? exams?.sort(compareDates).map((exam, index) => (
-            <div key={index} className={classes(styles.exam, isSameDay(exam.date, new Date()) && styles.active)}>
+        ? exams?.sort(compareDates).map((exam) => (
+            <div
+              key={`${exam.date.toISOString()}-${exam.number}-${exam.subject}-${exam.lecturer}`}
+              className={classes(styles.exam, isSameDay(exam.date, new Date()) && styles.active)}
+            >
               <div className={styles.top}>
                 <p>
                   {exam.date.toLocaleString("uk-UA", {
@@ -42,8 +45,8 @@ const ExamsTimetable: FC<OwnProps> = ({ exams, isLoading }) => {
               </div>
             </div>
           ))
-        : Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className={classes(styles.exam, "h-[106px] bg-neutral-500 !animate-pulse")} />
+        : [0, 1, 2].map((placeholder) => (
+            <div key={placeholder} className={classes(styles.exam, "h-[106px] bg-neutral-500 !animate-pulse")} />
           ))}
     </div>
   );

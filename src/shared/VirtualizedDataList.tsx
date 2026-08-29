@@ -12,7 +12,7 @@ type OwnProps = {
   onSelect: (item: DataListOption) => void;
   ignoreSpecialCharacters?: boolean;
   clearOnSelect?: boolean;
-  containerRef?: React.RefObject<HTMLDivElement>;
+  containerRef?: React.RefObject<HTMLDivElement | null>;
   label?: string;
   placeholder?: string;
   className?: string;
