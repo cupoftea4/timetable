@@ -139,12 +139,20 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
                       {groupParam === group ? <CheckMarkIcon className={styles["check-mark"]} /> : null}
                     </span>
                   </Link>
-                  <RemoveIcon
+                  <button
+                    type="button"
+                    className={styles.remove}
+                    aria-label={`Видалити ${getTimetableName(group)}`}
+                    title={`Видалити ${getTimetableName(group)}`}
                     onClick={() => {
                       deleteItem(index);
                     }}
-                    className={styles.remove}
-                  />
+                    onKeyDown={(event) => {
+                      event.stopPropagation();
+                    }}
+                  >
+                    <RemoveIcon />
+                  </button>
                 </li>
               ))}
             </ul>

@@ -123,13 +123,13 @@ $lecturers-second-layer-width: 9rem;
       grid-column: 2 / 4;
     }
     padding-top: 3rem;
-    @include tablet {
-      display: none;
-    }
     height: 65vh;
     height: 65dvh;
     @include flex-center;
     flex-direction: column;
+    @include tablet {
+      display: none;
+    }
     .cat {
       width: 20rem;
       height: auto;

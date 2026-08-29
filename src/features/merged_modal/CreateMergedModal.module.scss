@@ -16,13 +16,31 @@
     @include blur(2rem);
     padding: 1.625rem;
     border-radius: .625rem;
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      .close {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 1.5rem;
+        background: url(../../assets/close.svg) center / .875rem auto no-repeat;
+        opacity: .7;
+        transition: opacity .2s ease-in-out;
+        &:hover {
+          opacity: 1;
+        }
+      }
+    }
     .fieldset {
       margin: .75rem 0 1.25rem;
-      padding: 0 .5rem .5rem;
+      padding: 0;
       border-radius: .625rem;
       .choice {
         display: flex;
         flex-wrap: wrap;
+        margin-top: .25rem;
         .selected {
           display: flex;
           flex-wrap: wrap;
@@ -49,7 +67,10 @@
               transition: opacity .2s ease-in-out;
               opacity: 0;
             }
-            &:hover {
+            &:disabled {
+              cursor: default;
+            }
+            &:not(:disabled):hover {
               &::before {
                 color: transparent;
               }
@@ -86,8 +107,7 @@
     }
     .button {
       display: block;
-      margin: 0 auto;
-      margin-top: 1em;
+      margin: 1em auto 0;
       padding: .325em .75em;
       border-radius: .5em;
       background-color: hsla(0, 0%, 100%, 0.9);

@@ -20,6 +20,7 @@ type OwnProps = {
   autoFocus?: boolean;
   isExpanded?: boolean;
   allowCustomValue?: boolean;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 };
 
 const SPECIAL_CHARACTERS_REGEX = /[^\p{L}\p{N}]/gu;
@@ -37,6 +38,7 @@ const VirtualizedDataList: FC<OwnProps> = ({
   autoFocus = false,
   allowCustomValue = false,
   isExpanded = false,
+  onKeyDown,
 }) => {
   const { value: inputValue, setValue: setInputValue } = useComboboxControls({ isExpanded: false });
   const [displayedCount, setDisplayedCount] = React.useState(initialDisplayedCount);
@@ -78,7 +80,14 @@ const VirtualizedDataList: FC<OwnProps> = ({
       label={label}
       items={options}
       filters={[filterOptions]}
-      inputProps={{ autoFocus }}
+      inputProps={{
+        autoFocus,
+        onKeyDown: (event) => {
+          // Keep the first option visible when the library focuses it.
+          if (event.key === "ArrowDown") event.preventDefault();
+          onKeyDown?.(event);
+        },
+      }}
       isExpanded={isExpanded}
       onSelect={(item) => {
         onSelect(item);

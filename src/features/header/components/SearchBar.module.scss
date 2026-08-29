@@ -94,12 +94,22 @@ $icon-size: 1em;
       animation: show .4s ease;
     }
     .search-icon {
-      transition: transform .5s ease;
       width: 1.75rem;
       height: 1.75rem;
       cursor: pointer;
-      &:hover, &:focus {
-        transform: scale(1.1);
+      svg {
+        transition: transform 160ms ease-out;
+      }
+      @include can-hover {
+        &:hover svg {
+          transform: scale(1.04);
+        }
+      }
+      &:focus-visible svg {
+        transform: scale(1.04);
+      }
+      &:active svg {
+        transform: scale(.97);
       }
     }
     &.hidden-search {
@@ -110,9 +120,6 @@ $icon-size: 1em;
       svg {
         width: clamp(2rem, 8vw, 2.5rem);
         height: clamp(2rem, 8vw, 2.5rem);
-        &:hover, &:focus {
-          transform: scale(1);
-        }
       }
     }
   }

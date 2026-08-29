@@ -119,18 +119,20 @@ a, button {
 }
 
 .icon-button {
-  @include touchscreen {
-    &:hover,
-    &:focus {
-      background-color: var(--accent-clr);
-    }
-  }
   border-radius: 50%;
   padding: 0.325rem;
+  > svg {
+    transition: transform 160ms ease-out;
+  }
   @include can-hover {
-    &:hover,
-    &:focus {
-      transform: scale(1.05);
+    &:hover > svg {
+      transform: scale(1.04);
     }
+  }
+  &:focus-visible > svg {
+    transform: scale(1.04);
+  }
+  &:active > svg {
+    transform: scale(.97);
   }
 }
