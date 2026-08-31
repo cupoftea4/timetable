@@ -24,6 +24,7 @@ export type ExamsTimetableItem = {
 };
 
 export type TimetableItemType = "lection" | "practical" | "lab" | "consultation";
+export type Semester = "1" | "2";
 export type LPNUTimetableType = "timetable" | "selective" | "lecturer" | "parttime";
 export type TimetableType = LPNUTimetableType | "merged";
 
