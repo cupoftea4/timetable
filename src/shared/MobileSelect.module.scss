@@ -1,5 +1,6 @@
 @use '../styles/variables' as *;
 @use '../styles/mixins' as *;
+@use '../styles/utils' as *;
 
 .selected {
   @include light-pillow-button;
@@ -18,8 +19,7 @@
   > ul {
     flex: 1;
     background: var(--accent-clr);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    @include blur(10px);
     border-radius: $border-radius $border-radius 0 0;
     padding: .5rem 0;
     > li {

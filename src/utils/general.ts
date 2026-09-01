@@ -43,8 +43,9 @@ function romanToArabic(roman: string): number {
   let previousValue = 0;
 
   for (let i = 0; i < roman.length; i++) {
-    // biome-ignore lint/style/noNonNullAssertion: <explanation>
-    const currentValue = romanNumeralMap[roman[i]!];
+    const character = roman[i];
+    if (!character) return -1;
+    const currentValue = romanNumeralMap[character];
     if (!currentValue) return -1;
     arabicValue += currentValue;
 

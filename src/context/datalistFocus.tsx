@@ -3,7 +3,7 @@ import type React from "react";
 import { type ReactNode, createContext, useContext } from "react";
 
 interface DatalistFocusContextType {
-  ref: React.RefObject<HTMLDivElement>;
+  ref: React.RefObject<HTMLDivElement | null>;
   isFocused: boolean;
   focus: () => void;
   blur: () => void;

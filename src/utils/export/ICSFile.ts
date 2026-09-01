@@ -10,7 +10,7 @@ function toTFormattedString(date: Date, time: string) {
 }
 
 function weeksLeftToDate(date: Date) {
-  const timeDiff = date.getTime() - new Date().getTime();
+  const timeDiff = date.getTime() - Date.now();
   const oneWeek = 1000 * 60 * 60 * 24 * 7;
   const weeksLeft = Math.ceil(timeDiff / oneWeek);
   return weeksLeft;

@@ -3,7 +3,7 @@ import Toast from "@/utils/toasts";
 
 const DonationToast = () => {
   return (
-    <div className="flex items-center gap-0.5 text-white">
+    <div className="flex items-center gap-0.5 pr-5 text-white">
       <span className="flex-grow text-sm">Тепер можна підтримати автора через моно 🐱</span>
       <a
         href={DONATION_LINK}

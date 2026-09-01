@@ -32,19 +32,20 @@ const TimetablePartials: FC<OwnProps> = ({ partials, handlePartialClick }) => {
   return (
     <>
       {partials.length > 0 && (
-        <div
+        <nav
           className={styles.partials}
+          aria-label="Timetable period"
           onMouseEnter={openDropdown}
           onMouseLeave={closeDropdown}
           onFocusCapture={openDropdown}
         >
-          <button className={classes(showDropdown && styles.active)} tabIndex={-1} type="button">
+          <button className={classes(showDropdown && styles.active)} type="button">
             {activePartial === 0 ? "Весь семестр" : `${activePartial} півсеместр`} {showDropdown ? "▴" : "▾"}
           </button>
           {showDropdown && (
             <ul className={styles.dropdown}>
-              {[0, ...partials].map((partial, index) => (
-                <li key={index}>
+              {[0, ...partials].map((partial) => (
+                <li key={partial}>
                   <button
                     onClick={() => {
                       onPartialClick(partial);
@@ -57,7 +58,7 @@ const TimetablePartials: FC<OwnProps> = ({ partials, handlePartialClick }) => {
               ))}
             </ul>
           )}
-        </div>
+        </nav>
       )}
     </>
   );

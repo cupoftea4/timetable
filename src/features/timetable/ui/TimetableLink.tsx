@@ -26,14 +26,14 @@ const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
           Join
         </a>
       ) : urls.length > 1 ? (
-        <div
+        <nav
           className={styles.links}
-          tabIndex={0}
+          aria-label="Lesson links"
           onMouseEnter={openDropdown}
           onMouseLeave={closeDropdown}
           onFocusCapture={openDropdown}
         >
-          <button className={classes(type, showDropdown && styles.active)} tabIndex={-1} type="button">
+          <button className={classes(type, showDropdown && styles.active)} type="button">
             Links {showDropdown ? "▴" : "▾"}
           </button>
           {showDropdown && (
@@ -48,7 +48,7 @@ const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
               ))}
             </ul>
           )}
-        </div>
+        </nav>
       ) : null}
     </>
   );

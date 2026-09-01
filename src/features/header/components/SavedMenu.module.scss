@@ -33,8 +33,7 @@ $icon-size: 0.875rem;
     border: var(--border-clr) solid 1px;
     border-radius: $border-radius;
     box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(40px);
-    -webkit-backdrop-filter: blur(40px);
+    @include blur(40px);
     padding: 1rem 0;
 
     .title {
@@ -59,27 +58,31 @@ $icon-size: 0.875rem;
           background-color: var(--accent-clr);
           cursor: pointer;
         }
+        .remove {
+          position: absolute;
+          right: .875rem;
+          width: 2rem;
+          height: 2rem;
+          @include flex-center;
+          cursor: pointer;
+          svg {
+            width: $icon-size;
+            height: $icon-size;
+          }
+          &:focus-visible {
+            outline: 1px solid var(--border-clr);
+            border-radius: 50%;
+          }
+        }
         /* Remove Item Icon */
         @include can-hover {
           .remove {
             display: none;
           }
-        }
-        .remove {
-          position: absolute;
-          right: 1.5rem;
-          width: $icon-size;
-          height: $icon-size;
-          transition: transform 0.2s ease-in-out;
-          cursor: pointer;
-          &:hover,
-          &:focus {
-            outline: none;
-            transform: scale(1.15);
+          &:hover .remove,
+          &:focus-within .remove {
+            display: flex;
           }
-        }
-        &:hover .remove {
-          display: block;
         }
       }
       .list-item {
@@ -88,7 +91,7 @@ $icon-size: 0.875rem;
           display: flex;
           align-items: center;
           gap: 0.5rem;
-          width: calc(100% - $icon-size - 0.5rem);
+          width: calc(100% - 2.5rem);
         }
         .check-mark {
           width: $icon-size;

@@ -45,18 +45,16 @@ const App = () => {
   return (
     <>
       {status !== Status.Loading ? (
-        <>
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<NavigationSelector />} />
-              <Route path="home" element={<HomePage timetableType="timetable" />} />
-              <Route path="selective" element={<HomePage timetableType="selective" />} />
-              <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
-              <Route path="/:group" element={<TimetablePage />} />
-              <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
-            </Routes>
-          </BrowserRouter>
-        </>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<NavigationSelector />} />
+            <Route path="home" element={<HomePage timetableType="timetable" />} />
+            <Route path="selective" element={<HomePage timetableType="selective" />} />
+            <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
+            <Route path="/:group" element={<TimetablePage />} />
+            <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
+          </Routes>
+        </BrowserRouter>
       ) : (
         <LoadingPage />
       )}
@@ -65,6 +63,8 @@ const App = () => {
         theme="colored"
         pauseOnFocusLoss={false}
         autoClose={TOAST_AUTO_CLOSE_TIME}
+        closeOnClick
+        draggable
       />
     </>
   );

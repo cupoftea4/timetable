@@ -1,18 +1,19 @@
-import TimetableFooter from "@/features/footer/TimetableFooter";
+import { type FC, useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useTimetableISCFile from "@/features/footer/hooks/useTimetableISCFile";
+import TimetableFooter from "@/features/footer/TimetableFooter";
 import TimetableHeader from "@/features/header/TimetableHeader";
 import CreateMergedModal from "@/features/merged_modal/CreateMergedModal";
 import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
-import type { ExamsTimetableItem, HalfTerm, TimetableItem, TimetableType } from "@/types/timetable";
+import type { ExamsTimetableItem, HalfTerm, Semester, TimetableItem, TimetableType } from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
+import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, getNULPWeek } from "@/utils/date";
 import { optimisticRender } from "@/utils/general";
 import Toast from "@/utils/toasts";
-import { type FC, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import styles from "./TimetablePage.module.scss";
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => {
@@ -41,6 +42,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const [loading, setLoading] = useState(true);
   const [showCreateMergedModal, setShowCreateMergedModal] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState<Date | undefined>();
+  const [semester, setSemester] = useState<Semester>();
 
   const navigate = useNavigate();
   const timetableRef = useRef<HTMLElement>(null);
@@ -55,6 +57,10 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
   const isLecturers = timetableType === "lecturer";
+
+  useEffect(() => {
+    void getCurrentSemester().then(setSemester);
+  }, []);
 
   const availableWeeks = useMemo(() => {
     if (timetableType === "parttime" && timetable) {
@@ -149,22 +155,22 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   }
 
   return (
-    <>
-      <div className={styles.wrapper}>
-        <TimetableHeader
-          isExamsTimetable={isExamsTimetable}
-          timetableType={timetableType}
-          isLecturers={isLecturers}
-          partials={partials}
-          subgroupState={[isSecondSubgroup, setIsSecondSubgroup]}
-          weekState={[isSecondWeek, setIsSecondWeek]}
-          updatePartialTimetable={getPartialTimetable}
-          loading={loading}
-          availableWeeks={availableWeeks}
-          selectedWeek={selectedWeek}
-          onWeekChange={setSelectedWeek}
-        />
-        <main className={styles.container}>
+    <div className={styles.wrapper}>
+      <TimetableHeader
+        isExamsTimetable={isExamsTimetable}
+        timetableType={timetableType}
+        isLecturers={isLecturers}
+        partials={partials}
+        subgroupState={[isSecondSubgroup, setIsSecondSubgroup]}
+        weekState={[isSecondWeek, setIsSecondWeek]}
+        updatePartialTimetable={getPartialTimetable}
+        loading={loading}
+        availableWeeks={availableWeeks}
+        selectedWeek={selectedWeek}
+        onWeekChange={setSelectedWeek}
+      />
+      <main className={styles.container}>
+        <div className={styles.timetableWrapper}>
           <section className={styles.timetable} ref={timetableRef}>
             {!isExamsTimetable ? (
               <Timetable
@@ -182,29 +188,30 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
               <ExamsTimetable exams={examsTimetable ?? []} isLoading={isLoading} />
             )}
           </section>
-        </main>
-        <TimetableFooter
-          showCreateMergedModal={() => {
-            setShowCreateMergedModal(true);
+          {semester && <p className={styles.semester}>{semester}-й семестр</p>}
+        </div>
+      </main>
+      <TimetableFooter
+        showCreateMergedModal={() => {
+          setShowCreateMergedModal(true);
+        }}
+        loading={loading}
+        updateTimetable={updateTimetable}
+        isExamsTimetable={isExamsTimetable}
+        isSecondSubgroup={isSecondSubgroup}
+        icsFILE={iscFile}
+        time={time}
+      />
+      {showCreateMergedModal && (
+        <CreateMergedModal
+          defaultTimetable={group}
+          onClose={() => {
+            setShowCreateMergedModal(false);
           }}
-          loading={loading}
-          updateTimetable={updateTimetable}
-          isExamsTimetable={isExamsTimetable}
-          isSecondSubgroup={isSecondSubgroup}
-          icsFILE={iscFile}
-          time={time}
+          showTimetable={renderTimetableFromPromises}
         />
-        {showCreateMergedModal && (
-          <CreateMergedModal
-            defaultTimetable={group}
-            onClose={() => {
-              setShowCreateMergedModal(false);
-            }}
-            showTimetable={renderTimetableFromPromises}
-          />
-        )}
-      </div>
-    </>
+      )}
+    </div>
   );
 };
 

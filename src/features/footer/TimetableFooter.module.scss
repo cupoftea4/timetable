@@ -48,12 +48,6 @@
     }
   }
   .button {
-    transition: transform 0.2s ease-in-out;
-    @include can-hover {
-      &:not(.pending):hover {
-        transform: scale(1.1);
-      }
-    }
     width: var(--icon-size);
     height: var(--icon-size);
   }

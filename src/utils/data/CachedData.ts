@@ -1,3 +1,4 @@
+import type { Semester } from "@/types/timetable";
 import { DEVELOP } from "../constants";
 
 const FALLBACK_URL = import.meta.env.VITE_BACKEND_URL;
@@ -30,5 +31,9 @@ export default class CachedData {
 
   static getLecturerDepartments(): Promise<string[]> {
     return CachedData.fetchData("/lecturers/departments.json");
+  }
+
+  static getCurrentSemester(): Promise<{ semester: Semester; expiresAt: string }> {
+    return CachedData.fetchData("/semester");
   }
 }

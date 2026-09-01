@@ -1,18 +1,40 @@
-import type { LPNUTimetableType, TimetableType } from "@/types/timetable";
+import type { LPNUTimetableType, Semester, TimetableType } from "@/types/timetable";
 import { timeout } from "@/utils/promises";
+import LocalCache from "@/utils/timetableStorage";
 import { DEVELOP } from "../constants";
-import { getCurrentSemester } from "../date";
+import { getCurrentSemester as getCurrentSemesterByDate } from "../date";
+import CachedData from "./CachedData";
 import Parser from "./Parser";
 
 // const NULP_STUDENTS = 'https://student.lpnu.ua/';
 const NULP_STUDENTS_2023 = "https://student.lpnu.ua/";
 // const NULP_STAFF = 'https://staff.lpnu.ua/';
 const NULP_STAFF_2023 = "https://staff.lpnu.ua/";
-const CURRENT_SEMESTER = getCurrentSemester();
-
 const PROXY: string = import.meta.env.VITE_PROXY;
 
 const TIMEOUT = 35000; // 35s
+
+const fetchCurrentSemester = async (): Promise<Semester> => {
+  const { semester, expiresAt } = await CachedData.getCurrentSemester();
+  await LocalCache.set("currentSemester", { semester, expiresAt: Date.parse(expiresAt) });
+  return semester;
+};
+
+let semesterRequest: Promise<Semester> | null = null;
+
+export const getCurrentSemester = async () => {
+  try {
+    const { data: cached } = await LocalCache.get("currentSemester");
+    if (cached && cached.expiresAt > Date.now()) return cached.semester;
+
+    semesterRequest ??= fetchCurrentSemester().finally(() => {
+      semesterRequest = null;
+    });
+    return await semesterRequest;
+  } catch {
+    return getCurrentSemesterByDate();
+  }
+};
 
 const TIMETABLE_SUFFIX = "students_schedule";
 const SELECTIVE_SUFFIX = "schedule_selective";
@@ -126,32 +148,35 @@ export default class LPNUData {
     return LPNUData.fetchHTML(null, LECTURER_SUFFIX).then(Parser.parseLecturerDepartments.bind(Parser));
   }
 
-  static getGroups(institute = "All") {
+  static async getGroups(institute = "All") {
+    const semester = await getCurrentSemester();
     return LPNUData.fetchHTML({
-      semestr: CURRENT_SEMESTER,
+      semestr: semester,
       departmentparent_abbrname_selective: institute,
     }).then(Parser.parseGroups.bind(Parser));
   }
 
-  static getPartialGroups(semesterHalf: 1 | 2, institute = "All") {
+  static async getPartialGroups(semesterHalf: 1 | 2, institute = "All") {
+    const semester = await getCurrentSemester();
     const semesterParam = semesterHalf === 1 ? "2" : "3";
     return LPNUData.fetchHTML(
       {
         departmentparent_abbrname_selective: institute,
-        semestr: CURRENT_SEMESTER,
+        semestr: semester,
         semestrduration: semesterParam,
       },
       TIMETABLE_SUFFIX
     ).then(Parser.parsePartialGroups.bind(Parser));
   }
 
-  static getTimetable(type: LPNUTimetableType, timetableName = "All", _timetableCategory = "All") {
+  static async getTimetable(type: LPNUTimetableType, timetableName = "All", _timetableCategory = "All") {
+    const semester = await getCurrentSemester();
     const suffix = timetableSuffixes[type];
     if (suffix === LECTURER_SUFFIX) {
       return LPNUData.fetchHTML(
         {
           teachername: timetableName,
-          semestr: CURRENT_SEMESTER,
+          semestr: semester,
           // semestrduration: "1", // Why, NULP?
         },
         LECTURER_SUFFIX
@@ -170,7 +195,7 @@ export default class LPNUData {
     return LPNUData.fetchHTML(
       {
         studygroup_abbrname: timetableName.toUpperCase(),
-        semestr: CURRENT_SEMESTER,
+        semestr: semester,
         // semestrduration: "1", // Why, NULP?
       },
       suffix
@@ -180,7 +205,7 @@ export default class LPNUData {
         LPNUData.fetchHTML(
           {
             studygroup_abbrname: timetableName.toLowerCase(),
-            semestr: CURRENT_SEMESTER,
+            semestr: semester,
           },
           suffix
         ).then(Parser.parseTimetable.bind(Parser))

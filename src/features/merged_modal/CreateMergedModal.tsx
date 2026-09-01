@@ -84,6 +84,7 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
       <div className={styles.modal} ref={ref}>
         <div className={styles.header}>
           <h2 className={styles.title}>Оберіть групи для злиття</h2>
+          <button className={styles.close} type="button" onClick={onClose} aria-label="Закрити" />
         </div>
         <fieldset
           className={styles.fieldset}
@@ -94,14 +95,17 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
           <legend className={styles.legend}>Пошук</legend>
           <div className={styles.choice}>
             <span className={styles.selected}>
-              {timetablesToMerge.map((timetable) => (
-                <span
+              {timetablesToMerge.map((timetable, index) => (
+                <button
                   key={timetable}
+                  type="button"
+                  disabled={index === 0}
                   onClick={() => {
                     onRemoveItem(timetable);
                   }}
                   className={styles.selectedItem}
                   data-content={timetable}
+                  aria-label={index === 0 ? `Основна група ${timetable}` : `Видалити ${timetable}`}
                 />
               ))}
             </span>
@@ -113,6 +117,12 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
                 className={styles["search-bar"]}
                 onSelect={(item) => {
                   addTimetableToMerge(item.value);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key !== "Backspace" || event.currentTarget.value) return;
+                  setTimetablesToMerge((timetables) =>
+                    timetables.length > 1 ? timetables.slice(0, -1) : timetables
+                  );
                 }}
                 options={options}
                 ignoreSpecialCharacters

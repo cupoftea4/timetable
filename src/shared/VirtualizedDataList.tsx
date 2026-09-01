@@ -1,5 +1,5 @@
 import React, { type FC, useCallback } from "react";
-import DatalistInput, { useComboboxControls } from "react-datalist-input";
+import DatalistInput from "react-datalist-input";
 
 type DataListOption = {
   id: string;
@@ -12,7 +12,7 @@ type OwnProps = {
   onSelect: (item: DataListOption) => void;
   ignoreSpecialCharacters?: boolean;
   clearOnSelect?: boolean;
-  containerRef?: React.RefObject<HTMLDivElement>;
+  containerRef?: React.RefObject<HTMLDivElement | null>;
   label?: string;
   placeholder?: string;
   className?: string;
@@ -20,9 +20,19 @@ type OwnProps = {
   autoFocus?: boolean;
   isExpanded?: boolean;
   allowCustomValue?: boolean;
+  onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
 };
 
 const SPECIAL_CHARACTERS_REGEX = /[^\p{L}\p{N}]/gu;
+
+const matchesSearch = (itemName: string, searchQuery: string | undefined, ignoreSpecialCharacters: boolean) => {
+  if (!searchQuery) return true;
+  if (ignoreSpecialCharacters) {
+    const query = searchQuery.toLocaleLowerCase().replace(SPECIAL_CHARACTERS_REGEX, "");
+    return itemName.toLocaleLowerCase().replace(SPECIAL_CHARACTERS_REGEX, "").includes(query);
+  }
+  return itemName.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase());
+};
 
 const VirtualizedDataList: FC<OwnProps> = ({
   options,
@@ -37,23 +47,16 @@ const VirtualizedDataList: FC<OwnProps> = ({
   autoFocus = false,
   allowCustomValue = false,
   isExpanded = false,
+  onKeyDown,
 }) => {
-  const { value: inputValue, setValue: setInputValue } = useComboboxControls({ isExpanded: false });
+  const [inputKey, setInputKey] = React.useState(0);
   const [displayedCount, setDisplayedCount] = React.useState(initialDisplayedCount);
 
-  const matchesSearch = (itemName: string, searchQuery?: string) => {
-    if (!searchQuery) return true;
-    if (ignoreSpecialCharacters) {
-      const query = searchQuery.toLocaleLowerCase().replace(SPECIAL_CHARACTERS_REGEX, "");
-      return itemName.toLocaleLowerCase().replace(SPECIAL_CHARACTERS_REGEX, "").includes(query);
-    }
-    return itemName.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase());
-  };
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: I don't want to break it
   const filterOptions = useCallback(
     (datalistItems: DataListOption[], searchQuery?: string) => {
-      const res = datalistItems.filter((item) => matchesSearch(item.value, searchQuery)).slice(0, displayedCount);
+      const res = datalistItems
+        .filter((item) => matchesSearch(item.value, searchQuery, ignoreSpecialCharacters))
+        .slice(0, displayedCount);
 
       if (allowCustomValue && searchQuery && !res.some((item) => item.value === searchQuery)) {
         res.push({ id: searchQuery, value: `Відкрити «${searchQuery}»`, isCustom: true });
@@ -61,7 +64,7 @@ const VirtualizedDataList: FC<OwnProps> = ({
 
       return res;
     },
-    [options, inputValue, displayedCount]
+    [allowCustomValue, displayedCount, ignoreSpecialCharacters]
   );
 
   const showMoreOptions = () => {
@@ -70,19 +73,25 @@ const VirtualizedDataList: FC<OwnProps> = ({
 
   return (
     <DatalistInput
-      value={inputValue}
-      setValue={setInputValue}
+      key={inputKey}
       ref={containerRef}
       className={className}
       placeholder={placeholder}
       label={label}
       items={options}
       filters={[filterOptions]}
-      inputProps={{ autoFocus }}
+      inputProps={{
+        autoFocus,
+        onKeyDown: (event) => {
+          // Keep the first option visible when the library focuses it.
+          if (event.key === "ArrowDown") event.preventDefault();
+          onKeyDown?.(event);
+        },
+      }}
       isExpanded={isExpanded}
       onSelect={(item) => {
         onSelect(item);
-        clearOnSelect && setInputValue("");
+        if (clearOnSelect) setInputKey((key) => key + 1);
       }}
       listboxProps={{
         onScroll: (e) => {

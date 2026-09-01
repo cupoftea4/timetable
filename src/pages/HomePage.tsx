@@ -75,11 +75,6 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
     Toast.promise(TimetableManager.getFirstLayerSelectionByType(timetableType), "Fetching institutes...")
       .then(setFirstLayer)
       .catch(Toast.error);
-
-    // BUG: In strict mode it kinda ruins nonexisting group error toast
-    return () => {
-      Toast.hideAllMessages();
-    };
   }, [timetableType, reset]);
 
   // On first layer change

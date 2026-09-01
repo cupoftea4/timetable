@@ -4,17 +4,19 @@ import type {
   CachedTimetable,
   ExamsTimetableItem,
   MergedTimetable,
+  Semester,
   TimetableItem,
   TimetablePageType,
 } from "@/types/timetable";
 import storage from "./storage";
-import { sortGroups } from "./timetable";
 import * as Util from "./timetable";
+import { sortGroups } from "./timetable";
 
 type StorageType = "localStorage" | "indexedDB";
 const CACHE_KEYS = [
   "lastOpenedInstitute",
   "lastOpenedTimetable",
+  "currentSemester",
   "institutes",
   "groups",
   "lecturers",
@@ -32,6 +34,7 @@ export type CacheConfig = { key: string; storage: StorageType };
 const CACHE_CONFIGS: Record<StandardCacheKey, CacheConfig> = {
   lastOpenedInstitute: { key: "last_opened_institute", storage: "localStorage" },
   lastOpenedTimetable: { key: "last_opened_timetable", storage: "localStorage" },
+  currentSemester: { key: "current_semester", storage: "localStorage" },
   institutes: { key: "institutes", storage: "indexedDB" },
   groups: { key: "groups", storage: "indexedDB" },
   lecturers: { key: "lecturers", storage: "indexedDB" },
@@ -70,15 +73,17 @@ export type CacheData = {
           ? CachedTimetable[]
           : K extends "mergedTimetable"
             ? MergedTimetable
-            : K extends "lastOpenedInstitute" | "lastOpenedTimetable"
-              ? string
-              : K extends TimetableCacheKey
-                ? TimetableItem[]
-                : K extends ExamsTimetableCacheKey
-                  ? ExamsTimetableItem[]
-                  : K extends GroupsCacheKey
-                    ? string[]
-                    : never;
+            : K extends "currentSemester"
+              ? { semester: Semester; expiresAt: number }
+              : K extends "lastOpenedInstitute" | "lastOpenedTimetable"
+                ? string
+                : K extends TimetableCacheKey
+                  ? TimetableItem[]
+                  : K extends ExamsTimetableCacheKey
+                    ? ExamsTimetableItem[]
+                    : K extends GroupsCacheKey
+                      ? string[]
+                      : never;
 };
 
 // Manages data saved locally: in RAM, indexedDB and localStorage
