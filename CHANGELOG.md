@@ -22,3 +22,44 @@
 
 [2.6.3] - 2024-03-07
 - Fixed merged timetable subgroup not saving properly
+
+[2.6.5] - 2024-09-09
+- Added support for Saturday lessons
+- Improved timetable formatting
+
+[2.6.7] - 2024-12-15
+- Improved saved timetable persistence and local caching
+- Added clearer group-selection guidance
+- Added timetable-specific page titles
+- Improved loading states and mobile controls
+- Added donation prompts and a thank-you message
+
+[2.6.8] - 2025-09-10
+- Improved home-page navigation and loading states
+- Added additional PWA icons and updated the application theme color
+- Fixed home-page scrolling and semester date calculations
+
+[2025-09-16]
+- Added light and dark theme switching
+
+[2025-09-30]
+- Improved group loading and added guidance for finding missing groups
+
+[2026-01-25]
+- Added full support for part-time timetables
+- Added a message for days without lessons
+- Fixed timetable URLs and semester start dates
+
+[2026-02-08]
+- Fixed selective groups containing multiple dashes
+
+[2026-06-05]
+- Normalized LPNU group casing
+
+[2026-09-01]
+- Added automatic semester detection
+- Fixed search cursor behavior
+- Improved timetable, search, saved-menu, and merged-timetable UI
+
+[2.7.0] - 2026-09-03
+- Fixed lesson-time spacing
