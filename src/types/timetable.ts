@@ -46,3 +46,4 @@ export enum HalfTerm {
 }
 
 export type TimetablePageType = "home" | "lecturer" | "selective" | "timetable";
+export type TimetableMode = "timetable" | "exams";

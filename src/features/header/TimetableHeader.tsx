@@ -1,4 +1,10 @@
+import type React from "react";
+import type { FC } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import ArrowRightIcon from "@/assets/ArrowRightIcon";
+import ExamIcon from "@/assets/ExamIcon";
 import HomeIcon from "@/assets/HomeIcon";
+import useExamsPublished from "@/hooks/useExamsPublished";
 import usePageTitle from "@/hooks/usePageTitle";
 import { useIsMobile } from "@/hooks/useWindowDimensions";
 import Toggle from "@/shared/Toggle";
@@ -7,14 +13,11 @@ import type { HalfTerm } from "@/types/timetable";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { isMerged } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
-import type { FC } from "react";
-import type React from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
 import WeekNavigation from "../timetable/ui/WeekNavigation";
-import generalStyles from "./HeaderPanel.module.scss";
-import styles from "./TimetableHeader.module.scss";
 import SavedMenu from "./components/SavedMenu";
 import TimetablePartials from "./components/TimetablePartials";
+import generalStyles from "./HeaderPanel.module.scss";
+import styles from "./TimetableHeader.module.scss";
 
 type OwnProps = {
   loading: boolean;
@@ -48,6 +51,7 @@ const TimetableHeader: FC<OwnProps> = ({
   const navigate = useNavigate();
   const group = useParams().group?.trim() ?? "";
   const isMobile = useIsMobile();
+  const examsPublished = useExamsPublished();
   const groupTitle = timetableType === "merged" ? "Мій розклад" : group;
   usePageTitle(groupTitle);
 
@@ -87,24 +91,14 @@ const TimetableHeader: FC<OwnProps> = ({
           </Link>
           <SavedMenu timetableChanged={loading} />
         </div>
-        <h1 className={styles.title}>{groupTitle}</h1>
-        {timetableType !== "selective" && timetableType !== "parttime" && (
-          <button
-            type="button"
-            className={generalStyles.exams}
-            title={isExamsTimetable ? "Переключити на розклад пар" : "Переключити на розклад екзаменів"}
-            onClick={() => {
-              handleIsExamsTimetableChange(!isExamsTimetable);
-            }}
-          >
-            {!isExamsTimetable ? "Екзамени" : "Пари"}
-          </button>
-        )}
-        {!isExamsTimetable && <TimetablePartials partials={partials} handlePartialClick={updatePartialTimetable} />}
+        <h1 className={styles.title}>
+          {groupTitle}
+          {isExamsTimetable && <span className={styles.mode}>Екзамени</span>}
+        </h1>
       </nav>
-      <span className={styles.params}>
-        {!isExamsTimetable &&
-          (showWeekNavigation ? (
+      {!isExamsTimetable && (
+        <span className={styles.controls}>
+          {showWeekNavigation ? (
             <WeekNavigation weeks={availableWeeks} selectedWeek={selectedWeek} onWeekChange={onWeekChange} />
           ) : (
             <>
@@ -119,8 +113,45 @@ const TimetableHeader: FC<OwnProps> = ({
                 states={isMobile ? ["По чис.", "По знам."] : ["По чисельнику", "По знаменнику"]}
               />
             </>
-          ))}
-      </span>
+          )}
+          <TimetablePartials partials={partials} handlePartialClick={updatePartialTimetable} />
+        </span>
+      )}
+      {timetableType !== "selective" && timetableType !== "parttime" && (
+        <span className={styles.actions}>
+          <button
+            type="button"
+            className={classes(
+              generalStyles.exams,
+              isExamsTimetable && generalStyles.back,
+              !isExamsTimetable && examsPublished && generalStyles.published
+            )}
+            title={
+              isExamsTimetable
+                ? "Повернутися до розкладу пар"
+                : examsPublished
+                  ? "Відкрити розклад екзаменів"
+                  : "Відкрити розклад екзаменів (можливо, ще не опублікований)"
+            }
+            onClick={() => {
+              handleIsExamsTimetableChange(!isExamsTimetable);
+            }}
+          >
+            {isExamsTimetable ? (
+              <>
+                <ArrowRightIcon className={generalStyles.arrow} />
+                {isMobile ? "Пари" : "Розклад пар"}
+              </>
+            ) : (
+              <>
+                <ExamIcon className={generalStyles["exam-icon"]} />
+                {isMobile ? "Екзамени" : "Розклад екзаменів"}
+                <ArrowRightIcon className={generalStyles.arrow} />
+              </>
+            )}
+          </button>
+        </span>
+      )}
     </header>
   );
 };

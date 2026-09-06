@@ -1,13 +1,13 @@
-import TimetableManager from "@/utils/data/TimetableManager";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import TimetableManager from "@/utils/data/TimetableManager";
 
 const NavigationSelector = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    TimetableManager.getLastOpenedTimetable().then((t) => {
-      navigate(t || "/home");
+    TimetableManager.getLastOpenedPath().then((path) => {
+      navigate(path ? `/${path}` : "/home");
     });
   }, [navigate]);
   return null;

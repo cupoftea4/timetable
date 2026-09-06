@@ -21,16 +21,84 @@
     align-items: center;
     flex-wrap: wrap;
     justify-content: center;
-    button.exams {
-      @include light-pillow-button;
-      border-radius: $border-radius;
-    }
 
     svg {
       width: clamp(2rem, 8vw, 2.75rem);
-      height: clamp(2rem, 8vw, 2.75rem); 
+      height: clamp(2rem, 8vw, 2.75rem);
       transform-origin: center;
       cursor: pointer;
+    }
+  }
+
+  button.exams {
+    display: inline-block;
+    padding: .25rem .5rem;
+    border-radius: $border-radius;
+    font-size: 1rem;
+    line-height: 1.2;
+    color: hsla(0, 0%, 100%, .6);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color .2s ease-in-out, background-color .2s ease-in-out;
+    svg {
+      display: inline-block;
+      width: 1.125rem;
+      height: 1.125rem;
+      vertical-align: -.2em;
+      margin-right: .4rem;
+    }
+    .arrow {
+      width: .95rem;
+      height: .95rem;
+      margin-left: .125rem;
+      margin-right: 0;
+      vertical-align: -.125em;
+      opacity: .7;
+      transition: transform .2s ease-in-out;
+    }
+    .exam-icon {
+      @include mobile {
+        display: none;
+      }
+    }
+    &.published {
+      color: var(--text-clr);
+      &::before {
+        content: '';
+        display: inline-block;
+        width: .45rem;
+        height: .45rem;
+        margin-right: .625rem;
+        border-radius: 50%;
+        vertical-align: .1em;
+        background-color: hsla(0, 0%, 78%, 1);
+        box-shadow: 0 0 0 3px hsla(0, 0%, 69%, 0.3);
+      }
+    }
+    &.back {
+      padding: .25rem .625rem .25rem .5rem;
+      color: $extra-text-clr;
+      .arrow {
+        margin-left: 0;
+        margin-right: .4rem;
+        transform: scaleX(-1);
+      }
+    }
+    @include can-hover {
+      &:hover {
+        color: var(--text-clr);
+        background-color: var(--accent-clr);
+        .arrow {
+          transform: translateX(2px);
+        }
+        &.back .arrow {
+          transform: scaleX(-1) translateX(2px);
+        }
+      }
+    }
+    &:focus-visible {
+      color: var(--text-clr);
+      background-color: var(--accent-clr);
     }
   }
 }
