@@ -143,3 +143,22 @@ export function formatWeekRange(weekStart: Date, isCurrent: boolean): string {
 
   return isCurrent ? `Поточний тиждень (${range})` : range;
 }
+
+// `day`: 1 = Monday … 7 = Sunday
+export function getNextLessonDate(
+  now: Date,
+  day: number,
+  isFirstWeek: boolean,
+  isSecondWeek: boolean,
+  isCurrentWeekSecond: boolean
+): Date {
+  const date = new Date(now);
+  date.setHours(0, 0, 0, 0);
+  const today = date.getDay() || 7;
+  date.setDate(date.getDate() + ((day - today + 7) % 7));
+  if (isFirstWeek === isSecondWeek) return date;
+
+  const isTargetWeekSecond = day < today ? !isCurrentWeekSecond : isCurrentWeekSecond;
+  if (isSecondWeek !== isTargetWeekSecond) date.setDate(date.getDate() + 7);
+  return date;
+}

@@ -49,8 +49,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   const iscFile = useTimetableISCFile(
     (!isExamsTimetable && timetable) || (isExamsTimetable && examsTimetable),
-    isSecondSubgroup,
-    isSecondWeek
+    isSecondSubgroup
   );
 
   const isLoading = isExamsTimetable ? !examsTimetable : !timetable;

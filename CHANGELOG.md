@@ -69,3 +69,9 @@
 - The exams button is now highlighted once exams are published
 - Added reopening the last viewed mode (lessons or exams)
 - Fixed unpublished exams redirecting to the home page
+
+[2.8.1] - 2026-09-07
+- Fixed calendar (.ics) export placing every lesson one day early when exported between midnight and 03:00
+- Fixed biweekly lessons landing in the wrong week in the .ics export
+- The .ics export no longer depends on the "По чисельнику / По знаменнику" toggle
+- Fixed leading comma and missing lesson type in .ics event descriptions; event location now uses the actual building
