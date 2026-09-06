@@ -84,6 +84,11 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   useGTagTimetableEvents(group, source ?? "url", isCustom);
 
   function onError(e: string, userError?: string) {
+    if (isExamsTimetable) {
+      Toast.error(e, userError ?? Toast.NO_EXAMS);
+      navigate(`/${group}`, { state: { source: "no-exams" } });
+      return;
+    }
     Toast.error(e, userError);
     navigate("/home");
   }
@@ -101,7 +106,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     getTimetable(group, isExamsTimetable, timetableType)?.finally(() => {
       setLoading(false);
     });
-    TimetableManager.updateLastOpenedTimetable(group);
+    TimetableManager.updateLastOpenedTimetable(group, isExamsTimetable ? "exams" : "timetable");
   }, [group, isExamsTimetable, navigate, timetableType]);
 
   useEffect(() => {

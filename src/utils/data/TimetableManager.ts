@@ -4,6 +4,7 @@ import {
   HalfTerm,
   type MergedTimetableItem,
   type TimetableItem,
+  type TimetableMode,
   type TimetablePageType,
   type TimetableType,
 } from "@/types/timetable";
@@ -120,16 +121,21 @@ class TimetableManager {
     return LocalCache.get("lastOpenedInstitute").then((t) => t?.data);
   }
 
-  async getLastOpenedTimetable(): Promise<string | null> {
-    return LocalCache.get("lastOpenedTimetable").then((t) => t?.data);
+  async getLastOpenedPath(): Promise<string | null> {
+    const [timetable, mode] = await Promise.all([
+      LocalCache.get("lastOpenedTimetable"),
+      LocalCache.get("lastOpenedMode"),
+    ]);
+    if (!timetable.data) return null;
+    return mode.data === "exams" ? `${timetable.data}/exams` : timetable.data;
   }
 
   async updateLastOpenedInstitute(institute: string) {
     return LocalCache.set("lastOpenedInstitute", institute);
   }
 
-  async updateLastOpenedTimetable(timetable: string) {
-    return LocalCache.set("lastOpenedTimetable", timetable);
+  async updateLastOpenedTimetable(timetable: string, mode: TimetableMode = "timetable") {
+    await Promise.all([LocalCache.set("lastOpenedTimetable", timetable), LocalCache.set("lastOpenedMode", mode)]);
   }
 
   async getPartials(group: string): Promise<HalfTerm[]> {

@@ -6,6 +6,7 @@ import type {
   MergedTimetable,
   Semester,
   TimetableItem,
+  TimetableMode,
   TimetablePageType,
 } from "@/types/timetable";
 import storage from "./storage";
@@ -16,6 +17,7 @@ type StorageType = "localStorage" | "indexedDB";
 const CACHE_KEYS = [
   "lastOpenedInstitute",
   "lastOpenedTimetable",
+  "lastOpenedMode",
   "currentSemester",
   "institutes",
   "groups",
@@ -34,6 +36,7 @@ export type CacheConfig = { key: string; storage: StorageType };
 const CACHE_CONFIGS: Record<StandardCacheKey, CacheConfig> = {
   lastOpenedInstitute: { key: "last_opened_institute", storage: "localStorage" },
   lastOpenedTimetable: { key: "last_opened_timetable", storage: "localStorage" },
+  lastOpenedMode: { key: "last_opened_mode", storage: "localStorage" },
   currentSemester: { key: "current_semester", storage: "localStorage" },
   institutes: { key: "institutes", storage: "indexedDB" },
   groups: { key: "groups", storage: "indexedDB" },
@@ -74,16 +77,19 @@ export type CacheData = {
           : K extends "mergedTimetable"
             ? MergedTimetable
             : K extends "currentSemester"
-              ? { semester: Semester; expiresAt: number }
-              : K extends "lastOpenedInstitute" | "lastOpenedTimetable"
-                ? string
-                : K extends TimetableCacheKey
-                  ? TimetableItem[]
-                  : K extends ExamsTimetableCacheKey
-                    ? ExamsTimetableItem[]
-                    : K extends GroupsCacheKey
-                      ? string[]
-                      : never;
+              ? // TODO: make examsPublished required
+                { semester: Semester; expiresAt: number; examsPublished?: boolean | null }
+              : K extends "lastOpenedMode"
+                ? TimetableMode
+                : K extends "lastOpenedInstitute" | "lastOpenedTimetable"
+                  ? string
+                  : K extends TimetableCacheKey
+                    ? TimetableItem[]
+                    : K extends ExamsTimetableCacheKey
+                      ? ExamsTimetableItem[]
+                      : K extends GroupsCacheKey
+                        ? string[]
+                        : never;
 };
 
 // Manages data saved locally: in RAM, indexedDB and localStorage

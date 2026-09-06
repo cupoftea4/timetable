@@ -63,3 +63,9 @@
 
 [2.7.0] - 2026-09-03
 - Fixed lesson-time spacing
+
+[2.8.0] - 2026-09-06
+- Redesigned exams timetable button
+- The exams button is now highlighted once exams are published
+- Added reopening the last viewed mode (lessons or exams)
+- Fixed unpublished exams redirecting to the home page

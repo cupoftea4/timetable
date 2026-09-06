@@ -1,6 +1,6 @@
 import type { LPNUTimetableType, Semester, TimetableType } from "@/types/timetable";
 import { timeout } from "@/utils/promises";
-import LocalCache from "@/utils/timetableStorage";
+import LocalCache, { type CacheData } from "@/utils/timetableStorage";
 import { DEVELOP } from "../constants";
 import { getCurrentSemester as getCurrentSemesterByDate } from "../date";
 import CachedData from "./CachedData";
@@ -14,26 +14,43 @@ const PROXY: string = import.meta.env.VITE_PROXY;
 
 const TIMEOUT = 35000; // 35s
 
-const fetchCurrentSemester = async (): Promise<Semester> => {
-  const { semester, expiresAt } = await CachedData.getCurrentSemester();
-  await LocalCache.set("currentSemester", { semester, expiresAt: Date.parse(expiresAt) });
-  return semester;
+type SemesterState = CacheData["currentSemester"];
+
+const fetchSemesterState = async (): Promise<SemesterState> => {
+  const { semester, expiresAt, exams } = await CachedData.getCurrentSemester();
+  const state: SemesterState = {
+    semester,
+    expiresAt: Date.parse(expiresAt),
+    examsPublished: exams?.published ?? null,
+  };
+  await LocalCache.set("currentSemester", state);
+  return state;
 };
 
-let semesterRequest: Promise<Semester> | null = null;
+let semesterRequest: Promise<SemesterState> | null = null;
 
-export const getCurrentSemester = async () => {
+const getSemesterState = async (): Promise<SemesterState> => {
+  const { data: cached } = await LocalCache.get("currentSemester");
+  if (cached && cached.expiresAt > Date.now()) return cached;
+
+  semesterRequest ??= fetchSemesterState().finally(() => {
+    semesterRequest = null;
+  });
+  return await semesterRequest;
+};
+
+export const getCurrentSemester = async (): Promise<Semester> => {
   try {
-    const { data: cached } = await LocalCache.get("currentSemester");
-    if (cached && cached.expiresAt > Date.now()) return cached.semester;
-
-    semesterRequest ??= fetchCurrentSemester().finally(() => {
-      semesterRequest = null;
-    });
-    return await semesterRequest;
+    return (await getSemesterState()).semester;
   } catch {
     return getCurrentSemesterByDate();
   }
+};
+
+export const isExamsPublished = async (): Promise<boolean> => {
+  return getSemesterState()
+    .then((state) => state.examsPublished ?? false)
+    .catch(() => false);
 };
 
 const TIMETABLE_SUFFIX = "students_schedule";

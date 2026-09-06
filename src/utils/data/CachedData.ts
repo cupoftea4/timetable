@@ -33,7 +33,11 @@ export default class CachedData {
     return CachedData.fetchData("/lecturers/departments.json");
   }
 
-  static getCurrentSemester(): Promise<{ semester: Semester; expiresAt: string }> {
+  static getCurrentSemester(): Promise<{
+    semester: Semester;
+    expiresAt: string;
+    exams?: { published: boolean | null; checkedAt: string | null };
+  }> {
     return CachedData.fetchData("/semester");
   }
 }
