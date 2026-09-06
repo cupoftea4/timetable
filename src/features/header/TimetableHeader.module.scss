@@ -21,37 +21,23 @@ header.header {
   }
 }
 
-.actions {
+.title-group {
   display: flex;
   align-items: center;
-  margin-left: auto;
+  gap: .375rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .title {
-  display: inline-flex;
-  align-items: baseline;
-  gap: .375em;
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-size: clamp(1rem, 8vw, 2rem);
   font-weight: $semi-bold-font;
   line-height: 1.2;
   color: var(--text-clr);
   text-align: center;
   @include mobile {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0;
     line-height: 1.1;
-  }
-}
-
-.mode {
-  font-size: .6em;
-  font-weight: $thin-font;
-  color: $extra-text-clr;
-  white-space: nowrap;
-  @include mobile {
-    font-size: .5em;
-    font-weight: $regular-font;
-    line-height: 1.2;
   }
 }
