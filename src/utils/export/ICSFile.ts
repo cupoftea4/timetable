@@ -1,19 +1,23 @@
 import type { ExamsTimetableItem, TimetableItem } from "@/types/timetable";
+import { getCurrentUADate, getNextLessonDate, getNULPWeek } from "@/utils/date";
 import { removeLineBreaks } from "@/utils/general";
-import { formatLocationForGoogleMaps, lessonsTimes } from "../timetable";
+import { formatLocationForGoogleMaps, getDisplayType, lessonsTimes } from "../timetable";
+
+const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
+
+function cleanInfo(text: string) {
+  return text
+    .replaceAll(/Лекція|Практична|Лабораторна/giu, "")
+    .trim()
+    .replace(/,$/, "");
+}
 
 function toTFormattedString(date: Date, time: string) {
   const [hours, minutes] = time.split(":");
-  const dateOnly = date.toISOString().substring(0, 10).replace(/-/g, "");
-  const formattedTime = `${dateOnly}T${hours?.padStart(2, "0")}${minutes}00`;
-  return formattedTime;
-}
-
-function weeksLeftToDate(date: Date) {
-  const timeDiff = date.getTime() - Date.now();
-  const oneWeek = 1000 * 60 * 60 * 24 * 7;
-  const weeksLeft = Math.ceil(timeDiff / oneWeek);
-  return weeksLeft;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}${month}${day}T${hours?.padStart(2, "0")}${minutes}00`;
 }
 
 export default class ISCFile {
@@ -35,7 +39,9 @@ export default class ISCFile {
     return text;
   }
 
-  public static fromTimetable(timetable: TimetableItem[], subgroup: 1 | 2, curWeek: 1 | 2): string {
+  public static fromTimetable(timetable: TimetableItem[], subgroup: 1 | 2): string {
+    const now = getCurrentUADate();
+    const isCurrentWeekSecond = getNULPWeek() % 2 === 0;
     const text = ISCFile.createICSFile(
       timetable
         .map(
@@ -50,27 +56,22 @@ export default class ISCFile {
             isSecondWeek,
             isFirstSubgroup,
             isSecondSubgroup,
+            type,
           }) => {
             if (isSecondSubgroup !== (subgroup === 2) && !(isFirstSubgroup && isSecondSubgroup)) return null;
-            const date = new Date();
-            const daysUntilNextDayOfWeek = (day - new Date().getDay() + 7) % 7;
-            date.setDate(
-              date.getDate() +
-                daysUntilNextDayOfWeek +
-                (isSecondWeek === (curWeek === 2) && isFirstSubgroup && isSecondSubgroup ? 7 : 0)
-            );
+            const date = getNextLessonDate(now, day, isFirstWeek, isSecondWeek, isCurrentWeekSecond);
             const [start, end] = ISCFile.lessonNumberToICSTime(date, number);
-            const rrule = ISCFile.getRRULE(isFirstWeek, isSecondWeek, curWeek);
-            const lectureLocation = lecturer.split(",")[1];
+            const rrule = ISCFile.getRRULE(date, isFirstWeek, isSecondWeek, now);
+            const description = [cleanInfo(lecturer), cleanInfo(location), getDisplayType(type), urls[0]]
+              .filter(Boolean)
+              .join(", ");
 
             return ISCFile.createEvent({
               start,
               end,
               summary: subject,
-              description: `${location.replaceAll(/,./g, "").trim()}, ${lecturer.trim().replace(/,$/, "")} ${
-                urls[0] ?? ""
-              }`,
-              location: formatLocationForGoogleMaps(lectureLocation),
+              description,
+              location: formatLocationForGoogleMaps(location),
               rrule,
             });
           }
@@ -81,15 +82,14 @@ export default class ISCFile {
     return text;
   }
 
-  private static getRRULE(isFirstWeek: boolean, isSecondWeek: boolean, curWeek: 1 | 2): string {
-    const date = new Date();
+  private static getTermEnd(now: Date) {
     const LAST_MONTH_TERM_1 = 5; // June
     const LAST_MONTH_TERM_2 = 11; // December
     const FIRST_MONTH_TERM_2 = 7; // September
 
     const isHoliday = (month: number) => month >= LAST_MONTH_TERM_1 && month < FIRST_MONTH_TERM_2;
 
-    const currentMonth = date.getMonth();
+    const currentMonth = now.getMonth();
     let month: number;
 
     if (isHoliday(currentMonth)) {
@@ -100,20 +100,16 @@ export default class ISCFile {
       month = LAST_MONTH_TERM_2;
     }
 
-    const lastMonth = new Date(date.getFullYear(), month, 0);
-    const weeksToLastMonth = weeksLeftToDate(lastMonth);
-    const halfWeeksToLastMonth = (week: 1 | 2) =>
-      curWeek === week ? Math.ceil(weeksToLastMonth / 2) : Math.floor(weeksToLastMonth / 2);
-    if (isFirstWeek && isSecondWeek) {
-      return `FREQ=WEEKLY;INTERVAL=1;COUNT=${weeksToLastMonth}`;
-    }
-    if (isFirstWeek) {
-      return `FREQ=WEEKLY;INTERVAL=2;COUNT=${halfWeeksToLastMonth(1)};WKST=MO;`;
-    }
-    if (isSecondWeek) {
-      return `FREQ=WEEKLY;INTERVAL=2;COUNT=${halfWeeksToLastMonth(2)};WKST=MO;`;
-    }
-    return "";
+    return new Date(now.getFullYear(), month, 0);
+  }
+
+  private static getRRULE(firstDate: Date, isFirstWeek: boolean, isSecondWeek: boolean, now: Date): string {
+    if (!isFirstWeek && !isSecondWeek) return "";
+    const interval = isFirstWeek && isSecondWeek ? 1 : 2;
+    const termEnd = ISCFile.getTermEnd(now);
+    const occurrences = Math.floor((termEnd.getTime() - firstDate.getTime()) / (ONE_WEEK * interval)) + 1;
+    const count = Math.max(occurrences, 1);
+    return interval === 1 ? `FREQ=WEEKLY;INTERVAL=1;COUNT=${count}` : `FREQ=WEEKLY;INTERVAL=2;COUNT=${count};WKST=MO`;
   }
 
   private static lessonNumberToICSTime(date: Date, number: number) {
