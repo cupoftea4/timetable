@@ -75,3 +75,7 @@
 - Fixed biweekly lessons landing in the wrong week in the .ics export
 - The .ics export no longer depends on the "По чисельнику / По знаменнику" toggle
 - Fixed leading comma and missing lesson type in .ics event descriptions; event location now uses the actual building
+
+[2.8.2] - 2026-09-07
+- Fixed "По чисельнику / По знаменнику" being swapped for the 2026-2027 autumn semester
+- Week parity is now configured via `VITE_ZNAM_WEEK_START` (Monday of any "по знаменнику" week) instead of the ISO week number

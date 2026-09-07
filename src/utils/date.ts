@@ -1,3 +1,5 @@
+import { ZNAM_WEEK_START } from "./constants";
+
 export const LVIV_TIMEZONE = "Europe/Uzhgorod";
 
 export const getCurrentUADate = () => {
@@ -25,15 +27,9 @@ export const stringToDate = (time: string) => {
   return date;
 };
 
-export function getNULPWeek() {
-  const date = getCurrentUADate();
-  date.setHours(0, 0, 0, 0);
-  // Thursday in current week decides the year.
-  date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
-  // January 4 is always in week 1.
-  const week1 = new Date(date.getFullYear(), 0, 4);
-  // Adjust to Thursday in week 1 and count number of weeks from date to week1.
-  return 1 + Math.round(((date.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+export function isSecondNULPWeek(date = getCurrentUADate()) {
+  const days = (getWeekStart(date).getTime() - getWeekStart(ZNAM_WEEK_START).getTime()) / 86400000;
+  return Math.round(days / 7) % 2 === 0;
 }
 
 export function getCurrentSemester(): "1" | "2" {

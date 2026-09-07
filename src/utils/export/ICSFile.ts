@@ -1,5 +1,5 @@
 import type { ExamsTimetableItem, TimetableItem } from "@/types/timetable";
-import { getCurrentUADate, getNextLessonDate, getNULPWeek } from "@/utils/date";
+import { getCurrentUADate, getNextLessonDate, isSecondNULPWeek } from "@/utils/date";
 import { removeLineBreaks } from "@/utils/general";
 import { formatLocationForGoogleMaps, getDisplayType, lessonsTimes } from "../timetable";
 
@@ -41,7 +41,7 @@ export default class ISCFile {
 
   public static fromTimetable(timetable: TimetableItem[], subgroup: 1 | 2): string {
     const now = getCurrentUADate();
-    const isCurrentWeekSecond = getNULPWeek() % 2 !== 0;
+    const isCurrentWeekSecond = isSecondNULPWeek(now);
     const text = ISCFile.createICSFile(
       timetable
         .map(
