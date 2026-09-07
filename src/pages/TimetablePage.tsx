@@ -11,7 +11,7 @@ import type { ExamsTimetableItem, HalfTerm, Semester, TimetableItem, TimetableTy
 import type { RenderPromises } from "@/types/utils";
 import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
-import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, getNULPWeek } from "@/utils/date";
+import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
 import { optimisticRender } from "@/utils/general";
 import Toast from "@/utils/toasts";
 import styles from "./TimetablePage.module.scss";
@@ -33,7 +33,6 @@ type OwnProps = {
 const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const group = useParams().group?.trim() ?? "";
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
-  const isSecondNULPWeek = () => getNULPWeek() % 2 === 0;
   const [timetable, setTimetable] = useState<TimetableItem[]>();
   const [examsTimetable, setExamsTimetable] = useState<ExamsTimetableItem[]>();
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup);
