@@ -15,6 +15,12 @@ if (ENABLE_SATURDAYS && !import.meta.env.VITE_FIRST_CLASS_DATE) {
 
 export const FIRST_CLASS_DATE = new Date(import.meta.env.VITE_FIRST_CLASS_DATE);
 
+if (!import.meta.env.VITE_ZNAM_WEEK_START) {
+  throw new Error("VITE_ZNAM_WEEK_START is required");
+}
+
+export const ZNAM_WEEK_START = new Date(`${import.meta.env.VITE_ZNAM_WEEK_START}T00:00:00`);
+
 export const RECEIVED_DONATION_NOTIFICATION = "received-donation-notification";
 
 export const DONATION_LINK = "https://send.monobank.ua/jar/AR9WWgQGpz";
