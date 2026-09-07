@@ -41,7 +41,7 @@ export default class ISCFile {
 
   public static fromTimetable(timetable: TimetableItem[], subgroup: 1 | 2): string {
     const now = getCurrentUADate();
-    const isCurrentWeekSecond = getNULPWeek() % 2 === 0;
+    const isCurrentWeekSecond = getNULPWeek() % 2 !== 0;
     const text = ISCFile.createICSFile(
       timetable
         .map(

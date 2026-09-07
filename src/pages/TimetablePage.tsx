@@ -33,7 +33,7 @@ type OwnProps = {
 const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const group = useParams().group?.trim() ?? "";
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
-  const isSecondNULPWeek = () => getNULPWeek() % 2 === 0;
+  const isSecondNULPWeek = () => getNULPWeek() % 2 !== 0;
   const [timetable, setTimetable] = useState<TimetableItem[]>();
   const [examsTimetable, setExamsTimetable] = useState<ExamsTimetableItem[]>();
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup);
