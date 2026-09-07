@@ -1,60 +1,66 @@
-/* eslint-disable no-restricted-globals */
+const CACHE_PREFIX = "d-app-v";
+const CACHE_NAME = CACHE_PREFIX + new URLSearchParams(location.search).get("v");
+const HOME = "/home";
+// Same-origin proxy to lpnu.ua, must never be cached
+const PROXY_PATH = "/get.php";
 
-const DYNAMIC_CACHE_NAME_PREFIX  = "d-app-v";
-const urlParams = new URLSearchParams(location.search);
-const CURRENT_CACHE_VERSION = urlParams.get("v");
-const DYNAMIC_CACHE_NAME  = `${DYNAMIC_CACHE_NAME_PREFIX}${CURRENT_CACHE_VERSION}`;
-console.log(DYNAMIC_CACHE_NAME);
-const SERVER_FILE_NAME = "get.php";
+const isHtml = (response) => (response.headers.get("content-type") ?? "").includes("text/html");
+// Navigations must get HTML, anything else must not (the SPA fallback answers missing files with HTML)
+const isUsable = (request, response) => response.ok && isHtml(response) === (request.mode === "navigate");
 
-function shouldCache(request, response) {
-  const url = request.url;
-  const responseType = response.headers.get("content-type");
-  if (url.includes(SERVER_FILE_NAME)) return false;
-  return url.startsWith(location.origin + '/assets/') || 
-         url.startsWith(location.origin  + '/images/') ||
-         url === location.origin  + '/manifest.json' ||
-         ((url.startsWith(location.origin  + '/') && responseType.includes("text/html")) ? "home" : false);
-}
-
-self.addEventListener('install', function(event) {
-  event.waitUntil(self.skipWaiting()); // This will skip the waiting phase.
+self.addEventListener("install", (event) => {
+  event.waitUntil(precache().then(() => self.skipWaiting()));
 });
 
-self.addEventListener('activate', event => {
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
-      return Promise.all(
-        cacheNames.filter(cacheName => {
-          // Check if the cache name starts with the prefix and it's not the current version
-          return cacheName.startsWith(DYNAMIC_CACHE_NAME_PREFIX) && cacheName !== DYNAMIC_CACHE_NAME;
-        }).map(cacheName => {
-          // Delete the old cache
-          return caches.delete(cacheName);
-        })
-      );
-    })
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME).map((key) => caches.delete(key))
+      )
+    )
   );
 });
 
-self.addEventListener('fetch', event => {
-  const {request} = event;
-  event.respondWith(networkFirst(request));
-})
+self.addEventListener("fetch", (event) => {
+  const { request } = event;
+  const url = new URL(request.url);
+  if (request.method !== "GET" || url.origin !== location.origin || url.pathname.startsWith(PROXY_PATH)) return;
+  event.respondWith(url.pathname.startsWith("/assets/") ? cacheFirst(request) : networkFirst(request));
+});
+
+// Stores the current app shell together with its hashed assets, so they always match
+async function precache() {
+  const cache = await caches.open(CACHE_NAME);
+  const response = await fetch("/", { cache: "no-cache" });
+  if (!response.ok || !isHtml(response)) throw new Error("Failed to fetch app shell");
+  const html = await response.clone().text();
+  const assets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map((match) => match[1]);
+  await Promise.all([cache.put(HOME, response), cache.addAll(assets)]);
+}
+
+// Hashed assets never change, so the cached copy is always correct
+async function cacheFirst(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+  if (cached) return cached;
+  const response = await fetch(request);
+  if (isUsable(request, response)) cache.put(request, response.clone());
+  return response;
+}
 
 async function networkFirst(request) {
-  const cache = await caches.open(DYNAMIC_CACHE_NAME);
+  const cache = await caches.open(CACHE_NAME);
+  const isNavigation = request.mode === "navigate";
+  const fromCache = () => cache.match(isNavigation ? HOME : request);
   try {
     const response = await fetch(request);
-    const cacheRes = shouldCache(request, response);  
-
-    if (cacheRes) {
-      cache.put(cacheRes === "home" ? "/home" : request, response.clone());
-    }
-
-    return response ?? await cache.match(request);
+    if (!isUsable(request, response)) return (await fromCache()) ?? response;
+    if (!isNavigation) cache.put(request, response.clone());
+    return response;
   } catch (error) {
-    return await cache.match(request).then(async res => res ?? await cache.match("/home")); 
+    const cached = await fromCache();
+    if (cached) return cached;
+    throw error;
   }
-  
 }
