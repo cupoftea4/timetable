@@ -79,3 +79,7 @@
 [2.8.2] - 2026-09-07
 - Fixed "По чисельнику / По знаменнику" being swapped for the 2026-2027 autumn semester
 - Week parity is now configured via `VITE_ZNAM_WEEK_START` (Monday of any "по знаменнику" week) instead of the ISO week number
+
+[2.8.3] - 2026-09-07
+- Fixed the app occasionally opening to a blank white screen
+- Hashed assets are now served cache-first and precached on install, so the offline copy always matches its shell
