@@ -1,17 +1,17 @@
+import { type FC, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useInputFocus from "@/hooks/useFocus";
 import useOnClickOutside from "@/hooks/useOnOutsideClick";
 import VirtualizedDataList from "@/shared/VirtualizedDataList";
 import type { TimetableItem } from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
 import TimetableManager from "@/utils/data/TimetableManager";
-import { getAllTimetables, isMerged } from "@/utils/timetable";
+import { getAllTimetables, getTimetableName, isMerged } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
-import { type FC, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import styles from "./CreateMergedModal.module.scss";
 
 const getSearchBarOptions = () => {
-  return getAllTimetables().map((group) => ({ id: group, value: group }));
+  return getAllTimetables().map((group) => ({ id: group, value: getTimetableName(group) }));
 };
 
 function getSavedTimetables() {
@@ -34,12 +34,12 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
   const options = useMemo(() => {
     const savedTimetables = getSavedTimetables();
     const timetables = getSearchBarOptions().filter(
-      ({ value }) => !timetablesToMerge.includes(value) && !savedTimetables.includes(value)
+      ({ id }) => !timetablesToMerge.includes(id) && !savedTimetables.includes(id)
     );
     timetables.unshift(
       ...savedTimetables
         .filter((group) => !timetablesToMerge.includes(group))
-        .map((group) => ({ id: group, value: group }))
+        .map((group) => ({ id: group, value: getTimetableName(group) }))
     );
     return timetables;
   }, [timetablesToMerge]);
@@ -104,8 +104,12 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
                     onRemoveItem(timetable);
                   }}
                   className={styles.selectedItem}
-                  data-content={timetable}
-                  aria-label={index === 0 ? `Основна група ${timetable}` : `Видалити ${timetable}`}
+                  data-content={getTimetableName(timetable)}
+                  aria-label={
+                    index === 0
+                      ? `Основна група ${getTimetableName(timetable)}`
+                      : `Видалити ${getTimetableName(timetable)}`
+                  }
                 />
               ))}
             </span>
@@ -116,13 +120,11 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
                 containerRef={datalistRef}
                 className={styles["search-bar"]}
                 onSelect={(item) => {
-                  addTimetableToMerge(item.value);
+                  addTimetableToMerge(item.id);
                 }}
                 onKeyDown={(event) => {
                   if (event.key !== "Backspace" || event.currentTarget.value) return;
-                  setTimetablesToMerge((timetables) =>
-                    timetables.length > 1 ? timetables.slice(0, -1) : timetables
-                  );
+                  setTimetablesToMerge((timetables) => (timetables.length > 1 ? timetables.slice(0, -1) : timetables));
                 }}
                 options={options}
                 ignoreSpecialCharacters

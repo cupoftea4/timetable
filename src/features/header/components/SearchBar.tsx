@@ -1,17 +1,17 @@
+import type { FC } from "react";
+import { useNavigate } from "react-router-dom";
 import SearchIcon from "@/assets/SearchIcon";
 import useOnClickOutside from "@/hooks/useOnOutsideClick";
 import VirtualizedDataList from "@/shared/VirtualizedDataList";
 import { classes } from "@/styles/utils";
-import { getAllTimetables } from "@/utils/timetable";
-import type { FC } from "react";
-import { useNavigate } from "react-router-dom";
+import { getAllTimetables, getTimetableName } from "@/utils/timetable";
 import "react-datalist-input/dist/styles.css";
 import { useDatalistFocus } from "@/context/datalistFocus";
 import type { TimetableType } from "@/types/timetable";
 import styles from "./SearchBar.module.scss";
 
 const getSearchBarOptions = () => {
-  return getAllTimetables().map((group) => ({ id: group, value: group }));
+  return getAllTimetables().map((group) => ({ id: group, value: getTimetableName(group) }));
 };
 
 type OwnProps = {
