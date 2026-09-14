@@ -1,12 +1,12 @@
+import { type FC, useCallback, useEffect, useMemo, useState } from "react";
 import { useIsMobile } from "@/hooks/useWindowDimensions";
 import { classes } from "@/styles/utils";
 import type { TimetableItem, TimetableType } from "@/types/timetable";
 import { DEVELOP } from "@/utils/constants";
 import { getCurrentUADate, isDateInWeek, stringToDate } from "@/utils/date";
 import { generateSaturdayLessons, lessonsTimes, skeletonTimetable, unique } from "@/utils/timetable";
-import { type FC, useCallback, useEffect, useMemo, useState } from "react";
-import styles from "./Timetable.module.scss";
 import TimetableLesson from "./components/TimetableLesson";
+import styles from "./Timetable.module.scss";
 
 type OwnProps = {
   timetable: TimetableItem[];

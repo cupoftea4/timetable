@@ -1,7 +1,7 @@
+import { useMemo } from "react";
 import type { ExamsTimetableItem, TimetableItem } from "@/types/timetable";
 import ISCFile from "@/utils/export/ICSFile";
 import { isExams } from "@/utils/timetable";
-import { useMemo } from "react";
 
 const useTimetableISCFile = (
   timetable: TimetableItem[] | ExamsTimetableItem[] | undefined | false,

@@ -11,7 +11,7 @@ import Toggle from "@/shared/Toggle";
 import { classes } from "@/styles/utils";
 import type { HalfTerm } from "@/types/timetable";
 import TimetableManager from "@/utils/data/TimetableManager";
-import { isMerged } from "@/utils/timetable";
+import { getTimetableName, isMerged } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import WeekNavigation from "../timetable/ui/WeekNavigation";
 import SavedMenu from "./components/SavedMenu";
@@ -52,7 +52,7 @@ const TimetableHeader: FC<OwnProps> = ({
   const group = useParams().group?.trim() ?? "";
   const isMobile = useIsMobile();
   const examsPublished = useExamsPublished();
-  const groupTitle = timetableType === "merged" ? "Мій розклад" : group;
+  const groupTitle = timetableType === "merged" ? "Мій розклад" : getTimetableName(group);
   usePageTitle(groupTitle);
 
   const isPartTime = timetableType === "parttime";

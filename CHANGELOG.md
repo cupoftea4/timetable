@@ -83,3 +83,7 @@
 [2.8.3] - 2026-09-07
 - Fixed the app occasionally opening to a blank white screen
 - Hashed assets are now served cache-first and precached on install, so the offline copy always matches its shell
+
+[2.8.4] - 2026-09-14
+- Display part-time group suffixes as lowercase `з` to distinguish them from the digit `3`
+- Sort part-time groups after regular groups within each year, keeping both in numerical order

@@ -1,7 +1,7 @@
+import { type FC, memo } from "react";
 import { classes } from "@/styles/utils";
 import type { TimetableItem } from "@/types/timetable";
 import { getDisplayType } from "@/utils/timetable";
-import { type FC, memo } from "react";
 import TimetableLink from "../ui/TimetableLink";
 import styles from "./TimetableLesson.module.scss";
 

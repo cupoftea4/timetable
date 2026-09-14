@@ -1,6 +1,6 @@
+import { type FC, useEffect, useState } from "react";
 import { classes } from "@/styles/utils";
 import type { HalfTerm } from "@/types/timetable";
-import { type FC, useEffect, useState } from "react";
 import styles from "./TimetablePartials.module.scss";
 
 type OwnProps = {

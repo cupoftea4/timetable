@@ -1,8 +1,8 @@
-import { useIsMobile } from "@/hooks/useWindowDimensions";
-import { classes } from "@/styles/utils";
-import { sortGroupsByYear } from "@/utils/timetable";
 import { type FC, useState } from "react";
 import { Link } from "react-router-dom";
+import { useIsMobile } from "@/hooks/useWindowDimensions";
+import { classes } from "@/styles/utils";
+import { getTimetableName, sortGroupsByYear } from "@/utils/timetable";
 import MissingGroupTip from "./MissingGroupTip";
 import styles from "./TimetablesSelection.module.scss";
 
@@ -47,7 +47,7 @@ const TimetablesSelection: FC<OwnProps> = ({ timetables, withYears = false }) =>
                         setExpandedYear(year);
                       }}
                     >
-                      {group}
+                      {getTimetableName(group)}
                     </Link>
                   </li>
                 ))}

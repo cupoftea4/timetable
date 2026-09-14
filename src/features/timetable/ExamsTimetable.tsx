@@ -1,8 +1,8 @@
+import type { FC } from "react";
 import { classes } from "@/styles/utils";
 import type { ExamsTimetableItem } from "@/types/timetable";
 import { LVIV_TIMEZONE } from "@/utils/date";
 import { lessonsTimes } from "@/utils/timetable";
-import type { FC } from "react";
 import styles from "./ExamsTimetable.module.scss";
 import TimetableLink from "./ui/TimetableLink";
 

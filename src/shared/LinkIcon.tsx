@@ -1,3 +1,4 @@
+import React, { type FC } from "react";
 import DefaultLink from "@/assets/links/DefaultLink";
 import DiscordIcon from "@/assets/links/DiscordIcon";
 import GoogleMeetsIcon from "@/assets/links/GoogleMeetsIcon";
@@ -5,7 +6,6 @@ import SkypeIcon from "@/assets/links/SkypeIcon";
 import TeamsIcon from "@/assets/links/TeamsIcon";
 import YouTubeIcon from "@/assets/links/YouTubeIcon";
 import ZoomIcon from "@/assets/links/ZoomIcon";
-import React, { type FC } from "react";
 
 type OwnProps = {
   link: string;

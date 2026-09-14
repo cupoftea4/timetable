@@ -104,18 +104,18 @@ class TimetableParser {
 
   private parseDayOrDate(text: string): { day: number; date?: Date } {
     const dayNumber = this.dayToNumber(text);
-    
+
     if (dayNumber !== -1) {
       return { day: dayNumber };
     }
-    
+
     const date = new Date(text);
     if (!Number.isNaN(date.getTime())) {
       const dayOfWeek = date.getDay();
       const adjustedDay = dayOfWeek === 0 ? 7 : dayOfWeek;
       return { day: adjustedDay, date };
     }
-    
+
     return { day: -1 };
   }
 

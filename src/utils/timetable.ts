@@ -45,7 +45,7 @@ export function isMerged(timetable: string) {
 export function getTimetableName(timetable: CachedTimetable | string) {
   const name = typeof timetable === "string" ? timetable : timetable.group;
   if (isMerged(name)) return "Мій розклад";
-  return name;
+  return name.replace(/(\d)З$/, "$1з");
 }
 
 export function getGroupName(group: string, timetableType: TimetableType) {
@@ -198,7 +198,11 @@ export function sortGroups(groups: string[]) {
     const r = /^(.*-\d)(\d+).*$/;
     const [, year1 = "", groupNumber1 = ""] = g1.split(r);
     const [, year2 = "", groupNumber2 = ""] = g2.split(r);
-    return `${year1}${groupNumber1.padStart(2, "0")}`.localeCompare(`${year2}${groupNumber2.padStart(2, "0")}`);
+    return (
+      year1.localeCompare(year2) ||
+      Number(/[зЗ]$/.test(g1)) - Number(/[зЗ]$/.test(g2)) ||
+      groupNumber1.localeCompare(groupNumber2, "uk", { numeric: true })
+    );
   });
 }
 

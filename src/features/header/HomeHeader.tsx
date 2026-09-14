@@ -1,13 +1,13 @@
+import { type FC, useEffect, useMemo, useState } from "react";
 import { useDatalistFocus } from "@/context/datalistFocus";
 import useWindowDimensions from "@/hooks/useWindowDimensions";
 import { classes } from "@/styles/utils";
 import type { TimetableType } from "@/types/timetable";
 import { NARROW_SCREEN_BREAKPOINT, TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
-import { type FC, useEffect, useMemo, useState } from "react";
-import styles from "./HeaderPanel.module.scss";
 import Navigation from "./components/Navigation";
 import SavedMenu from "./components/SavedMenu";
 import SearchBar from "./components/SearchBar";
+import styles from "./HeaderPanel.module.scss";
 
 type OwnProps = {
   timetableType: TimetableType;

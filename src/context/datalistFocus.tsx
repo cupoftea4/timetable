@@ -1,6 +1,6 @@
-import useInputFocus from "@/hooks/useFocus";
 import type React from "react";
-import { type ReactNode, createContext, useContext } from "react";
+import { createContext, type ReactNode, useContext } from "react";
+import useInputFocus from "@/hooks/useFocus";
 
 interface DatalistFocusContextType {
   ref: React.RefObject<HTMLDivElement | null>;

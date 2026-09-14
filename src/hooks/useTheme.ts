@@ -1,5 +1,5 @@
-import { isDarkMode } from "@/utils/general";
 import { useEffect, useState } from "react";
+import { isDarkMode } from "@/utils/general";
 
 type Theme = "light" | "dark";
 

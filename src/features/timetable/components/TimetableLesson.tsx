@@ -1,8 +1,8 @@
+import { type FC, memo, type ReactNode } from "react";
 import { useDelayedProp } from "@/hooks/useDelayedProp";
 import { classes } from "@/styles/utils";
 import type { TimetableItem } from "@/types/timetable";
 import { generateId, lessonsTimes } from "@/utils/timetable";
-import { type FC, type ReactNode, memo } from "react";
 import styles from "./TimetableLesson.module.scss";
 import TimetableLessonInfo from "./TimetableLessonInfo";
 

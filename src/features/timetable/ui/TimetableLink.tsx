@@ -1,6 +1,6 @@
+import { type FC, useState } from "react";
 import LinkIcon from "@/shared/LinkIcon";
 import type { TimetableItemType } from "@/types/timetable";
-import { type FC, useState } from "react";
 import { classes } from "../../../styles/utils";
 import styles from "./TimetableLink.module.scss";
 
