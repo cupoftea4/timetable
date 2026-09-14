@@ -1,5 +1,5 @@
-import { MOBILE_SCREEN_BREAKPOINT, TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
 import { useEffect, useState } from "react";
+import { MOBILE_SCREEN_BREAKPOINT, TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
 
 function getWindowDimensions() {
   const { innerWidth: width, innerHeight: height } = window;

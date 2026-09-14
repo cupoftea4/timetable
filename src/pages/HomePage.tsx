@@ -1,7 +1,9 @@
+import { type FC, useCallback, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import BugIcon from "@/assets/BugIcon";
+import catImage from "@/assets/cat.svg";
 import HeartIcon from "@/assets/HeartIcon";
 import LoadingIcon from "@/assets/LoadingIcon";
-import catImage from "@/assets/cat.svg";
 import { DatalistFocusProvider } from "@/context/datalistFocus";
 import HeaderPanel from "@/features/header/HomeHeader";
 import MissingGroupTip from "@/features/home/MissingGroupTip";
@@ -13,8 +15,6 @@ import type { TimetableType } from "@/types/timetable";
 import { BUG_REPORT_LINK, DONATION_LINK } from "@/utils/constants";
 import TimetableManager from "@/utils/data/TimetableManager";
 import Toast from "@/utils/toasts";
-import { type FC, useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import styles from "./HomePage.module.scss";
 
 type OwnProps = {

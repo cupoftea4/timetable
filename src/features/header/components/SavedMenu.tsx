@@ -1,3 +1,5 @@
+import { type FC, useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import CheckMarkIcon from "@/assets/CheckMarkIcon";
 import HistoryIcon from "@/assets/HistoryIcon";
 import RemoveIcon from "@/assets/RemoveIcon";
@@ -5,8 +7,6 @@ import { classes } from "@/styles/utils";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getTimetableName, isMerged } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
-import { type FC, useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
 import styles from "./SavedMenu.module.scss";
 
 const MAX_SAVED_ITEMS = 5;

@@ -1,3 +1,5 @@
+import type { FC } from "react";
+import { useParams } from "react-router-dom";
 import DownloadIcon from "@/assets/DownloadIcon";
 import MergeIcon from "@/assets/MergeIcon";
 import MoonIcon from "@/assets/MoonIcon";
@@ -5,8 +7,6 @@ import RefreshIcon from "@/assets/RefreshIcon";
 import SunIcon from "@/assets/SunIcon";
 import { useTheme } from "@/hooks/useTheme";
 import { classes } from "@/styles/utils";
-import type { FC } from "react";
-import { useParams } from "react-router-dom";
 import styles from "./TimetableFooter.module.scss";
 
 type OwnProps = {

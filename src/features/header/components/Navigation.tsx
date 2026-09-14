@@ -1,9 +1,9 @@
+import type { FC } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/useWindowDimensions";
 import MobileSelect from "@/shared/MobileSelect";
 import { classes } from "@/styles/utils";
 import type { TimetableType } from "@/types/timetable";
-import type { FC } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import styles from "./Navigation.module.scss";
 
 const navigationItems: Array<{ value: TimetableType; name: string }> = [

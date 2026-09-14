@@ -1,8 +1,8 @@
+import type { FC } from "react";
 import { useIsMobile } from "@/hooks/useWindowDimensions";
 import MobileSelect from "@/shared/MobileSelect";
 import { classes } from "@/styles/utils";
 import { formatWeekRange, getCurrentUADate, getWeekStart } from "@/utils/date";
-import type { FC } from "react";
 import styles from "./WeekNavigation.module.scss";
 
 type OwnProps = {
