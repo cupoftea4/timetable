@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <g fill="#000" fill-rule="evenodd" transform="translate(64 64) scale(.74) translate(-64 -64)">
+  <rect width="128" height="128" rx="26" fill="#3730a3"/>
+  <g fill="#f7f7f2" fill-rule="evenodd" transform="translate(64 64) scale(.74) translate(-64 -64)">
     <path d="M64 23 28 35h72ZM24 37h80v3.5H24ZM26 43h76l-1.5 4h-73Z"/>
     <path d="M28 48.5h7V51h-7Zm13 0h7V51h-7Zm13 0h7V51h-7Zm13 0h7V51h-7Zm13 0h7V51h-7Zm13 0h7V51h-7Z"/>
     <path d="M29 52.5h5v24h-5Zm13 0h5v24h-5Zm13 0h5V73h-5Zm13 0h5V73h-5Zm13 0h5v24h-5Zm13 0h5v24h-5Z"/>
