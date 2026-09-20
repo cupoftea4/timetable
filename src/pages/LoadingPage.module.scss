@@ -4,7 +4,8 @@
 .container {
   @include flex-center;
   height: 100vh;
-  height: 100dvh;
+  height: var(--app-height, 100dvh);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   background-color: rgba(0, 0, 0, 0.5);
   div {
     @include flex-center;

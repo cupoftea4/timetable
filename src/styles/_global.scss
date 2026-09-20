@@ -26,6 +26,10 @@
 
   @include auto-scroll(y, auto, transparent, var(--accent-clr), false);
   overflow: overlay; // deprecated :(
+
+  @media (display-mode: standalone) {
+    --app-height: 100svh;
+  }
 }
 
 :root {
@@ -37,21 +41,38 @@
   );
 } 
 
+html {
+ background: #0e4c5a;
+}
+
+html.dark-mode {
+ background: rgb(0, 0, 10);
+}
+
 html, body, #root {
  min-height: 100vh;
- min-height: 100dvh;
+ min-height: var(--app-height, 100dvh);
 }
  
 
 body {
-  background: $bg-light;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  position: relative;
+  isolation: isolate;
+  background: transparent;
   font-family: 'Ubuntu', sans-serif;
   
   font-weight: $regular-font;
   
 
   color: var(--text-clr);
+  &::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+    background: $bg-light;
+  }
   main {
     padding: $main-padding;
     padding-top: 0.125rem;
@@ -78,13 +99,15 @@ body {
   --background-start-rgb: 0, 00, 10;
   --background-end-rgb: 0, 0, 10;
 
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb)
-  );
+  &::before {
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgb(var(--background-end-rgb))
+      )
+      rgb(var(--background-start-rgb)
+    );
+  }
 }
 .toast {
   font-size: 16px;
