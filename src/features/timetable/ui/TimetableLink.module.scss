@@ -25,10 +25,11 @@
   }
   .dropdown {
     position: absolute;
-    transform-origin: top left;
+    right: 0;
+    transform-origin: top right;
     animation: show-menu 150ms ease-out;
     background: hsla(0, 0%, 30%, 0.85);
-    @include blur(40px);
+    @include blur(30px);
     z-index: 100;
     border-radius: 0.5rem;
     li {
@@ -47,6 +48,48 @@
       z-index: 200;
       background-color: transparent;
       border-radius: 0;
+    }
+  }
+  .details {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    border: 0;
+    color: inherit;
+    width: min(16rem, calc(100vw - 2rem));
+    max-height: min(28rem, 65vh);
+    overflow: auto;
+    padding: .75rem;
+    font-size: $small-font-size;
+    overflow-wrap: anywhere;
+    background: hsla(0, 0%, 30%, .5);
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: .5rem;
+      button {
+        padding: .5em .75em;
+        background: rgba(255, 255, 255, .1);
+        &:hover, &:focus-visible {
+          background: var(--accent-clr);
+        }
+      }
+    }
+    .originalText {
+      white-space: pre-wrap;
+      user-select: text;
+      cursor: text;
+      p {
+        margin-bottom: .75rem;
+        &:empty {
+          display: none;
+        }
+      }
+      a {
+        text-decoration: underline;
+        text-underline-offset: .15em;
+      }
     }
   }
 }

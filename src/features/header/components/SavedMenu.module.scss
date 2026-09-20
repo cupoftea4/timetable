@@ -20,6 +20,14 @@ $icon-size: 0.875rem;
   @include tablet {
     width: 13rem;
   }
+  @include mobile {
+    left: -3rem;
+    width: min(13rem, calc(100vw - 2rem));
+    &.home {
+      left: auto;
+      right: 0;
+    }
+  }
   z-index: 100;
   padding-block: 1rem;
   .saved-menu {
@@ -35,6 +43,8 @@ $icon-size: 0.875rem;
     box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
     @include blur(40px);
     padding: 1rem 0;
+    max-height: calc(100dvh - 6rem);
+    overflow-y: auto;
 
     .title {
       font-weight: $semi-bold-font;

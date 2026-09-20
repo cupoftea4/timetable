@@ -235,11 +235,9 @@ class TimetableParser {
       if (node.nodeName === "BR") {
         if (br) texts.push(""); // sometimes text is skipped with sequenced <br/>
         br = true;
-      } else if (node.nodeName === "SPAN") {
-        const a = (node as Element).querySelector("a");
-        const url = a?.getAttribute("href");
-        const fixedUrl = url?.startsWith("http") ? url : `https://${url}`;
-        lessonUrls.push(fixedUrl);
+      } else if (node instanceof Element && node.tagName === "SPAN") {
+        const a = node.querySelector("a");
+        lessonUrls.push(a?.getAttribute("href") ?? node.textContent ?? "");
         br = false;
       } else {
         br = false;
