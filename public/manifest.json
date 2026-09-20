@@ -72,5 +72,5 @@
   "start_url": ".",
   "display": "standalone",
   "theme_color": "hsl(216, 69%, 16%)",
-  "background_color": "hsl(216, 69%, 16%)"
+  "background_color": "#3730a3"
 }
