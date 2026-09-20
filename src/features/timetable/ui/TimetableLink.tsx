@@ -33,8 +33,11 @@ const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
           onMouseLeave={closeDropdown}
           onFocusCapture={openDropdown}
         >
-          <button className={classes(type, showDropdown && styles.active)} type="button">
-            Links {showDropdown ? "▴" : "▾"}
+          <button className={type} type="button" aria-expanded={showDropdown}>
+            <span>Links</span>
+            <svg className={styles.arrow} viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M12 6H4l4 4.5z" />
+            </svg>
           </button>
           {showDropdown && (
             <ul className={styles.dropdown}>
