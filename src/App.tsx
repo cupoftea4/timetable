@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer as MessageToast } from "react-toastify";
+import { CatModeProvider } from "./context/catMode";
 import { useTheme } from "./hooks/useTheme";
 import LoadingPage from "./pages/LoadingPage";
 import NavigationSelector from "./pages/NavigationSelector";
@@ -13,6 +14,7 @@ import Toast from "./utils/toasts";
 
 const HomePage = lazy(() => import("./pages/HomePage"));
 const TimetablePage = lazy(() => import("./pages/TimetablePage"));
+const WaifuPage = import.meta.env.VITE_ENABLE_WAIFU === "true" ? lazy(() => import("./pages/WaifuPage")) : null;
 
 /* TODO:
   - add tests
@@ -47,16 +49,19 @@ const App = () => {
     <>
       {status !== Status.Loading ? (
         <BrowserRouter>
-          <Suspense fallback={<LoadingPage />}>
-            <Routes>
-              <Route path="/" element={<NavigationSelector />} />
-              <Route path="home" element={<HomePage timetableType="timetable" />} />
-              <Route path="selective" element={<HomePage timetableType="selective" />} />
-              <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
-              <Route path="/:group" element={<TimetablePage />} />
-              <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
-            </Routes>
-          </Suspense>
+          <CatModeProvider>
+            <Suspense fallback={<LoadingPage />}>
+              <Routes>
+                <Route path="/" element={<NavigationSelector />} />
+                <Route path="home" element={<HomePage timetableType="timetable" />} />
+                <Route path="selective" element={<HomePage timetableType="selective" />} />
+                <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
+                <Route path="waifu" element={WaifuPage ? <WaifuPage /> : <Navigate to="/home" replace />} />
+                <Route path="/:group" element={<TimetablePage />} />
+                <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
+              </Routes>
+            </Suspense>
+          </CatModeProvider>
         </BrowserRouter>
       ) : (
         <LoadingPage />

@@ -208,6 +208,45 @@ td.empty {
   animation: disappear 300ms ease-in-out forwards; // flickers without forwards :/
 }
 
+:global(body:has(.cat-doodles)) .cell-container {
+  .cell[data-cat-doodle] {
+    &::after {
+      content: '';
+      position: absolute;
+      right: .75rem;
+      bottom: 2.25rem;
+      width: 3rem;
+      height: 2.5rem;
+      background-color: hsla(var(--lect-clr), .8);
+      mask: url('../../../assets/cat-face.svg') center / contain no-repeat;
+      transform: rotate(8deg);
+      pointer-events: none;
+    }
+    .info .title { padding-right: 3.25rem; }
+    .info > .extra { margin-top: .75rem; }
+
+    &[data-cat-color='practical']::after { background-color: hsla(var(--pract-clr), .8); }
+    &[data-cat-color='lab']::after { background-color: hsla(var(--lab-clr), .8); }
+
+    &[data-cat-doodle='sleepy']::after {
+      mask: url('../../../assets/cat-sleepy.svg') center / contain no-repeat;
+      transform: rotate(-8deg);
+    }
+    &[data-cat-doodle='paw']::after {
+      mask: url('../../../assets/cat-paw-print.svg') center / contain no-repeat;
+      transform: rotate(18deg) scale(.85);
+    }
+    &[data-cat-doodle='curled']::after {
+      mask: url('../../../assets/cat-curled-up.svg') center / contain no-repeat;
+      transform: rotate(-5deg);
+    }
+  }
+}
+
+@media print {
+  :global(body:has(.cat-doodles)) .cell-container .cell::after { display: none; }
+}
+
 
 @keyframes appear {
   0% {

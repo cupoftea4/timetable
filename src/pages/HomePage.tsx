@@ -4,6 +4,7 @@ import BugIcon from "@/assets/BugIcon";
 import catImage from "@/assets/cat.svg";
 import HeartIcon from "@/assets/HeartIcon";
 import LoadingIcon from "@/assets/LoadingIcon";
+import { DisableCatModeButton } from "@/context/catMode";
 import { DatalistFocusProvider } from "@/context/datalistFocus";
 import HeaderPanel from "@/features/header/HomeHeader";
 import MissingGroupTip from "@/features/home/MissingGroupTip";
@@ -117,14 +118,24 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
 
   const handleFirstChange = useCallback(
     (institute: string | null) => {
-      setSearchParams(institute ? { institute } : {});
+      setSearchParams((params) => {
+        params.delete("major");
+        if (institute) params.set("institute", institute);
+        else params.delete("institute");
+        return params;
+      });
     },
     [setSearchParams]
   );
 
   const handleSecondChange = useCallback(
     (major: string | null) => {
-      setSearchParams(major ? { institute: selectedFirst ?? "", major } : { institute: selectedFirst ?? "" });
+      setSearchParams((params) => {
+        params.set("institute", selectedFirst ?? "");
+        if (major) params.set("major", major);
+        else params.delete("major");
+        return params;
+      });
     },
     [setSearchParams, selectedFirst]
   );
@@ -164,6 +175,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
             )}
           </section>
           <div className={classes(styles.feedback, "flex gap-2")}>
+            <DisableCatModeButton />
             <a
               href={DONATION_LINK}
               title="Support the project"
