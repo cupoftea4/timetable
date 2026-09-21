@@ -1,5 +1,5 @@
-import React, { type FC, useCallback } from "react";
-import DatalistInput from "react-datalist-input";
+import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/react";
+import React, { type FC } from "react";
 
 type DataListOption = {
   id: string;
@@ -16,92 +16,92 @@ type OwnProps = {
   label?: string;
   placeholder?: string;
   className?: string;
-  initialDisplayedCount?: number;
+  optionsClassName?: string;
   autoFocus?: boolean;
-  isExpanded?: boolean;
   allowCustomValue?: boolean;
   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+  onClose?: () => void;
 };
 
 const SPECIAL_CHARACTERS_REGEX = /[^\p{L}\p{N}]/gu;
 
-const matchesSearch = (itemName: string, searchQuery: string | undefined, ignoreSpecialCharacters: boolean) => {
-  if (!searchQuery) return true;
-  if (ignoreSpecialCharacters) {
-    const query = searchQuery.toLocaleLowerCase().replace(SPECIAL_CHARACTERS_REGEX, "");
-    return itemName.toLocaleLowerCase().replace(SPECIAL_CHARACTERS_REGEX, "").includes(query);
-  }
-  return itemName.toLocaleLowerCase().includes(searchQuery.toLocaleLowerCase());
+const normalize = (value: string, ignoreSpecialCharacters: boolean) => {
+  const normalized = value.toLocaleLowerCase();
+  return ignoreSpecialCharacters ? normalized.replace(SPECIAL_CHARACTERS_REGEX, "") : normalized;
 };
 
 const VirtualizedDataList: FC<OwnProps> = ({
   options,
   onSelect,
   className,
+  optionsClassName,
   containerRef,
   ignoreSpecialCharacters = false,
   clearOnSelect = false,
   label = "",
   placeholder = "",
-  initialDisplayedCount = 10,
   autoFocus = false,
   allowCustomValue = false,
-  isExpanded = false,
   onKeyDown,
+  onClose,
 }) => {
+  const buttonRef = React.useRef<HTMLButtonElement>(null);
   const [inputKey, setInputKey] = React.useState(0);
-  const [displayedCount, setDisplayedCount] = React.useState(initialDisplayedCount);
-
-  const filterOptions = useCallback(
-    (datalistItems: DataListOption[], searchQuery?: string) => {
-      const res = datalistItems
-        .filter((item) => matchesSearch(item.value, searchQuery, ignoreSpecialCharacters))
-        .slice(0, displayedCount);
-
-      if (allowCustomValue && searchQuery && !res.some((item) => item.value === searchQuery)) {
-        res.push({ id: searchQuery, value: `Відкрити «${searchQuery}»`, isCustom: true });
-      }
-
-      return res;
-    },
-    [allowCustomValue, displayedCount, ignoreSpecialCharacters]
+  const [query, setQuery] = React.useState("");
+  const normalizedQuery = normalize(query, ignoreSpecialCharacters);
+  const filteredOptions = options.filter((item) =>
+    normalize(item.value, ignoreSpecialCharacters).includes(normalizedQuery)
   );
 
-  const showMoreOptions = () => {
-    setDisplayedCount(displayedCount + initialDisplayedCount);
-  };
+  if (allowCustomValue && query && !filteredOptions.some((item) => item.value === query)) {
+    filteredOptions.push({ id: query, value: `Відкрити «${query}»`, isCustom: true });
+  }
 
   return (
-    <DatalistInput
-      key={inputKey}
-      ref={containerRef}
-      className={className}
-      placeholder={placeholder}
-      label={label}
-      items={options}
-      filters={[filterOptions]}
-      inputProps={{
-        autoFocus,
-        onKeyDown: (event) => {
-          // Keep the first option visible when the library focuses it.
-          if (event.key === "ArrowDown") event.preventDefault();
-          onKeyDown?.(event);
-        },
-      }}
-      isExpanded={isExpanded}
-      onSelect={(item) => {
-        onSelect(item);
-        if (clearOnSelect) setInputKey((key) => key + 1);
-      }}
-      listboxProps={{
-        onScroll: (e) => {
-          const bottom = e.currentTarget.scrollHeight - e.currentTarget.clientHeight;
-          if (Math.abs(e.currentTarget.scrollTop - bottom) < 2) {
-            showMoreOptions();
+    <div ref={containerRef} className={className}>
+      <Combobox
+        immediate
+        virtual={{ options: filteredOptions }}
+        onClose={onClose}
+        onChange={(item: DataListOption | null) => {
+          if (!item) return;
+          onSelect(item);
+          if (clearOnSelect) {
+            setQuery("");
+            setInputKey((key) => key + 1);
           }
-        },
-      }}
-    />
+        }}
+      >
+        {({ open }) => (
+          <>
+            <ComboboxButton ref={buttonRef} hidden aria-label="Show suggestions" />
+            <ComboboxInput
+              key={inputKey}
+              aria-label={label || placeholder || "Search"}
+              placeholder={placeholder}
+              autoFocus={autoFocus}
+              onClick={() => {
+                if (!open) buttonRef.current?.click();
+              }}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={onKeyDown}
+            />
+            <ComboboxOptions
+              as="ul"
+              modal={false}
+              anchor={{ to: "bottom", gap: 6, padding: 8 }}
+              className={optionsClassName}
+            >
+              {({ option }) => (
+                <ComboboxOption as="li" value={option}>
+                  {option.value}
+                </ComboboxOption>
+              )}
+            </ComboboxOptions>
+          </>
+        )}
+      </Combobox>
+    </div>
   );
 };
 

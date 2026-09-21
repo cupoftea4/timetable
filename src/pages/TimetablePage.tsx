@@ -1,9 +1,8 @@
-import { type FC, useEffect, useMemo, useRef, useState } from "react";
+import { type FC, lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useTimetableISCFile from "@/features/footer/hooks/useTimetableISCFile";
 import TimetableFooter from "@/features/footer/TimetableFooter";
 import TimetableHeader from "@/features/header/TimetableHeader";
-import CreateMergedModal from "@/features/merged_modal/CreateMergedModal";
 import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
@@ -15,6 +14,8 @@ import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek }
 import { optimisticRender } from "@/utils/general";
 import Toast from "@/utils/toasts";
 import styles from "./TimetablePage.module.scss";
+
+const CreateMergedModal = lazy(() => import("@/features/merged_modal/CreateMergedModal"));
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => {
   // yeah, naming! :)
@@ -206,13 +207,15 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
         time={time}
       />
       {showCreateMergedModal && (
-        <CreateMergedModal
-          defaultTimetable={group}
-          onClose={() => {
-            setShowCreateMergedModal(false);
-          }}
-          showTimetable={renderTimetableFromPromises}
-        />
+        <Suspense fallback={null}>
+          <CreateMergedModal
+            defaultTimetable={group}
+            onClose={() => {
+              setShowCreateMergedModal(false);
+            }}
+            showTimetable={renderTimetableFromPromises}
+          />
+        </Suspense>
       )}
     </div>
   );

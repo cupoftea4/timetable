@@ -4,9 +4,9 @@
   "homepage": "/",
   "private": true,
   "dependencies": {
+    "@headlessui/react": "^2.2.10",
     "idb": "^8.0.3",
     "react": "^19.2.8",
-    "react-datalist-input": "^3.2.1",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.3",
     "react-toastify": "^11.1.0",

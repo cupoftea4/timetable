@@ -6,30 +6,22 @@
   @include flex-center;
 }
 
+.pointerFocus {
+  outline: none;
+}
+
 $icon-size: 0.875rem;
 
 .saved-menu-wrapper {
-  position: absolute;
-  top: 80%;
   width: 15rem;
-  left: -190%;
-  &.home {
-    left: auto;
-    right: -70%;
-  }
   @include tablet {
     width: 13rem;
   }
   @include mobile {
-    left: -3rem;
     width: min(13rem, calc(100vw - 2rem));
-    &.home {
-      left: auto;
-      right: 0;
-    }
   }
   z-index: 100;
-  padding-block: 1rem;
+  padding-block: 0.5rem;
   .saved-menu {
     z-index: 101;
     animation: show-menu 0.1s ease-in-out forwards;
@@ -64,7 +56,7 @@ $icon-size: 0.875rem;
         align-items: center;
         position: relative;
         &:hover,
-        &.selected {
+        &:focus-within {
           background-color: var(--accent-clr);
           cursor: pointer;
         }

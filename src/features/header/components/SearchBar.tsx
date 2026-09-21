@@ -1,13 +1,11 @@
 import type { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchIcon from "@/assets/SearchIcon";
-import useOnClickOutside from "@/hooks/useOnOutsideClick";
+import { useDatalistFocus } from "@/context/datalistFocus";
 import VirtualizedDataList from "@/shared/VirtualizedDataList";
 import { classes } from "@/styles/utils";
-import { getAllTimetables, getTimetableName } from "@/utils/timetable";
-import "react-datalist-input/dist/styles.css";
-import { useDatalistFocus } from "@/context/datalistFocus";
 import type { TimetableType } from "@/types/timetable";
+import { getAllTimetables, getTimetableName } from "@/utils/timetable";
 import styles from "./SearchBar.module.scss";
 
 const getSearchBarOptions = () => {
@@ -21,15 +19,12 @@ type OwnProps = {
 };
 
 const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
-  const { isFocused, ref: datalistRef } = useDatalistFocus();
+  const { ref: datalistRef } = useDatalistFocus();
   const options = getSearchBarOptions();
   const navigate = useNavigate();
-  const ref = useOnClickOutside(() => {
-    toggleSearchBar(false);
-  });
 
   return (
-    <span className={classes(styles.bar, !show && styles["hidden-search"])} ref={ref}>
+    <span className={classes(styles.bar, !show && styles["hidden-search"])}>
       <button
         onClick={() => {
           toggleSearchBar();
@@ -42,14 +37,15 @@ const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
       <span className={styles.search}>
         <VirtualizedDataList
           options={options}
+          onClose={() => toggleSearchBar(false)}
           onSelect={(item) => {
             navigate(`/${item.id}`, { state: { source: "search-bar", isCustom: item.isCustom } });
           }}
           placeholder="Розклад..."
+          optionsClassName={styles.options}
           ignoreSpecialCharacters
           allowCustomValue
           autoFocus
-          isExpanded={isFocused}
           containerRef={datalistRef}
         />
       </span>

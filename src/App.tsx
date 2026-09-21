@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ToastContainer as MessageToast } from "react-toastify";
 import { useTheme } from "./hooks/useTheme";
-import HomePage from "./pages/HomePage";
 import LoadingPage from "./pages/LoadingPage";
 import NavigationSelector from "./pages/NavigationSelector";
-import TimetablePage from "./pages/TimetablePage";
 import { Status } from "./types/utils";
 import { RECEIVED_DONATION_NOTIFICATION, TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 import TimetableManager from "./utils/data/TimetableManager";
 import { doOnce } from "./utils/general";
 import { pathnameToType } from "./utils/timetable";
 import Toast from "./utils/toasts";
+
+const HomePage = lazy(() => import("./pages/HomePage"));
+const TimetablePage = lazy(() => import("./pages/TimetablePage"));
 
 /* TODO:
   - add tests
@@ -46,14 +47,16 @@ const App = () => {
     <>
       {status !== Status.Loading ? (
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<NavigationSelector />} />
-            <Route path="home" element={<HomePage timetableType="timetable" />} />
-            <Route path="selective" element={<HomePage timetableType="selective" />} />
-            <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
-            <Route path="/:group" element={<TimetablePage />} />
-            <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
-          </Routes>
+          <Suspense fallback={<LoadingPage />}>
+            <Routes>
+              <Route path="/" element={<NavigationSelector />} />
+              <Route path="home" element={<HomePage timetableType="timetable" />} />
+              <Route path="selective" element={<HomePage timetableType="selective" />} />
+              <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
+              <Route path="/:group" element={<TimetablePage />} />
+              <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       ) : (
         <LoadingPage />
