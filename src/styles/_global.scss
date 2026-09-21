@@ -26,6 +26,7 @@
 
   @include auto-scroll(y, auto, transparent, var(--accent-clr), false);
   overflow: overlay; // deprecated :(
+  scrollbar-gutter: stable;
 
   @media (display-mode: standalone) {
     --app-height: 100svh;
@@ -138,7 +139,7 @@ a, button {
 }
 
 .icon-button {
-  border-radius: 50%;
+  border-radius: .25rem;
   padding: 0.325rem;
   > svg {
     transition: transform 160ms ease-out;

@@ -1,7 +1,5 @@
 import { type FC, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useInputFocus from "@/hooks/useFocus";
-import useOnClickOutside from "@/hooks/useOnOutsideClick";
 import VirtualizedDataList from "@/shared/VirtualizedDataList";
 import type { TimetableItem } from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
@@ -44,14 +42,6 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
     return timetables;
   }, [timetablesToMerge]);
 
-  const ref = useOnClickOutside<HTMLDivElement>(onClose);
-  const {
-    ref: datalistRef,
-    focus,
-    isFocused,
-  } = useInputFocus<HTMLDivElement>({
-    initFocus: true,
-  });
   const navigate = useNavigate();
 
   function addTimetableToMerge(timetable: string) {
@@ -80,18 +70,30 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
   }
 
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.modal} ref={ref}>
+    <div
+      className={styles.wrapper}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="merge-title"
+      onKeyDownCapture={(event) => {
+        if (event.key === "Escape" && timetablesToMerge.every((timetable) => timetable === defaultTimetable)) {
+          event.preventDefault();
+          event.stopPropagation();
+          onClose();
+        }
+      }}
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div className={styles.modal}>
         <div className={styles.header}>
-          <h2 className={styles.title}>Оберіть групи для злиття</h2>
+          <h2 id="merge-title" className={styles.title}>
+            Оберіть групи для злиття
+          </h2>
           <button className={styles.close} type="button" onClick={onClose} aria-label="Закрити" />
         </div>
-        <fieldset
-          className={styles.fieldset}
-          onClick={() => {
-            focus();
-          }}
-        >
+        <fieldset className={styles.fieldset}>
           <legend className={styles.legend}>Пошук</legend>
           <div className={styles.choice}>
             <span className={styles.selected}>
@@ -117,8 +119,10 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
               <VirtualizedDataList
                 autoFocus
                 clearOnSelect
-                containerRef={datalistRef}
+                label="Додати групу"
+                placeholder="Назва групи..."
                 className={styles["search-bar"]}
+                optionsClassName={styles.options}
                 onSelect={(item) => {
                   addTimetableToMerge(item.id);
                 }}
@@ -128,7 +132,6 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetable, onClose, showTimeta
                 }}
                 options={options}
                 ignoreSpecialCharacters
-                isExpanded={isFocused}
               />
             )}
           </div>

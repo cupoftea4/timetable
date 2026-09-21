@@ -6,33 +6,91 @@
   
   button {
     --bg-alpha: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: .125em;
     color: var(--text-clr);
     padding: 0.25em 0.5em;
     border-radius: .5rem;
+    &[aria-expanded='true'] {
+      box-shadow: inset 0 0 0 .125rem rgba(255, 255, 255, .35);
+    }
   }
-  .dropdown {
-    position: absolute;
-    animation: show-menu 0.1s ease-in-out;
-    background: hsla(0, 0%, 30%, 0.85);
-    @include blur(40px);
-    z-index: 100;
-    border-radius: 0.5rem;
-    li {
-      &:hover {
+  .arrow {
+    display: block;
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    flex: none;
+  }
+}
+.dropdown {
+  border: 1px solid var(--border-clr);
+  transform-origin: top right;
+  transition: opacity 150ms ease-out, transform 150ms ease-out;
+  background: hsla(0, 0%, 30%, 0.85);
+  @include blur(30px);
+  z-index: 100;
+  border-radius: 0.5rem;
+  &[data-closed] {
+    opacity: 0;
+    transform: scale(.95);
+  }
+  li {
+    &:hover {
+      background: var(--accent-clr);
+    }
+    &:first-child {
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
+    &:last-child {
+      border-radius: 0 0 0.5rem 0.5rem;
+    }
+  }
+  li a {
+    padding: .5rem;
+    z-index: 200;
+    background-color: transparent;
+    border-radius: 0;
+  }
+}
+
+.details {
+  color: inherit;
+  width: min(16rem, calc(100vw - 2rem));
+  --anchor-max-height: min(28rem, 65vh);
+  overflow: auto;
+  padding: .75rem;
+  font-size: $small-font-size;
+  overflow-wrap: anywhere;
+  background: hsla(0, 0%, 30%, .5);
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .5rem;
+    button {
+      padding: .5em .75em;
+      border-radius: .5rem;
+      background: rgba(255, 255, 255, .1);
+      &:hover, &:focus-visible {
         background: var(--accent-clr);
       }
-      &:first-child {
-        border-radius: 0.5rem 0.5rem 0 0;
-      }
-      &:last-child {
-        border-radius: 0 0 0.5rem 0.5rem;
+    }
+  }
+  .originalText {
+    white-space: pre-wrap;
+    user-select: text;
+    cursor: text;
+    p {
+      margin-bottom: .75rem;
+      &:empty {
+        display: none;
       }
     }
-    li a {
-      padding: .5rem;
-      z-index: 200;
-      background-color: transparent;
-      border-radius: 0;
+    a {
+      text-decoration: underline;
+      text-underline-offset: .15em;
     }
   }
 }
@@ -50,17 +108,5 @@
   svg {
     width: 1rem;
     height: auto;
-  }
-}
-
-
-@keyframes show-menu {
-  0% {
-    opacity: 0;
-    transform: translateY(.5rem);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
