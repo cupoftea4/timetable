@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { ToastContainer as MessageToast } from "react-toastify";
+import { CatModeProvider } from "./context/catMode";
 import { useTheme } from "./hooks/useTheme";
 import LoadingPage from "./pages/LoadingPage";
 import NavigationSelector from "./pages/NavigationSelector";
@@ -48,17 +49,19 @@ const App = () => {
     <>
       {status !== Status.Loading ? (
         <BrowserRouter>
-          <Suspense fallback={<LoadingPage />}>
-            <Routes>
-              <Route path="/" element={<NavigationSelector />} />
-              <Route path="home" element={<HomePage timetableType="timetable" />} />
-              <Route path="selective" element={<HomePage timetableType="selective" />} />
-              <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
-              <Route path="waifu" element={WaifuPage ? <WaifuPage /> : <Navigate to="/home" replace />} />
-              <Route path="/:group" element={<TimetablePage />} />
-              <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
-            </Routes>
-          </Suspense>
+          <CatModeProvider>
+            <Suspense fallback={<LoadingPage />}>
+              <Routes>
+                <Route path="/" element={<NavigationSelector />} />
+                <Route path="home" element={<HomePage timetableType="timetable" />} />
+                <Route path="selective" element={<HomePage timetableType="selective" />} />
+                <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
+                <Route path="waifu" element={WaifuPage ? <WaifuPage /> : <Navigate to="/home" replace />} />
+                <Route path="/:group" element={<TimetablePage />} />
+                <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
+              </Routes>
+            </Suspense>
+          </CatModeProvider>
         </BrowserRouter>
       ) : (
         <LoadingPage />

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="480" viewBox="0 0 560 480" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <g transform="translate(46 50) rotate(-22)">
+    <path d="M9 28c-10 9-8 17 1 16q8-4 15 0c10 2 11-8 2-16-5-6-12-6-18 0Z"/>
+    <ellipse cx="1" cy="20" rx="4" ry="6" transform="rotate(-20 1 20)"/><ellipse cx="12" cy="10" rx="4" ry="6"/><ellipse cx="24" cy="11" rx="4" ry="6"/><ellipse cx="34" cy="21" rx="4" ry="6" transform="rotate(20 34 21)"/>
+  </g>
+  <g transform="translate(395 305) rotate(25)">
+    <path d="M9 28c-10 9-8 17 1 16q8-4 15 0c10 2 11-8 2-16-5-6-12-6-18 0Z"/>
+    <ellipse cx="1" cy="20" rx="4" ry="6"/><ellipse cx="12" cy="10" rx="4" ry="6"/><ellipse cx="24" cy="11" rx="4" ry="6"/><ellipse cx="34" cy="21" rx="4" ry="6"/>
+  </g>
+  <g transform="translate(325 82) rotate(-14)">
+    <path d="M0 14Q25-9 44 14 25 39 0 14Zm44 0L58 3v23ZM13 7q9 8 0 16"/><circle cx="10" cy="13" r="1"/>
+  </g>
+  <g transform="translate(106 321) rotate(12)">
+    <circle cx="24" cy="24" r="22"/><path d="M7 10q28-1 36 24M3 22q24-5 36 17M13 4q-5 23 20 39M26 2Q10 18 20 45m25-16c27-7 35 11 18 20-10 6-20 0-13-6"/>
+  </g>
+  <path d="m220 193 3 9 9 3-9 3-3 9-3-9-9-3 9-3ZM494 427l2 6 6 2-6 2-2 6-2-6-6-2 6-2Z"/>
+</svg>

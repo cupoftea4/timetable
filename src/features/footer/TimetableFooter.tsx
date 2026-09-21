@@ -5,6 +5,7 @@ import MergeIcon from "@/assets/MergeIcon";
 import MoonIcon from "@/assets/MoonIcon";
 import RefreshIcon from "@/assets/RefreshIcon";
 import SunIcon from "@/assets/SunIcon";
+import { DisableCatModeButton } from "@/context/catMode";
 import { useTheme } from "@/hooks/useTheme";
 import { classes } from "@/styles/utils";
 import styles from "./TimetableFooter.module.scss";
@@ -44,6 +45,7 @@ const TimetableFooter: FC<OwnProps> = ({
           <MoonIcon className={classes(styles.themeIcon, styles.moonIcon)} />
           <SunIcon className={classes(styles.themeIcon, styles.sunIcon)} />
         </button>
+        <DisableCatModeButton />
         <button
           type="button"
           aria-label="Об`єднати кілька розкладів в одну таблицю"
