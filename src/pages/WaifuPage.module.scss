@@ -1,0 +1,57 @@
+.page {
+  position: relative;
+  min-height: 100svh;
+  padding: 4.5rem 2rem;
+  display: grid;
+  place-items: center;
+}
+
+.back {
+  position: absolute;
+  top: 1.25rem;
+  left: 1.25rem;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: .25rem;
+  opacity: .7;
+  transition: opacity 150ms;
+  svg { transform: rotate(180deg); }
+  &:hover { opacity: 1; }
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+    opacity: 1;
+  }
+}
+
+.frame {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, calc(100svh - 9rem), 64rem);
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -.625rem;
+    border: 1px solid #ddc18d50;
+    border-radius: 1rem;
+    transform: rotate(2deg);
+    z-index: -1;
+  }
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: .75rem;
+    box-shadow: 0 1rem 3rem #0004;
+  }
+}
+
+.accent {
+  position: absolute;
+  top: -1.125rem;
+  right: -.875rem;
+  color: #ddc18d;
+  font-size: 1.75rem;
+  line-height: 1;
+}

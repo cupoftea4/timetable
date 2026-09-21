@@ -8,6 +8,9 @@
 	root * /app/build
 	encode zstd gzip
 
+	@waifu path /waifu /waifu/
+	header @waifu X-Robots-Tag "noindex"
+
 	handle /assets/* {
 		file_server
 	}
