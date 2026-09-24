@@ -1,8 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>.small{display:none}@media (max-width:24px){.small{display:inline}.large{display:none}}</style>
   <rect width="32" height="32" rx="6.5" fill="#f7f7f2"/>
-  <g fill="#3730a3">
-    <path d="m16 4 12 7H4ZM6 13h3v12h2v3H4v-3h2Zm17 0h3v12h2v3h-7v-3h2ZM12 13h3v4h-3Zm5 0h3v4h-3Z"/>
-    <circle cx="16" cy="22.5" r="5.5"/>
+  <g class="large">
+    <g fill="#3730a3">
+      <path d="m16 4 12 7H4ZM6 13h3v12h2v3H4v-3h2Zm17 0h3v12h2v3h-7v-3h2ZM12 13h3v4h-3Zm5 0h3v4h-3Z"/>
+      <circle cx="16" cy="22.5" r="5.5"/>
+    </g>
+    <path d="m13 21 3 2.5 3-3" fill="none" stroke="#f7f7f2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
-  <path d="m13 21 3 2.5 3-3" fill="none" stroke="#f7f7f2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- snapped to the 16px pixel grid -->
+  <g class="small">
+    <g fill="#3730a3">
+      <path d="m16 4 12 8H4ZM6 14h4v12h2v2H4v-2h2Zm16 0h4v12h2v2h-8v-2h2ZM12 14h2v4h-2Zm6 0h2v4h-2Z"/>
+      <circle cx="16" cy="22" r="6"/>
+    </g>
+    <path d="m12.75 21 3.25 2.5 3.25-3.5" fill="none" stroke="#f7f7f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
 </svg>
