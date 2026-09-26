@@ -7,8 +7,10 @@ import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
 import useGroupParam from "@/hooks/useGroupParam";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
+import useWindowDimensions from "@/hooks/useWindowDimensions";
 import type {
   CustomTimetable,
+  CustomTimetableDraft,
   ExamsTimetableItem,
   HalfTerm,
   Semester,
@@ -16,15 +18,18 @@ import type {
   TimetableType,
 } from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
-import { toTimetableItems } from "@/utils/customTimetable";
+import { TIMETABLE_SCREEN_BREAKPOINT } from "@/utils/constants";
+import { getDefaultCustomName, toCustomLessons, toTimetableItems } from "@/utils/customTimetable";
 import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
 import { optimisticRender } from "@/utils/general";
+import { CUSTOM_PREFIX } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import styles from "./TimetablePage.module.scss";
 
 const CreateMergedModal = lazy(() => import("@/features/merged_modal/CreateMergedModal"));
+const TimetableEditor = lazy(() => import("@/features/editor/TimetableEditor"));
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => {
   // yeah, naming! :)
@@ -40,6 +45,8 @@ type OwnProps = {
   isExamsTimetable?: boolean;
 };
 
+type LocationState = { source?: string; isCustom?: boolean; editFromView?: boolean };
+
 const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const group = useGroupParam();
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
@@ -53,6 +60,13 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const [showCreateMergedModal, setShowCreateMergedModal] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState<Date | undefined>();
   const [semester, setSemester] = useState<Semester>();
+  const { state, search }: { state: LocationState | null; search: string } = useLocation();
+  const isEditing = new URLSearchParams(search).has("edit");
+  const isDesktop = useWindowDimensions().width >= TIMETABLE_SCREEN_BREAKPOINT;
+  // Starting from the saved draft avoids flashing the timetable before the editor on reload
+  const [editor, setEditor] = useState(() =>
+    isEditing && isDesktop ? TimetableManager.getCustomDraft(group) : undefined
+  );
 
   const navigate = useNavigate();
   const timetableRef = useRef<HTMLElement>(null);
@@ -66,6 +80,14 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
   const hasCellSubgroups = timetableType === "lecturer" || customTimetable?.subgroupToggle === false;
+  const editToken = customTimetable && TimetableManager.getCustomEditToken(customTimetable.id);
+  const isEditable = isDesktop && !isExamsTimetable && timetableType !== "parttime";
+  const canEdit = isEditable && Boolean(timetable);
+  const editTitle = editToken
+    ? "Редагувати розклад"
+    : customTimetable
+      ? "Створити копію розкладу для редагування"
+      : "Створити змінену версію розкладу";
 
   useEffect(() => {
     void getCurrentSemester().then(setSemester);
@@ -87,7 +109,6 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     return [];
   }, [timetableType, timetable, selectedWeek]);
 
-  const { state }: { state: { source: string; isCustom?: boolean } | null } = useLocation();
   const { source, isCustom } = state ?? {};
 
   useGTagTimetableEvents(group, source ?? "url", isCustom);
@@ -112,7 +133,6 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       navigate(`/${group}`, { state: { source: "no-selective-exams" } });
     setLoading(true);
     setSelectedWeek(undefined);
-    setCustomTimetable(undefined);
     getTimetable(group, isExamsTimetable, timetableType)?.finally(() => {
       setLoading(false);
     });
@@ -167,6 +187,48 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     });
   };
 
+  function createEditor(): CustomTimetableDraft {
+    if (customTimetable) {
+      const { id, name, subgroupToggle, lessons, sourceNames } = customTimetable;
+      const start = { name: editToken ? name : `${name.slice(0, 52)} (копія)`, subgroupToggle, lessons };
+      const saved = editToken ? { id, editToken } : undefined;
+      return { group, timetable: start, draft: start, sourceNames, saved };
+    }
+    const sourceNames =
+      timetableType === "merged" ? (TimetableManager.cachedMergedTimetable?.timetables ?? []) : [group];
+    const start = {
+      name: getDefaultCustomName(sourceNames),
+      subgroupToggle: timetableType !== "lecturer",
+      lessons: toCustomLessons(timetable ?? []),
+    };
+    return { group, timetable: start, draft: start, sourceNames };
+  }
+
+  // Edit mode lives in the url (?edit), so going back leaves it and a reload keeps it. The draft is kept
+  // until cancel, save or delete, so reopening the editor continues it.
+  useEffect(() => {
+    if (!isEditing || !isEditable) setEditor(undefined);
+    else if (!editor) setEditor(TimetableManager.getCustomDraft(group) ?? (timetable && createEditor()));
+  });
+
+  function closeEditor() {
+    TimetableManager.saveCustomDraft(null);
+    // Return to the entry the editor was opened from instead of stacking another one on top
+    if (state?.editFromView) navigate(-1);
+    else navigate({ search: "" }, { replace: true, state });
+  }
+
+  async function onEditorSaved(saved: CustomTimetable) {
+    await TimetableManager.saveCustomLocally(CUSTOM_PREFIX + saved.id, saved);
+    if (group === CUSTOM_PREFIX + saved.id) {
+      closeEditor();
+      updateTimetable();
+      return;
+    }
+    TimetableManager.saveCustomDraft(null);
+    navigate(`/${CUSTOM_PREFIX}${saved.id}`, { replace: true });
+  }
+
   function renderTimetableFromPromises(promises: RenderPromises<TimetableItem[]>) {
     optimisticRender(
       (timetable: TimetableItem[]) => {
@@ -174,6 +236,16 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       },
       onError,
       promises
+    );
+  }
+
+  if (isEditing && editor) {
+    return (
+      <div className={styles.wrapper}>
+        <Suspense fallback={null}>
+          <TimetableEditor {...editor} onCancel={closeEditor} onSaved={onEditorSaved} />
+        </Suspense>
+      </div>
     );
   }
 
@@ -226,6 +298,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
         icsFILE={iscFile}
         time={time}
         customTimetable={customTimetable}
+        onEdit={canEdit ? () => navigate({ search: "?edit" }, { state: { ...state, editFromView: true } }) : undefined}
+        editTitle={editTitle}
       />
       {showCreateMergedModal && (
         <Suspense fallback={null}>
@@ -242,4 +316,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   );
 };
 
-export default TimetablePage;
+// A fresh page per timetable, so state and late responses from the previous one don't leak into it
+const TimetablePageRoute: FC<OwnProps> = (props) => <TimetablePage key={useGroupParam()} {...props} />;
+
+export default TimetablePageRoute;

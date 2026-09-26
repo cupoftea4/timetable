@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ArrowRightIcon from "@/assets/ArrowRightIcon";
 import ExamIcon from "@/assets/ExamIcon";
 import HomeIcon from "@/assets/HomeIcon";
+import ShareIcon from "@/assets/ShareIcon";
 import useExamsPublished from "@/hooks/useExamsPublished";
 import useGroupParam from "@/hooks/useGroupParam";
 import usePageTitle from "@/hooks/usePageTitle";
@@ -69,6 +70,16 @@ const TimetableHeader: FC<OwnProps> = ({
       })
     : group;
 
+  const share = () => {
+    const url = `${window.location.origin}/${group}`;
+    // The native share sheet is handy on phones, on desktop copying the link is more useful
+    if (isMobile && navigator.share) return navigator.share({ title: groupTitle, url }).catch(() => {});
+    navigator.clipboard.writeText(url).then(
+      () => Toast.success("Посилання скопійовано"),
+      (e) => Toast.error(e, "Не вдалося скопіювати посилання")
+    );
+  };
+
   const handleIsExamsTimetableChange = (isExams: boolean) => {
     navigate(`/${examsGroup ?? group}${isExams ? "/exams" : ""}`);
   };
@@ -94,11 +105,21 @@ const TimetableHeader: FC<OwnProps> = ({
             <HomeIcon />
           </Link>
           <SavedMenu timetableChanged={loading} />
+          {customTimetable && (
+            <button
+              type="button"
+              className={classes("icon-button", "transition duration-300")}
+              title="Поділитися розкладом"
+              aria-label="Поділитися розкладом"
+              onClick={share}
+            >
+              <ShareIcon />
+            </button>
+          )}
         </div>
         <h1 className={styles.title}>
           {groupTitle}
           {isExamsTimetable && <span className={styles.mode}>Екзамени</span>}
-          {customTimetable && <span className={styles.mode}>Змінений</span>}
         </h1>
       </nav>
       {!isExamsTimetable && (

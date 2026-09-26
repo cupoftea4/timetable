@@ -1,0 +1,352 @@
+@use '../../styles/utils' as *;
+@use '../../styles/mixins' as *;
+@use '../../styles/variables' as *;
+
+%control {
+  padding: .5rem .75rem;
+  background-color: rgba(255, 255, 255, .05);
+  border: 1px solid var(--border-clr);
+  border-radius: .5rem;
+  color: var(--text-clr);
+  outline: none;
+  &:focus-visible {
+    border-color: rgba(255, 255, 255, .35);
+  }
+}
+
+%popup {
+  padding: .25rem;
+  background: hsla(240, 6%, 14%, .95);
+  border: 1px solid var(--border-clr);
+  border-radius: .5rem;
+  box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .3);
+  @include blur(2rem);
+  z-index: 110;
+}
+
+// Matches the site's pill toggles: transparent by default, `.primary` gets the pill background
+%action {
+  padding: .25rem .875rem;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .2s ease-in-out, border-color .2s ease-in-out;
+  &:hover:not(:disabled) {
+    background-color: var(--accent-clr);
+  }
+  &:disabled {
+    opacity: .6;
+    cursor: default;
+  }
+  &.primary {
+    background-color: var(--accent-clr);
+    border-color: var(--border-clr);
+    &:hover:not(:disabled) {
+      background-color: rgba(255, 255, 255, .3);
+    }
+  }
+  &.danger {
+    color: hsl(0, 85%, 75%);
+  }
+}
+
+.editor {
+  width: 100%;
+  max-width: var(--max-app-width);
+  margin: 0 auto;
+  padding: 2rem 4rem;
+  @include tablet {
+    padding: 2rem 2.5rem;
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .5rem;
+  .name {
+    // Only as wide as the text, so the underline stays under it
+    field-sizing: content;
+    min-width: 6ch;
+    max-width: 40rem;
+    padding: 0 0 .125rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    outline: none;
+    color: var(--text-clr);
+    font-size: 2rem;
+    font-weight: $semi-bold-font;
+    line-height: 1.2;
+    transition: border-color .08s ease-out;
+    &:hover {
+      border-bottom-color: var(--border-clr);
+    }
+    &:focus-visible {
+      border-bottom-color: rgba(255, 255, 255, .5);
+    }
+  }
+  .button {
+    @extend %action;
+  }
+  .more {
+    margin-left: auto;
+    letter-spacing: .1em;
+  }
+}
+
+.hint {
+  margin-bottom: 1.25rem;
+  font-size: $small-font-size;
+  color: $extra-text-clr;
+}
+
+.menu {
+  @extend %popup;
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  button {
+    padding: .5rem .75rem;
+    border-radius: .375rem;
+    text-align: left;
+    &[data-focus] {
+      background-color: rgba(255, 255, 255, .1);
+    }
+  }
+  .danger {
+    color: hsl(0, 85%, 75%);
+  }
+}
+
+.grid {
+  width: 100%;
+  table-layout: fixed;
+  th:first-child {
+    height: 5rem;
+  }
+}
+
+.slot {
+  position: relative;
+  vertical-align: top;
+  padding: .25rem .25rem 1.75rem;
+  transition: background-color .15s;
+  &.over {
+    background-color: rgba(255, 255, 255, .05);
+  }
+  .add {
+    position: absolute;
+    bottom: .25rem;
+    right: .25rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: .375rem;
+    line-height: 1;
+    opacity: 0;
+    transition: opacity .15s, background-color .15s;
+    &:hover {
+      background-color: var(--accent-clr);
+    }
+    &:focus-visible {
+      opacity: 1;
+    }
+  }
+  &:hover .add {
+    opacity: .8;
+  }
+}
+
+.card {
+  --clr: #{hsl-list($timetable-lect-hsl)};
+  &[data-type="practical"] {
+    --clr: #{hsl-list($timetable-pract-hsl)};
+  }
+  &[data-type="lab"] {
+    --clr: #{hsl-list($timetable-lab-hsl)};
+  }
+  &[data-type="consultation"] {
+    --clr: #{hsl-list($timetable-consultation-hsl)};
+  }
+  display: flex;
+  flex-direction: column;
+  gap: .125rem;
+  width: 100%;
+  margin-bottom: .25rem;
+  padding: .375rem .5rem;
+  border-left: .3125rem solid hsla(var(--clr), 1);
+  border-radius: .375rem;
+  background-color: hsla(var(--clr), .2);
+  font-size: .8125rem;
+  text-align: left;
+  cursor: grab;
+  touch-action: none;
+  transition: background-color .15s;
+  &:hover {
+    background-color: hsla(var(--clr), .28);
+  }
+  &.dragging {
+    opacity: .35;
+  }
+  &.overlay {
+    cursor: grabbing;
+    box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .4);
+    @include blur(1rem);
+  }
+  .subject {
+    font-weight: $semi-bold-font;
+  }
+  .meta {
+    color: $extra-text-clr;
+  }
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem;
+    color: $extra-text-clr;
+    span {
+      padding: 0 .375rem;
+      border-radius: .25rem;
+      background-color: hsla(var(--clr), .45);
+      color: var(--text-clr);
+    }
+  }
+}
+
+.backdrop {
+  position: fixed;
+  @include inset-0;
+  z-index: 100;
+  @include flex-center;
+  background-color: hsla(0, 0%, 0%, 0.7);
+}
+
+.dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(36rem, calc(100vw - 2rem));
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  padding: 1.5rem;
+  border: 1px solid var(--border-clr);
+  border-radius: 1rem;
+  background-color: hsla(240, 6%, 14%, .95);
+  box-shadow: 2px 2px 11px 0 hsla(0, 0%, 0%, 0.7);
+  @include blur(2rem);
+  &.confirm {
+    width: min(26rem, calc(100vw - 2rem));
+  }
+  .dialogTitle {
+    font-size: 1.25rem;
+    font-weight: $semi-bold-font;
+  }
+  .row {
+    display: flex;
+    gap: .75rem;
+    > * {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    font-size: $small-font-size;
+    color: $extra-text-clr;
+    input, textarea {
+      @extend %control;
+      font-size: 1rem;
+    }
+  }
+  .select {
+    @extend %control;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    font-size: 1rem;
+    text-align: left;
+    svg {
+      flex-shrink: 0;
+      width: 1rem;
+      height: 1rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      opacity: .7;
+      transition: transform .2s ease-in-out;
+    }
+    &[data-open] svg {
+      transform: rotate(180deg);
+    }
+  }
+  .importText {
+    @extend %control;
+    font-family: monospace;
+    font-size: .8125rem;
+    resize: vertical;
+  }
+  .dialogActions {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    button {
+      @extend %action;
+      border-radius: .5em;
+      // Same as the merge dialog's button
+      &.primary {
+        border-color: transparent;
+        background-color: hsla(0, 0%, 100%, 0.9);
+        color: hsla(0, 0%, 0%, 0.8);
+        &:hover:not(:disabled) {
+          background-color: hsla(226, 55%, 94%, 0.9);
+        }
+        &.danger {
+          background-color: #913a3d;
+          color: white;
+          &:hover:not(:disabled) {
+            background-color: #a3454a;
+          }
+        }
+      }
+    }
+    input[type="file"] {
+      font-size: $small-font-size;
+      min-width: 0;
+      color: $extra-text-clr;
+      &::file-selector-button {
+        margin-right: .5rem;
+        padding: .25rem .875rem;
+        border: 1px solid var(--border-clr);
+        border-radius: 1rem;
+        background-color: var(--accent-clr);
+        color: var(--text-clr);
+        cursor: pointer;
+      }
+    }
+    .pushRight {
+      margin-left: auto;
+    }
+  }
+}
+
+.options {
+  @extend %popup;
+  width: var(--button-width);
+  outline: none;
+  .option {
+    padding: .375rem .625rem;
+    border-radius: .375rem;
+    cursor: pointer;
+    &[data-focus] {
+      background-color: rgba(255, 255, 255, .1);
+    }
+    &[data-selected] {
+      font-weight: $semi-bold-font;
+    }
+  }
+}

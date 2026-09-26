@@ -1,5 +1,16 @@
 import type { CustomLesson, CustomTimetableData, TimetableItem } from "@/types/timetable";
-import { lessonsTimes } from "./timetable";
+import { getTimetableName, lessonsTimes } from "./timetable";
+
+const NAME_SUFFIX = " (змінений)";
+
+export function getDefaultCustomName(sourceNames: string[]) {
+  return (
+    sourceNames
+      .map(getTimetableName)
+      .join(" + ")
+      .slice(0, 60 - NAME_SUFFIX.length) + NAME_SUFFIX
+  );
+}
 
 export function toTimetableItems(lessons: CustomLesson[]): TimetableItem[] {
   return lessons.map(({ week, subgroup, details, ...lesson }) => ({
@@ -33,7 +44,6 @@ export function toCustomLessons(items: TimetableItem[]): CustomLesson[] {
   return [...new Map(lessons.map((lesson) => [JSON.stringify(lesson), lesson])).values()];
 }
 
-const lessonTimesComment = lessonsTimes.map(({ start, end }, i) => `${i + 1} = ${start}–${end}`).join(", ");
 const LESSON_KEYS = [
   "day",
   "number",
@@ -47,6 +57,7 @@ const LESSON_KEYS = [
 ] as const satisfies (keyof CustomLesson)[];
 
 export function toJSON5({ name, subgroupToggle, lessons }: CustomTimetableData) {
+  const lessonTimesComment = lessonsTimes.map(({ start, end }, i) => `${i + 1} = ${start}–${end}`).join(", ");
   const lessonLines = lessons
     .toSorted((a, b) => a.day - b.day || a.number - b.number)
     .map((lesson) => `    { ${LESSON_KEYS.map((key) => `${key}: ${JSON.stringify(lesson[key])}`).join(", ")} },`);

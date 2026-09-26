@@ -1,6 +1,7 @@
 import {
   type CachedInstitute,
   type CustomTimetable,
+  type CustomTimetableDraft,
   type ExamsTimetableItem,
   HalfTerm,
   type MergedTimetableItem,
@@ -257,6 +258,23 @@ class TimetableManager {
       { group, time: Date.now(), subgroup, name: timetable.name },
     ]);
     await LocalCache.set(`custom_${timetable.id}`, timetable);
+  }
+
+  getCustomEditToken(id: string) {
+    return LocalCache.sync.customEditTokens?.[id];
+  }
+
+  saveCustomEditToken(id: string, token: string) {
+    return LocalCache.set("customEditTokens", { ...LocalCache.sync.customEditTokens, [id]: token });
+  }
+
+  getCustomDraft(group: string) {
+    const draft = LocalCache.sync.customDraft;
+    return draft?.group === group ? draft : undefined;
+  }
+
+  saveCustomDraft(draft: CustomTimetableDraft | null) {
+    return LocalCache.set("customDraft", draft);
   }
 
   async saveExamsLocally(group: string, timetable?: ExamsTimetableItem[] | null) {

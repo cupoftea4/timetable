@@ -50,6 +50,14 @@ export default class Toast {
     showWarningToast(message);
   }
 
+  static success(message: string) {
+    toast.success(message, {
+      theme: isDarkMode() ? "dark" : "light",
+      className: "border border-gray-600 rounded-lg [--toastify-icon-color-success:white]",
+      hideProgressBar: true,
+    });
+  }
+
   static info(message: string) {
     if (DEVELOP) console.info(`[Handler] ${message}`);
     showInfoToast(message);

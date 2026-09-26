@@ -37,6 +37,16 @@ export type CustomLesson = Pick<TimetableItem, "day" | "number" | "subject" | "l
 };
 export type CustomTimetableData = { name: string; subgroupToggle: boolean; lessons: CustomLesson[] };
 export type CustomTimetable = CustomTimetableData & { id: string; sourceNames: string[]; updatedAt: string };
+export type CustomTimetableDraft = {
+  /** Page the editor was opened on */
+  group: string;
+  /** State before editing, to know if there are changes */
+  timetable: CustomTimetableData;
+  draft: CustomTimetableData;
+  sourceNames: string[];
+  /** Missing until the first save creates the custom timetable */
+  saved?: { id: string; editToken: string };
+};
 
 export type CachedGroup = string;
 export type CachedInstitute = string;
