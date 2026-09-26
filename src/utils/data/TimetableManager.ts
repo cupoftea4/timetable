@@ -1,6 +1,7 @@
 import {
   type CachedInstitute,
   type CustomTimetable,
+  type CustomTimetableDraft,
   type ExamsTimetableItem,
   HalfTerm,
   type MergedTimetableItem,
@@ -249,14 +250,31 @@ class TimetableManager {
     return [cacheData, fetchData] as const;
   }
 
-  async saveCustomLocally(group: string, timetable: CustomTimetable) {
+  async saveCustomLocally(group: string, timetable: CustomTimetable, subgroup?: 1 | 2) {
     const saved = LocalCache.sync.savedTimetables ?? [];
-    const subgroup = saved.find((el) => el.group === group)?.subgroup;
+    subgroup ??= saved.find((el) => el.group === group)?.subgroup;
     await LocalCache.set("savedTimetables", [
       ...saved.filter((el) => el.group !== group),
       { group, time: Date.now(), subgroup, name: timetable.name },
     ]);
     await LocalCache.set(`custom_${timetable.id}`, timetable);
+  }
+
+  getCustomEditToken(id: string) {
+    return LocalCache.sync.customEditTokens?.[id];
+  }
+
+  saveCustomEditToken(id: string, token: string) {
+    return LocalCache.set("customEditTokens", { ...LocalCache.sync.customEditTokens, [id]: token });
+  }
+
+  getCustomDraft(group: string) {
+    const draft = LocalCache.sync.customDraft;
+    return draft?.group === group ? draft : undefined;
+  }
+
+  saveCustomDraft(draft: CustomTimetableDraft | null) {
+    return LocalCache.set("customDraft", draft);
   }
 
   async saveExamsLocally(group: string, timetable?: ExamsTimetableItem[] | null) {
@@ -315,7 +333,7 @@ class TimetableManager {
     if (data.subgroup === subgroup) return;
 
     const savedTimetables = LocalCache.sync.savedTimetables?.filter((el) => el.group !== group) ?? []; // remove previous timetable
-    return LocalCache.set("savedTimetables", [...savedTimetables, { group, time: data.time, subgroup }]);
+    return LocalCache.set("savedTimetables", [...savedTimetables, { ...data, subgroup }]);
   }
 
   getSubgroup(groupName?: string) {

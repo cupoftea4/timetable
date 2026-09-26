@@ -1,10 +1,8 @@
 import { CloseButton, Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { type FC, useEffect, useState } from "react";
-import useGroupParam from "@/hooks/useGroupParam";
 import LinkIcon from "@/shared/LinkIcon";
 import type { TimetableItemType } from "@/types/timetable";
 import { parseLessonLink } from "@/utils/lessonLinks";
-import { isCustom } from "@/utils/timetable";
 import { classes } from "../../../styles/utils";
 import styles from "./TimetableLink.module.scss";
 
@@ -21,9 +19,6 @@ const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
   const links = [...new Set(entries.flatMap((entry) => entry.links))];
   const hasDetails = entries.some((entry) => !entry.directUrl);
   const originalText = urls.join("\n\n");
-  // Links in custom timetables are user-written, so show where they lead
-  const showHostname = isCustom(useGroupParam());
-  const linkLabel = (url: string) => (showHostname ? new URL(url).hostname : "Join");
 
   const copyDetails = async () => {
     try {
@@ -51,7 +46,7 @@ const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
       {entries.length === 1 && !hasDetails && links[0] ? (
         <a href={links[0]} target="_blank" rel="noreferrer" className={classes(styles.link, type)}>
           <LinkIcon link={links[0]} />
-          {linkLabel(links[0])}
+          {new URL(links[0]).hostname}
         </a>
       ) : entries.length > 0 ? (
         <Popover as="nav" className={styles.links} aria-label={hasDetails ? "Lesson details" : "Lesson links"}>
@@ -98,7 +93,7 @@ const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
                   <li key={url}>
                     <CloseButton as="a" href={url} target="_blank" rel="noreferrer" className={styles.link}>
                       <LinkIcon link={url} />
-                      {linkLabel(url)}
+                      {new URL(url).hostname}
                     </CloseButton>
                   </li>
                 ))}

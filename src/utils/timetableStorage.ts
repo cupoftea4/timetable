@@ -3,6 +3,7 @@ import type {
   CachedInstitute,
   CachedTimetable,
   CustomTimetable,
+  CustomTimetableDraft,
   ExamsTimetableItem,
   MergedTimetable,
   Semester,
@@ -28,6 +29,8 @@ const CACHE_KEYS = [
   "savedTimetables",
   "examsTimetables",
   "mergedTimetable",
+  "customEditTokens",
+  "customDraft",
   "firstHalfTermGroups",
   "secondHalfTermGroups",
 ] as const;
@@ -47,6 +50,8 @@ const CACHE_CONFIGS: Record<StandardCacheKey, CacheConfig> = {
   savedTimetables: { key: "cached_timetables", storage: "localStorage" },
   examsTimetables: { key: "cached_exams_timetables", storage: "localStorage" },
   mergedTimetable: { key: "my", storage: "localStorage" },
+  customEditTokens: { key: "custom_edit_tokens", storage: "localStorage" },
+  customDraft: { key: "custom_draft", storage: "localStorage" },
   firstHalfTermGroups: { key: "first_half_term_groups", storage: "indexedDB" },
   secondHalfTermGroups: { key: "second_half_term_groups", storage: "indexedDB" },
 };
@@ -84,22 +89,26 @@ export type CacheData = {
           ? CachedTimetable[]
           : K extends "mergedTimetable"
             ? MergedTimetable
-            : K extends "currentSemester"
-              ? // TODO: make examsPublished required
-                { semester: Semester; expiresAt: number; examsPublished?: boolean | null }
-              : K extends "lastOpenedMode"
-                ? TimetableMode
-                : K extends "lastOpenedInstitute" | "lastOpenedTimetable"
-                  ? string
-                  : K extends TimetableCacheKey
-                    ? TimetableItem[]
-                    : K extends ExamsTimetableCacheKey
-                      ? ExamsTimetableItem[]
-                      : K extends GroupsCacheKey
-                        ? string[]
-                        : K extends CustomTimetableCacheKey
-                          ? CustomTimetable
-                          : never;
+            : K extends "customEditTokens"
+              ? Record<string, string>
+              : K extends "customDraft"
+                ? CustomTimetableDraft
+                : K extends "currentSemester"
+                  ? // TODO: make examsPublished required
+                    { semester: Semester; expiresAt: number; examsPublished?: boolean | null }
+                  : K extends "lastOpenedMode"
+                    ? TimetableMode
+                    : K extends "lastOpenedInstitute" | "lastOpenedTimetable"
+                      ? string
+                      : K extends TimetableCacheKey
+                        ? TimetableItem[]
+                        : K extends ExamsTimetableCacheKey
+                          ? ExamsTimetableItem[]
+                          : K extends GroupsCacheKey
+                            ? string[]
+                            : K extends CustomTimetableCacheKey
+                              ? CustomTimetable
+                              : never;
 };
 
 // Manages data saved locally: in RAM, indexedDB and localStorage
@@ -115,6 +124,8 @@ export default class LocalCache {
       ),
       LocalCache.get("lecturers").then(LocalCache.setRamCache),
       LocalCache.get("mergedTimetable").then(LocalCache.setRamCache),
+      LocalCache.get("customEditTokens").then(LocalCache.setRamCache),
+      LocalCache.get("customDraft").then(LocalCache.setRamCache),
       LocalCache.get("lastOpenedTimetable").then(LocalCache.setRamCache),
       LocalCache.get("lastOpenedInstitute").then(LocalCache.setRamCache),
     ]);

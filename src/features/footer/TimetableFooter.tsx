@@ -1,9 +1,9 @@
 import { type FC, Fragment } from "react";
 import { Link } from "react-router-dom";
 import DownloadIcon from "@/assets/DownloadIcon";
-import FileDownIcon from "@/assets/FileDownIcon";
 import MergeIcon from "@/assets/MergeIcon";
 import MoonIcon from "@/assets/MoonIcon";
+import PencilIcon from "@/assets/PencilIcon";
 import RefreshIcon from "@/assets/RefreshIcon";
 import SunIcon from "@/assets/SunIcon";
 import { DisableCatModeButton } from "@/context/catMode";
@@ -11,7 +11,6 @@ import useGroupParam from "@/hooks/useGroupParam";
 import { useTheme } from "@/hooks/useTheme";
 import { classes } from "@/styles/utils";
 import type { CustomTimetable } from "@/types/timetable";
-import { downloadJSON5 } from "@/utils/customTimetable";
 import styles from "./TimetableFooter.module.scss";
 
 type OwnProps = {
@@ -23,6 +22,8 @@ type OwnProps = {
   time?: number;
   icsFILE?: string;
   customTimetable?: CustomTimetable;
+  onEdit?: () => void;
+  editTitle: string;
 };
 
 const TimetableFooter: FC<OwnProps> = ({
@@ -32,6 +33,8 @@ const TimetableFooter: FC<OwnProps> = ({
   time,
   icsFILE,
   customTimetable,
+  onEdit,
+  editTitle,
   showCreateMergedModal,
   updateTimetable,
 }) => {
@@ -82,15 +85,9 @@ const TimetableFooter: FC<OwnProps> = ({
         >
           <DownloadIcon />
         </a>
-        {customTimetable && (
-          <button
-            type="button"
-            className={styles.button}
-            title="Експортувати розклад у JSON5 для редагування"
-            aria-label="Експортувати розклад у JSON5 для редагування"
-            onClick={() => downloadJSON5(customTimetable)}
-          >
-            <FileDownIcon />
+        {onEdit && (
+          <button type="button" className={styles.button} title={editTitle} aria-label={editTitle} onClick={onEdit}>
+            <PencilIcon />
           </button>
         )}
       </span>
