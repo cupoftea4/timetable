@@ -1,13 +1,22 @@
 import { type FC, lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useTimetableISCFile from "@/features/footer/hooks/useTimetableISCFile";
 import TimetableFooter from "@/features/footer/TimetableFooter";
 import TimetableHeader from "@/features/header/TimetableHeader";
 import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
+import useGroupParam from "@/hooks/useGroupParam";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
-import type { ExamsTimetableItem, HalfTerm, Semester, TimetableItem, TimetableType } from "@/types/timetable";
+import type {
+  CustomTimetable,
+  ExamsTimetableItem,
+  HalfTerm,
+  Semester,
+  TimetableItem,
+  TimetableType,
+} from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
+import { toTimetableItems } from "@/utils/customTimetable";
 import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
@@ -32,10 +41,11 @@ type OwnProps = {
 };
 
 const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
-  const group = useParams().group?.trim() ?? "";
+  const group = useGroupParam();
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
   const [timetable, setTimetable] = useState<TimetableItem[]>();
   const [examsTimetable, setExamsTimetable] = useState<ExamsTimetableItem[]>();
+  const [customTimetable, setCustomTimetable] = useState<CustomTimetable>();
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup);
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
   const [partials, setPartials] = useState<HalfTerm[]>([]);
@@ -55,7 +65,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const isLoading = isExamsTimetable ? !examsTimetable : !timetable;
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
-  const isLecturers = timetableType === "lecturer";
+  const hasCellSubgroups = timetableType === "lecturer" || customTimetable?.subgroupToggle === false;
 
   useEffect(() => {
     void getCurrentSemester().then(setSemester);
@@ -102,6 +112,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       navigate(`/${group}`, { state: { source: "no-selective-exams" } });
     setLoading(true);
     setSelectedWeek(undefined);
+    setCustomTimetable(undefined);
     getTimetable(group, isExamsTimetable, timetableType)?.finally(() => {
       setLoading(false);
     });
@@ -123,6 +134,14 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
       if (!optimistic && type === "timetable") TimetableManager.getPartials(group).then(setPartials);
     };
+    if (type === "custom") {
+      const renderCustomTimetable = (timetable: CustomTimetable, optimistic: boolean) => {
+        setCustomTimetable(timetable);
+        renderTimetable(toTimetableItems(timetable.lessons), optimistic);
+      };
+      const onCustomError = (e: string) => onError(e, e === Toast.NONEXISTING_TIMETABLE ? e : undefined);
+      return optimisticRender(renderCustomTimetable, onCustomError, TimetableManager.getCustomTimetable(group));
+    }
     try {
       return optimisticRender(renderTimetable, onError, TimetableManager.getTimetable(group, type, checkCache));
     } catch (_e) {
@@ -163,7 +182,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       <TimetableHeader
         isExamsTimetable={isExamsTimetable}
         timetableType={timetableType}
-        isLecturers={isLecturers}
+        hasCellSubgroups={hasCellSubgroups}
+        customTimetable={customTimetable}
         partials={partials}
         subgroupState={[isSecondSubgroup, setIsSecondSubgroup]}
         weekState={[isSecondWeek, setIsSecondWeek]}
@@ -181,7 +201,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
                 timetable={timetable ?? []}
                 isSecondWeek={isSecondWeek}
                 isSecondSubgroup={isSecondSubgroup}
-                hasCellSubgroups={isLecturers}
+                hasCellSubgroups={hasCellSubgroups}
                 isLoading={isLoading}
                 timetableType={timetableType}
                 selectedWeek={selectedWeek}
@@ -205,6 +225,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
         isSecondSubgroup={isSecondSubgroup}
         icsFILE={iscFile}
         time={time}
+        customTimetable={customTimetable}
       />
       {showCreateMergedModal && (
         <Suspense fallback={null}>

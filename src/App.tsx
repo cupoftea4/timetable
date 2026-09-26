@@ -57,6 +57,7 @@ const App = () => {
                 <Route path="selective" element={<HomePage timetableType="selective" />} />
                 <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
                 <Route path="waifu" element={WaifuPage ? <WaifuPage /> : <Navigate to="/home" replace />} />
+                <Route path="/c/:id" element={<TimetablePage />} />
                 <Route path="/:group" element={<TimetablePage />} />
                 <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
               </Routes>

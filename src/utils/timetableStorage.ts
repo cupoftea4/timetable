@@ -2,6 +2,7 @@ import type {
   CachedGroup,
   CachedInstitute,
   CachedTimetable,
+  CustomTimetable,
   ExamsTimetableItem,
   MergedTimetable,
   Semester,
@@ -53,6 +54,7 @@ const CACHE_CONFIGS: Record<StandardCacheKey, CacheConfig> = {
 const TIMETABLE_KEY = "timetable_" as const;
 const EXAMS_TIMETABLE_KEY = "exams_timetable_" as const;
 const GROUPS_KEY = "groups_" as const;
+const CUSTOM_TIMETABLE_KEY = "custom_" as const;
 
 const UPDATED = "_updated";
 
@@ -63,7 +65,13 @@ const isStandardKey = (key: string): key is StandardCacheKey => {
 type TimetableCacheKey = `${typeof TIMETABLE_KEY}${string}`;
 type ExamsTimetableCacheKey = `${typeof EXAMS_TIMETABLE_KEY}${string}`;
 type GroupsCacheKey = `${typeof GROUPS_KEY}${string}`;
-export type CacheKey = StandardCacheKey | TimetableCacheKey | ExamsTimetableCacheKey | GroupsCacheKey;
+type CustomTimetableCacheKey = `${typeof CUSTOM_TIMETABLE_KEY}${string}`;
+export type CacheKey =
+  | StandardCacheKey
+  | TimetableCacheKey
+  | ExamsTimetableCacheKey
+  | GroupsCacheKey
+  | CustomTimetableCacheKey;
 
 export type CacheData = {
   [K in CacheKey]: K extends "institutes"
@@ -89,7 +97,9 @@ export type CacheData = {
                       ? ExamsTimetableItem[]
                       : K extends GroupsCacheKey
                         ? string[]
-                        : never;
+                        : K extends CustomTimetableCacheKey
+                          ? CustomTimetable
+                          : never;
 };
 
 // Manages data saved locally: in RAM, indexedDB and localStorage

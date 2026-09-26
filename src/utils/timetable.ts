@@ -38,13 +38,25 @@ export function mergeTimetables(timetables: Array<{ name: string; timetable: Tim
   return mergedTimetable;
 }
 
+export const CUSTOM_PREFIX = "c/";
+
+export function isCustom(timetable: string) {
+  return timetable.startsWith(CUSTOM_PREFIX);
+}
+
+export function getCustomId(timetable: string) {
+  return timetable.slice(CUSTOM_PREFIX.length);
+}
+
 export function isMerged(timetable: string) {
-  return timetable.includes("my") || timetable.includes("Мій розклад");
+  // Custom ids are random and can contain "my"
+  return !isCustom(timetable) && (timetable.includes("my") || timetable.includes("Мій розклад"));
 }
 
 export function getTimetableName(timetable: CachedTimetable | string) {
   const name = typeof timetable === "string" ? timetable : timetable.group;
   if (isMerged(name)) return "Мій розклад";
+  if (isCustom(name)) return TimetableManager.cachedTimetables.find((t) => t.group === name)?.name ?? name;
   return name.replace(/(\d)З$/, "$1з");
 }
 

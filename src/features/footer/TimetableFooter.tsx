@@ -1,13 +1,17 @@
-import type { FC } from "react";
-import { useParams } from "react-router-dom";
+import { type FC, Fragment } from "react";
+import { Link } from "react-router-dom";
 import DownloadIcon from "@/assets/DownloadIcon";
+import FileDownIcon from "@/assets/FileDownIcon";
 import MergeIcon from "@/assets/MergeIcon";
 import MoonIcon from "@/assets/MoonIcon";
 import RefreshIcon from "@/assets/RefreshIcon";
 import SunIcon from "@/assets/SunIcon";
 import { DisableCatModeButton } from "@/context/catMode";
+import useGroupParam from "@/hooks/useGroupParam";
 import { useTheme } from "@/hooks/useTheme";
 import { classes } from "@/styles/utils";
+import type { CustomTimetable } from "@/types/timetable";
+import { downloadJSON5 } from "@/utils/customTimetable";
 import styles from "./TimetableFooter.module.scss";
 
 type OwnProps = {
@@ -18,6 +22,7 @@ type OwnProps = {
   updateTimetable: () => void;
   time?: number;
   icsFILE?: string;
+  customTimetable?: CustomTimetable;
 };
 
 const TimetableFooter: FC<OwnProps> = ({
@@ -26,10 +31,11 @@ const TimetableFooter: FC<OwnProps> = ({
   isSecondSubgroup,
   time,
   icsFILE,
+  customTimetable,
   showCreateMergedModal,
   updateTimetable,
 }) => {
-  const group = useParams().group?.trim() ?? "";
+  const group = useGroupParam();
   const { toggleTheme } = useTheme();
 
   return (
@@ -76,8 +82,34 @@ const TimetableFooter: FC<OwnProps> = ({
         >
           <DownloadIcon />
         </a>
+        {customTimetable && (
+          <button
+            type="button"
+            className={styles.button}
+            title="Експортувати розклад у JSON5 для редагування"
+            aria-label="Експортувати розклад у JSON5 для редагування"
+            onClick={() => downloadJSON5(customTimetable)}
+          >
+            <FileDownIcon />
+          </button>
+        )}
       </span>
-      {time && <p>Last updated {new Date(time).toLocaleString()}</p>}
+      {customTimetable ? (
+        <p>
+          Змінений розклад на основі{" "}
+          {customTimetable.sourceNames.map((source, i) => (
+            <Fragment key={source}>
+              {i > 0 && ", "}
+              <Link to={`/${source}`} className="underline">
+                {source}
+              </Link>
+            </Fragment>
+          ))}{" "}
+          · оновлено {new Date(customTimetable.updatedAt).toLocaleDateString("uk-UA")}
+        </p>
+      ) : (
+        time && <p>Last updated {new Date(time).toLocaleString()}</p>
+      )}
     </footer>
   );
 };
