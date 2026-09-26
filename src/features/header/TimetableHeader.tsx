@@ -1,15 +1,16 @@
 import type React from "react";
 import type { FC } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ArrowRightIcon from "@/assets/ArrowRightIcon";
 import ExamIcon from "@/assets/ExamIcon";
 import HomeIcon from "@/assets/HomeIcon";
 import useExamsPublished from "@/hooks/useExamsPublished";
+import useGroupParam from "@/hooks/useGroupParam";
 import usePageTitle from "@/hooks/usePageTitle";
 import { useIsMobile } from "@/hooks/useWindowDimensions";
 import Toggle from "@/shared/Toggle";
 import { classes } from "@/styles/utils";
-import type { HalfTerm } from "@/types/timetable";
+import type { CustomTimetable, HalfTerm } from "@/types/timetable";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getTimetableName, isMerged } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
@@ -21,8 +22,9 @@ import styles from "./TimetableHeader.module.scss";
 
 type OwnProps = {
   loading: boolean;
-  isLecturers: boolean;
+  hasCellSubgroups: boolean;
   timetableType?: string;
+  customTimetable?: CustomTimetable;
   isExamsTimetable: boolean;
   partials: HalfTerm[];
   subgroupState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
@@ -36,7 +38,8 @@ type OwnProps = {
 const TimetableHeader: FC<OwnProps> = ({
   timetableType,
   isExamsTimetable,
-  isLecturers,
+  hasCellSubgroups,
+  customTimetable,
   partials,
   subgroupState,
   weekState,
@@ -49,24 +52,25 @@ const TimetableHeader: FC<OwnProps> = ({
   const [isSecondSubgroup, setIsSecondSubgroup] = subgroupState;
   const [isSecondWeek, setIsSecondWeek] = weekState;
   const navigate = useNavigate();
-  const group = useParams().group?.trim() ?? "";
+  const group = useGroupParam();
   const isMobile = useIsMobile();
   const examsPublished = useExamsPublished();
-  const groupTitle = timetableType === "merged" ? "Мій розклад" : getTimetableName(group);
+  const groupTitle = customTimetable?.name ?? (timetableType === "merged" ? "Мій розклад" : getTimetableName(group));
   usePageTitle(groupTitle);
 
   const isPartTime = timetableType === "parttime";
   const showWeekNavigation = isPartTime && availableWeeks && availableWeeks.length > 0 && selectedWeek && onWeekChange;
 
+  const sources = isMerged(group) ? TimetableManager.cachedMergedTimetable?.timetables : customTimetable?.sourceNames;
+  const examsGroup = sources
+    ? sources.find((t) => {
+        const type = TimetableManager.tryToGetType(t);
+        return type === "timetable" || type === "lecturer";
+      })
+    : group;
+
   const handleIsExamsTimetableChange = (isExams: boolean) => {
-    const path =
-      isMerged(group) && TimetableManager.cachedMergedTimetable
-        ? (TimetableManager.cachedMergedTimetable.timetables?.find((t) => {
-            const type = TimetableManager.tryToGetType(t);
-            return type === "timetable" || type === "lecturer";
-          }) ?? group)
-        : group;
-    navigate(`/${path}${isExams ? "/exams" : ""}`);
+    navigate(`/${examsGroup ?? group}${isExams ? "/exams" : ""}`);
   };
 
   const changeIsSecondSubgroup = (isSecond: boolean) => {
@@ -94,6 +98,7 @@ const TimetableHeader: FC<OwnProps> = ({
         <h1 className={styles.title}>
           {groupTitle}
           {isExamsTimetable && <span className={styles.mode}>Екзамени</span>}
+          {customTimetable && <span className={styles.mode}>Змінений</span>}
         </h1>
       </nav>
       {!isExamsTimetable && (
@@ -102,7 +107,7 @@ const TimetableHeader: FC<OwnProps> = ({
             <WeekNavigation weeks={availableWeeks} selectedWeek={selectedWeek} onWeekChange={onWeekChange} />
           ) : (
             <>
-              {!isLecturers && (
+              {!hasCellSubgroups && (
                 <Toggle
                   toggleState={[isSecondSubgroup, changeIsSecondSubgroup]}
                   states={isMobile ? ["I підг.", "II підг."] : ["I підгрупа", "II підгрупа"]}
@@ -117,7 +122,7 @@ const TimetableHeader: FC<OwnProps> = ({
           <TimetablePartials partials={partials} handlePartialClick={updatePartialTimetable} />
         </span>
       )}
-      {timetableType !== "selective" && timetableType !== "parttime" && (
+      {examsGroup && timetableType !== "selective" && timetableType !== "parttime" && (
         <span className={styles.actions}>
           <button
             type="button"

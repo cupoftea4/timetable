@@ -1,9 +1,10 @@
 import { CloseButton, Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { type FC, Fragment, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import CheckMarkIcon from "@/assets/CheckMarkIcon";
 import HistoryIcon from "@/assets/HistoryIcon";
 import RemoveIcon from "@/assets/RemoveIcon";
+import useGroupParam from "@/hooks/useGroupParam";
 import { classes } from "@/styles/utils";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getTimetableName, isMerged } from "@/utils/timetable";
@@ -25,7 +26,7 @@ function getCachedGroups(): string[] {
 }
 
 const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
-  const groupParam = useParams().group?.trim();
+  const groupParam = useGroupParam();
   const [savedGroups, setSavedGroups] = useState<string[]>(getCachedGroups);
   // Hover's programmatic click can trigger :focus-visible; keep the outline for keyboard focus only.
   const [pointerFocus, setPointerFocus] = useState(false);

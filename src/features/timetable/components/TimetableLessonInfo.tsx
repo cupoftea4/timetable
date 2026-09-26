@@ -1,5 +1,5 @@
 import { type FC, memo } from "react";
-import { useParams } from "react-router-dom";
+import useGroupParam from "@/hooks/useGroupParam";
 import { classes } from "@/styles/utils";
 import type { TimetableItem } from "@/types/timetable";
 import { hashCode } from "@/utils/general";
@@ -14,7 +14,7 @@ type OwnProps = {
 };
 
 const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) => {
-  const { group = "" } = useParams();
+  const group = useGroupParam();
   const doodleSeed = Math.abs(hashCode(`${group}|${generateId(lesson)}`));
   const doodle = ["face", "sleepy", "paw", "curled"][doodleSeed % 10];
   const doodleColor = ["lection", "practical", "lab"][Math.floor(doodleSeed / 10) % 3];
