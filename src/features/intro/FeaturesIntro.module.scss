@@ -1,0 +1,99 @@
+@use '../../styles/utils' as *;
+@use '../../styles/variables' as *;
+
+.backdrop {
+  position: fixed;
+  @include inset-0;
+  z-index: 100;
+  @include flex-center;
+  background-color: hsla(0, 0%, 0%, 0.7);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: min(28rem, calc(100vw - 2rem));
+  padding: 1.75rem 1.5rem 1.5rem;
+  border: 1px solid var(--border-clr);
+  border-radius: 1rem;
+  background-color: hsla(240, 6%, 14%, .95);
+  box-shadow: 2px 2px 11px 0 hsla(0, 0%, 0%, 0.7);
+  @include blur(2rem);
+  text-align: center;
+}
+
+.cat {
+  width: 4.5rem;
+  // The doodle is drawn in black
+  filter: invert(1);
+  opacity: .9;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: $semi-bold-font;
+}
+
+.text {
+  color: $extra-text-clr;
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  width: 100%;
+  text-align: left;
+  li {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .625rem .75rem;
+    border-radius: .625rem;
+    background-color: rgba(255, 255, 255, .05);
+    font-size: $small-font-size;
+  }
+  svg {
+    flex-shrink: 0;
+    width: 1.375rem;
+    height: 1.375rem;
+  }
+}
+
+// Same as the merge dialog's button
+.primary {
+  align-self: flex-end;
+  padding: .5em 1em;
+  border-radius: .5em;
+  background-color: hsla(0, 0%, 100%, 0.9);
+  color: hsla(0, 0%, 0%, 0.8);
+  transition: background-color .2s;
+  &:hover {
+    background-color: hsla(226, 55%, 94%, 0.9);
+  }
+}
+
+.help {
+  align-items: stretch;
+  width: min(36rem, calc(100vw - 2rem));
+  text-align: left;
+}
+
+.helpSteps {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+  padding-left: 1.25rem;
+  list-style: decimal;
+  a {
+    text-decoration: underline;
+  }
+}
+
+.screenshot {
+  width: 100%;
+  border: 1px solid var(--border-clr);
+  border-radius: .625rem;
+}

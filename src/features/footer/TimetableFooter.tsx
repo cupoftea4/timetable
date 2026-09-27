@@ -24,6 +24,7 @@ type OwnProps = {
   customTimetable?: CustomTimetable;
   onEdit?: () => void;
   editTitle: string;
+  onCalendarExport: () => void;
 };
 
 const TimetableFooter: FC<OwnProps> = ({
@@ -35,6 +36,7 @@ const TimetableFooter: FC<OwnProps> = ({
   customTimetable,
   onEdit,
   editTitle,
+  onCalendarExport,
   showCreateMergedModal,
   updateTimetable,
 }) => {
@@ -82,6 +84,7 @@ const TimetableFooter: FC<OwnProps> = ({
           href={icsFILE}
           download={isExamsTimetable ? `${group}-exams.ics` : `${group}-${isSecondSubgroup ? 2 : 1}.ics`}
           aria-label="Експортувати розклад для Google Calendar"
+          onClick={onCalendarExport}
         >
           <DownloadIcon />
         </a>

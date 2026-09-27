@@ -1,7 +1,7 @@
 import { toast } from "react-toastify";
 import DonationToast from "@/shared/DonationToast";
-import { DEVELOP, TOAST_AUTO_CLOSE_TIME } from "./constants";
-import { getRandomValue, isDarkMode } from "./general";
+import { DEVELOP, RECEIVED_DONATION_NOTIFICATION, TOAST_AUTO_CLOSE_TIME } from "./constants";
+import { doOnce, getRandomValue, isDarkMode } from "./general";
 
 const DEBOUNCE_TOAST_TIME = 500;
 
@@ -70,11 +70,13 @@ export default class Toast {
   }
 
   static donationNotification() {
-    toast(DonationToast, {
-      autoClose: false,
-      className: "!bg-cyan-900 text-white dark:!bg-gray-800 border border-gray-600 rounded-lg",
-      delay: 500,
-    });
+    doOnce(RECEIVED_DONATION_NOTIFICATION, () =>
+      toast(DonationToast, {
+        autoClose: false,
+        className: "!bg-[hsla(240,6%,14%,.95)] text-white border border-[var(--border-clr)] rounded-lg",
+        delay: 500,
+      })
+    );
   }
 
   static hideAllMessages() {

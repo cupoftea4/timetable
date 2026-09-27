@@ -254,7 +254,7 @@ const TimetableEditor: FC<OwnProps> = ({
           <MenuButton className={classes(styles.button, styles.more)} aria-label="Інші дії">
             ⋯
           </MenuButton>
-          <MenuItems anchor={{ to: "bottom end", gap: 8 }} className={styles.menu}>
+          <MenuItems modal={false} anchor={{ to: "bottom end", gap: 8 }} className={styles.menu}>
             <MenuItem>
               <button type="button" onClick={copyJSON5}>
                 Скопіювати JSON5

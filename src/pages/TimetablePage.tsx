@@ -19,18 +19,20 @@ import type {
   TimetableType,
 } from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
-import { TIMETABLE_SCREEN_BREAKPOINT } from "@/utils/constants";
+import { SEEN_CALENDAR_HELP, SEEN_FEATURES_INTRO, TIMETABLE_SCREEN_BREAKPOINT } from "@/utils/constants";
 import { getDefaultCustomName, toCustomLessons, toTimetableItems } from "@/utils/customTimetable";
 import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
-import { optimisticRender } from "@/utils/general";
+import { isFeaturesIntroDue, optimisticRender } from "@/utils/general";
 import { CUSTOM_PREFIX } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import styles from "./TimetablePage.module.scss";
 
 const CreateMergedModal = lazy(() => import("@/features/merged_modal/CreateMergedModal"));
 const TimetableEditor = lazy(() => import("@/features/editor/TimetableEditor"));
+const FeaturesIntro = lazy(() => import("@/features/intro/FeaturesIntro"));
+const CalendarHelp = lazy(() => import("@/features/intro/CalendarHelp"));
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => {
   // yeah, naming! :)
@@ -59,6 +61,9 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const [partials, setPartials] = useState<HalfTerm[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateMergedModal, setShowCreateMergedModal] = useState(false);
+  // Only in September, when new students start using the site
+  const [showIntro, setShowIntro] = useState(isFeaturesIntroDue);
+  const [showCalendarHelp, setShowCalendarHelp] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState<Date | undefined>();
   const [semester, setSemester] = useState<Semester>();
   const { state, search }: { state: LocationState | null; search: string } = useLocation();
@@ -212,6 +217,20 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     else if (!editor) setEditor(TimetableManager.getCustomDraft(group) ?? (timetable && createEditor()));
   });
 
+  const openEditor = () => navigate({ search: "?edit" }, { state: { ...state, editFromView: true } });
+
+  function showCalendarHelpOnce() {
+    if (localStorage.getItem(SEEN_CALENDAR_HELP)) return;
+    localStorage.setItem(SEEN_CALENDAR_HELP, "true");
+    setShowCalendarHelp(true);
+  }
+
+  function closeIntro() {
+    localStorage.setItem(SEEN_FEATURES_INTRO, "true");
+    setShowIntro(false);
+    Toast.donationNotification();
+  }
+
   function exitEditMode() {
     // Return to the entry the editor was opened from instead of stacking another one on top
     if (state?.editFromView) navigate(-1);
@@ -321,9 +340,20 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
         icsFILE={iscFile}
         time={time}
         customTimetable={customTimetable}
-        onEdit={canEdit ? () => navigate({ search: "?edit" }, { state: { ...state, editFromView: true } }) : undefined}
+        onEdit={canEdit ? openEditor : undefined}
+        onCalendarExport={showCalendarHelpOnce}
         editTitle={editTitle}
       />
+      {showCalendarHelp && (
+        <Suspense fallback={null}>
+          <CalendarHelp isExams={isExamsTimetable} onClose={() => setShowCalendarHelp(false)} />
+        </Suspense>
+      )}
+      {showIntro && timetable && !isExamsTimetable && (
+        <Suspense fallback={null}>
+          <FeaturesIntro onClose={closeIntro} />
+        </Suspense>
+      )}
       {showCreateMergedModal && (
         <Suspense fallback={null}>
           <CreateMergedModal
