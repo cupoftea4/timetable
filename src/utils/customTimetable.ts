@@ -6,7 +6,8 @@ const NAME_SUFFIX = " (змінений)";
 export function getDefaultCustomName(sourceNames: string[]) {
   return (
     sourceNames
-      .map(getTimetableName)
+      // A copy of an already changed timetable shouldn't say it twice
+      .map((source) => getTimetableName(source).replace(NAME_SUFFIX, ""))
       .join(" + ")
       .slice(0, 60 - NAME_SUFFIX.length) + NAME_SUFFIX
   );

@@ -48,7 +48,7 @@ type OwnProps = {
   isExamsTimetable?: boolean;
 };
 
-type LocationState = { source?: string; isCustom?: boolean; editFromView?: boolean };
+type LocationState = { source?: string; isCustom?: boolean; editFromView?: boolean; examsFrom?: string };
 
 const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const group = useGroupParam();
@@ -122,7 +122,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   function onError(e: string, userError?: string) {
     if (isExamsTimetable) {
       Toast.error(e, userError ?? Toast.NO_EXAMS);
-      navigate(`/${group}`, { state: { source: "no-exams" } });
+      navigate(`/${state?.examsFrom ?? group}`, { state: { source: "no-exams" } });
       return;
     }
     Toast.error(e, userError);
@@ -238,7 +238,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   }
 
   function closeEditor() {
-    TimetableManager.saveCustomDraft(null);
+    TimetableManager.saveCustomDraft(group, null);
     exitEditMode();
   }
 
@@ -250,8 +250,9 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       updateTimetable();
       return;
     }
-    TimetableManager.saveCustomDraft(null);
+    TimetableManager.saveCustomDraft(group, null);
     navigate(`/${CUSTOM_PREFIX}${saved.id}`, { replace: true });
+    Toast.customCreated(`${window.location.origin}/${CUSTOM_PREFIX}${saved.id}`);
   }
 
   function renderTimetableFromPromises(promises: RenderPromises<TimetableItem[]>) {
@@ -343,6 +344,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
         onEdit={canEdit ? openEditor : undefined}
         onCalendarExport={showCalendarHelpOnce}
         editTitle={editTitle}
+        isOwner={Boolean(editToken)}
       />
       {showCalendarHelp && (
         <Suspense fallback={null}>

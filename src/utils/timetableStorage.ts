@@ -30,7 +30,7 @@ const CACHE_KEYS = [
   "examsTimetables",
   "mergedTimetable",
   "customEditTokens",
-  "customDraft",
+  "customDrafts",
   "firstHalfTermGroups",
   "secondHalfTermGroups",
 ] as const;
@@ -51,7 +51,7 @@ const CACHE_CONFIGS: Record<StandardCacheKey, CacheConfig> = {
   examsTimetables: { key: "cached_exams_timetables", storage: "localStorage" },
   mergedTimetable: { key: "my", storage: "localStorage" },
   customEditTokens: { key: "custom_edit_tokens", storage: "localStorage" },
-  customDraft: { key: "custom_draft", storage: "localStorage" },
+  customDrafts: { key: "custom_drafts", storage: "localStorage" },
   firstHalfTermGroups: { key: "first_half_term_groups", storage: "indexedDB" },
   secondHalfTermGroups: { key: "second_half_term_groups", storage: "indexedDB" },
 };
@@ -91,8 +91,8 @@ export type CacheData = {
             ? MergedTimetable
             : K extends "customEditTokens"
               ? Record<string, string>
-              : K extends "customDraft"
-                ? CustomTimetableDraft
+              : K extends "customDrafts"
+                ? Record<string, CustomTimetableDraft>
                 : K extends "currentSemester"
                   ? // TODO: make examsPublished required
                     { semester: Semester; expiresAt: number; examsPublished?: boolean | null }
@@ -125,7 +125,7 @@ export default class LocalCache {
       LocalCache.get("lecturers").then(LocalCache.setRamCache),
       LocalCache.get("mergedTimetable").then(LocalCache.setRamCache),
       LocalCache.get("customEditTokens").then(LocalCache.setRamCache),
-      LocalCache.get("customDraft").then(LocalCache.setRamCache),
+      LocalCache.get("customDrafts").then(LocalCache.setRamCache),
       LocalCache.get("lastOpenedTimetable").then(LocalCache.setRamCache),
       LocalCache.get("lastOpenedInstitute").then(LocalCache.setRamCache),
     ]);

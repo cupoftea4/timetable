@@ -21,7 +21,7 @@ import type { CustomLesson, CustomTimetable, CustomTimetableData, CustomTimetabl
 import { toJSON5 } from "@/utils/customTimetable";
 import FallbackData from "@/utils/data/CachedData";
 import TimetableManager from "@/utils/data/TimetableManager";
-import { CUSTOM_PREFIX, getDisplayType, lessonsTimes } from "@/utils/timetable";
+import { CUSTOM_PREFIX, getDisplayType, isCustom, lessonsTimes } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import AiEditDialog from "./AiEditDialog";
 import ConfirmDialog, { type Confirmation } from "./ConfirmDialog";
@@ -144,7 +144,7 @@ const TimetableEditor: FC<OwnProps> = ({
   // Kept until cancel, save or delete, so reloading or leaving the page doesn't lose the edit
   useEffect(() => {
     const draft = { name, subgroupToggle, lessons: lessons.map(({ id: _, ...lesson }) => lesson) };
-    TimetableManager.saveCustomDraft({ group, timetable, draft, sourceNames, saved });
+    TimetableManager.saveCustomDraft(group, { group, timetable, draft, sourceNames, saved });
   }, [group, timetable, name, subgroupToggle, lessons, sourceNames, saved]);
 
   const moveLesson = ({ active, over }: DragEndEvent) => {
@@ -220,7 +220,7 @@ const TimetableEditor: FC<OwnProps> = ({
         run(async () => {
           await FallbackData.deleteCustomTimetable(saved.id, saved.editToken);
           await TimetableManager.deleteTimetable(CUSTOM_PREFIX + saved.id);
-          await TimetableManager.saveCustomDraft(null);
+          await TimetableManager.saveCustomDraft(group, null);
           navigate(`/${sourceNames[0] ?? "home"}`, { replace: true });
         }),
     });
@@ -278,14 +278,12 @@ const TimetableEditor: FC<OwnProps> = ({
           Скасувати
         </button>
         <button type="button" className={classes(styles.button, styles.primary)} onClick={save} disabled={pending}>
-          Зберегти
+          {saved ? "Зберегти" : isCustom(group) ? "Створити копію" : "Створити розклад"}
         </button>
       </header>
       <p className={styles.hint}>
-        Перетягуйте пари між клітинками, натисніть на пару, щоб змінити її, або на «+», щоб додати нову.{" "}
-        {saved
-          ? "Зміни побачать усі, у кого є посилання, після збереження."
-          : "Після збереження буде створено новий розклад з окремим посиланням."}
+        {saved ? "Зміни побачать усі, у кого є посилання." : "Оригінал не зміниться, ви отримаєте нове посилання."}{" "}
+        Перетягуйте пари між клітинками, натисніть на пару, щоб змінити її, або на «+», щоб додати нову.
       </p>
       <DndContext
         sensors={sensors}

@@ -67,6 +67,7 @@ const App = () => {
         <LoadingPage />
       )}
       <MessageToast
+        className="[--toastify-toast-width:23rem]"
         position="bottom-right"
         theme="colored"
         pauseOnFocusLoss={false}

@@ -1,9 +1,13 @@
 import { toast } from "react-toastify";
+import CustomCreatedToast from "@/shared/CustomCreatedToast";
 import DonationToast from "@/shared/DonationToast";
 import { DEVELOP, RECEIVED_DONATION_NOTIFICATION, TOAST_AUTO_CLOSE_TIME } from "./constants";
-import { doOnce, getRandomValue, isDarkMode } from "./general";
+import { doOnce, getRandomValue } from "./general";
 
 const DEBOUNCE_TOAST_TIME = 500;
+const TOAST_BASE_CLASS =
+  "text-white border border-[var(--border-clr)] rounded-lg [--toastify-font-family:Ubuntu,sans-serif]";
+const TOAST_CLASS = `${TOAST_BASE_CLASS} !bg-[var(--toast-clr)] backdrop-blur-md`;
 
 const initErrors = [
   "The creator run out of imagination, failed to initialize cache",
@@ -52,9 +56,10 @@ export default class Toast {
 
   static success(message: string) {
     toast.success(message, {
-      theme: isDarkMode() ? "dark" : "light",
-      className: "border border-gray-600 rounded-lg [--toastify-icon-color-success:white]",
+      theme: "dark",
+      className: `${TOAST_CLASS} [--toastify-icon-color-success:white]`,
       hideProgressBar: true,
+      autoClose: 2500,
     });
   }
 
@@ -73,10 +78,20 @@ export default class Toast {
     doOnce(RECEIVED_DONATION_NOTIFICATION, () =>
       toast(DonationToast, {
         autoClose: false,
-        className: "!bg-[hsla(240,6%,14%,.95)] text-white border border-[var(--border-clr)] rounded-lg",
+        className: TOAST_CLASS,
         delay: 500,
       })
     );
+  }
+
+  static customCreated(url: string) {
+    toast(CustomCreatedToast, {
+      data: url,
+      autoClose: 10000,
+      closeButton: false,
+      hideProgressBar: true,
+      className: TOAST_CLASS,
+    });
   }
 
   static hideAllMessages() {
@@ -106,8 +121,8 @@ function showPromiseToast(promise: Promise<unknown>, params: PromiseToastParams)
     pendingToasts.add(params.pending);
     toast
       .promise(promise, params, {
-        theme: isDarkMode() ? "dark" : "light",
-        className: "border border-gray-600 rounded-lg",
+        theme: "dark",
+        className: TOAST_CLASS,
       })
       .finally(() => pendingToasts.delete(params.pending));
   }, DEBOUNCE_TOAST_TIME);
@@ -117,7 +132,7 @@ function showErrorToast(message: string) {
   if (pendingToasts.has(message)) return;
   pendingToasts.add(message);
   toast.error(message, {
-    className: "!bg-red-700 text-white dark:!bg-red-900 border border-gray-600 rounded-lg",
+    className: `${TOAST_BASE_CLASS} !bg-[var(--danger-clr)]`,
     hideProgressBar: true,
   });
   setTimeout(() => pendingToasts.delete(message), TOAST_AUTO_CLOSE_TIME);
@@ -127,8 +142,8 @@ function showWarningToast(message: string) {
   if (pendingToasts.has(message)) return;
   pendingToasts.add(message);
   toast.warn(message, {
-    theme: isDarkMode() ? "dark" : "light",
-    className: "border border-gray-600 rounded-lg",
+    theme: "dark",
+    className: TOAST_CLASS,
     hideProgressBar: true,
   });
   setTimeout(() => pendingToasts.delete(message), TOAST_AUTO_CLOSE_TIME);
@@ -138,7 +153,8 @@ function showInfoToast(message: string) {
   if (pendingToasts.has(message)) return;
   pendingToasts.add(message);
   toast.info(message, {
-    className: "!bg-cyan-900 text-white dark:!bg-gray-800 border border-gray-600 rounded-lg",
+    theme: "dark",
+    className: `${TOAST_CLASS} [--toastify-icon-color-info:white]`,
     hideProgressBar: true,
     autoClose: false,
     onClose() {

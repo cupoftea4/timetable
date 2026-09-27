@@ -16,11 +16,7 @@
 
 %popup {
   padding: .25rem;
-  background: hsla(240, 6%, 14%, .95);
-  border: 1px solid var(--border-clr);
-  border-radius: .5rem;
-  box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .3);
-  @include blur(2rem);
+  @include popup-surface;
   z-index: 110;
 }
 
@@ -233,11 +229,7 @@
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
   padding: 1.5rem;
-  border: 1px solid var(--border-clr);
-  border-radius: 1rem;
-  background-color: hsla(240, 6%, 14%, .95);
-  box-shadow: 2px 2px 11px 0 hsla(0, 0%, 0%, 0.7);
-  @include blur(2rem);
+  @include dialog-surface;
   &.confirm {
     width: min(26rem, calc(100vw - 2rem));
   }
@@ -334,10 +326,10 @@
           background-color: hsla(226, 55%, 94%, 0.9);
         }
         &.danger {
-          background-color: #913a3d;
+          background-color: var(--danger-clr);
           color: white;
           &:hover:not(:disabled) {
-            background-color: #a3454a;
+            background-color: var(--danger-hover-clr);
           }
         }
       }

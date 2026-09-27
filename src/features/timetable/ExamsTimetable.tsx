@@ -46,7 +46,7 @@ const ExamsTimetable: FC<OwnProps> = ({ exams, isLoading }) => {
             </div>
           ))
         : [0, 1, 2].map((placeholder) => (
-            <div key={placeholder} className={classes(styles.exam, "h-[106px] bg-neutral-500 !animate-pulse")} />
+            <div key={placeholder} className={classes(styles.exam, "h-[106px] bg-white/15 !animate-pulse")} />
           ))}
     </div>
   );

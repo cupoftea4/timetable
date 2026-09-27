@@ -1,6 +1,6 @@
 import type React from "react";
 import type { FC } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import ArrowRightIcon from "@/assets/ArrowRightIcon";
 import ExamIcon from "@/assets/ExamIcon";
 import HomeIcon from "@/assets/HomeIcon";
@@ -53,6 +53,7 @@ const TimetableHeader: FC<OwnProps> = ({
   const [isSecondSubgroup, setIsSecondSubgroup] = subgroupState;
   const [isSecondWeek, setIsSecondWeek] = weekState;
   const navigate = useNavigate();
+  const { state }: { state: { examsFrom?: string } | null } = useLocation();
   const group = useGroupParam();
   const isMobile = useIsMobile();
   const examsPublished = useExamsPublished();
@@ -81,7 +82,8 @@ const TimetableHeader: FC<OwnProps> = ({
   };
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
-    navigate(`/${examsGroup ?? group}${isExams ? "/exams" : ""}`);
+    if (isExams) navigate(`/${examsGroup ?? group}/exams`, { state: { examsFrom: group } });
+    else navigate(`/${state?.examsFrom ?? group}`);
   };
 
   const changeIsSecondSubgroup = (isSecond: boolean) => {

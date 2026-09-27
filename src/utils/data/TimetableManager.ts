@@ -236,7 +236,8 @@ class TimetableManager {
     const fetchData: ActualPromise<CustomTimetable> = FallbackData.getCustomTimetable(Util.getCustomId(group)).then(
       async (timetable) => {
         if (!timetable) {
-          await this.deleteTimetable(group);
+          // A merged timetable keeps the last lessons of a deleted custom one, they just stop updating
+          if (!LocalCache.sync.mergedTimetable?.timetables.includes(group)) await this.deleteTimetable(group);
           throw Toast.NONEXISTING_TIMETABLE;
         }
         await this.saveCustomLocally(group, timetable);
@@ -269,12 +270,12 @@ class TimetableManager {
   }
 
   getCustomDraft(group: string) {
-    const draft = LocalCache.sync.customDraft;
-    return draft?.group === group ? draft : undefined;
+    return LocalCache.sync.customDrafts?.[group];
   }
 
-  saveCustomDraft(draft: CustomTimetableDraft | null) {
-    return LocalCache.set("customDraft", draft);
+  saveCustomDraft(group: string, draft: CustomTimetableDraft | null) {
+    const { [group]: _, ...drafts } = LocalCache.sync.customDrafts ?? {};
+    return LocalCache.set("customDrafts", draft ? { ...drafts, [group]: draft } : drafts);
   }
 
   async saveExamsLocally(group: string, timetable?: ExamsTimetableItem[] | null) {
@@ -290,7 +291,11 @@ class TimetableManager {
     if (!timetableNames) throw Error("Merge doesn't exist!");
     const timetables = timetableNames.map((el) => ({ name: el, data: this.getTimetable(el) }));
     const cachePromises = timetables.map(({ name, data }) => data[0].then((timetable) => ({ timetable, name })));
-    const fetchPromises = timetables.map(({ name, data }) => data[1].then((timetable) => ({ timetable, name })));
+    const fetchPromises = timetables.map(({ name, data }) =>
+      data[1]
+        .catch((error) => (error === Toast.NONEXISTING_TIMETABLE ? data[0] : Promise.reject(error)))
+        .then((timetable) => ({ timetable, name }))
+    );
     const cacheData: OptimisticPromise<MergedTimetableItem[]> = Promise.all(cachePromises)
       .then((timetables) => Util.mergeTimetables(timetables))
       .catch((err) => {

@@ -11,6 +11,7 @@ import useGroupParam from "@/hooks/useGroupParam";
 import { useTheme } from "@/hooks/useTheme";
 import { classes } from "@/styles/utils";
 import type { CustomTimetable } from "@/types/timetable";
+import { getTimetableName } from "@/utils/timetable";
 import styles from "./TimetableFooter.module.scss";
 
 type OwnProps = {
@@ -24,6 +25,7 @@ type OwnProps = {
   customTimetable?: CustomTimetable;
   onEdit?: () => void;
   editTitle: string;
+  isOwner: boolean;
   onCalendarExport: () => void;
 };
 
@@ -36,18 +38,25 @@ const TimetableFooter: FC<OwnProps> = ({
   customTimetable,
   onEdit,
   editTitle,
+  isOwner,
   onCalendarExport,
   showCreateMergedModal,
   updateTimetable,
 }) => {
   const group = useGroupParam();
   const { toggleTheme } = useTheme();
+  const customTimetableUpdatedAt = customTimetable && new Date(customTimetable.updatedAt);
+  const customTimetableUpdatedAtText = customTimetableUpdatedAt
+    ? customTimetableUpdatedAt.toDateString() === new Date().toDateString()
+      ? customTimetableUpdatedAt.toLocaleTimeString()
+      : customTimetableUpdatedAt.toLocaleDateString()
+    : "";
 
   return (
     <footer className={styles.bottom}>
       <span className={styles.container}>
         <button
-          title="Змінити тему"
+          data-tooltip="Змінити тему"
           className={classes(styles.theme, styles.button)}
           onClick={toggleTheme}
           aria-label="Змінити тему"
@@ -60,7 +69,7 @@ const TimetableFooter: FC<OwnProps> = ({
         <button
           type="button"
           aria-label="Об`єднати кілька розкладів в одну таблицю"
-          title="Об`єднати кілька розкладів в одну таблицю"
+          data-tooltip="Об`єднати кілька розкладів в одну таблицю"
           onClick={showCreateMergedModal}
           className={classes(styles.merge, styles.button)}
         >
@@ -70,7 +79,7 @@ const TimetableFooter: FC<OwnProps> = ({
           type="button"
           disabled={loading}
           className={classes(styles.update, styles.button, loading && styles.pending)}
-          title="Оновити дані"
+          data-tooltip="Оновити дані"
           aria-label="Оновити дані"
           onClick={() => {
             updateTimetable();
@@ -80,7 +89,7 @@ const TimetableFooter: FC<OwnProps> = ({
         </button>
         <a
           className={classes(styles.download, styles.button)}
-          title="Експортувати розклад для Google Calendar"
+          data-tooltip="Експортувати розклад для Google Calendar"
           href={icsFILE}
           download={isExamsTimetable ? `${group}-exams.ics` : `${group}-${isSecondSubgroup ? 2 : 1}.ics`}
           aria-label="Експортувати розклад для Google Calendar"
@@ -89,26 +98,37 @@ const TimetableFooter: FC<OwnProps> = ({
           <DownloadIcon />
         </a>
         {onEdit && (
-          <button type="button" className={styles.button} title={editTitle} aria-label={editTitle} onClick={onEdit}>
+          <button
+            type="button"
+            className={styles.button}
+            data-tooltip={editTitle}
+            aria-label={editTitle}
+            onClick={onEdit}
+          >
             <PencilIcon />
           </button>
         )}
       </span>
       {customTimetable ? (
         <p>
-          Змінений розклад на основі{" "}
+          {isOwner && (
+            <span className="underline decoration-dotted" data-tooltip="Редагувати його можна лише в цьому браузері">
+              Ваш
+            </span>
+          )}
+          {isOwner ? " змінений" : "Змінений"} розклад на основі{" "}
           {customTimetable.sourceNames.map((source, i) => (
             <Fragment key={source}>
               {i > 0 && ", "}
               <Link to={`/${source}`} className="underline">
-                {source}
+                {getTimetableName(source)}
               </Link>
             </Fragment>
           ))}{" "}
-          · оновлено {new Date(customTimetable.updatedAt).toLocaleDateString("uk-UA")}
+          · оновлено {customTimetableUpdatedAtText}
         </p>
       ) : (
-        time && <p>Last updated {new Date(time).toLocaleString()}</p>
+        time && <p>Оновлено {new Date(time).toLocaleString()}</p>
       )}
     </footer>
   );

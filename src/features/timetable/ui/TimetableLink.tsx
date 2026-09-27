@@ -1,8 +1,9 @@
 import { CloseButton, Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
-import { type FC, useEffect, useState } from "react";
+import type { FC } from "react";
 import LinkIcon from "@/shared/LinkIcon";
 import type { TimetableItemType } from "@/types/timetable";
 import { parseLessonLink } from "@/utils/lessonLinks";
+import Toast from "@/utils/toasts";
 import { classes } from "../../../styles/utils";
 import styles from "./TimetableLink.module.scss";
 
@@ -11,36 +12,18 @@ type OwnProps = {
   type: TimetableItemType;
 };
 
-type CopyStatus = "idle" | "copied" | "failed";
-
 const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
-  const [copyStatus, setCopyStatus] = useState<CopyStatus>("idle");
   const entries = urls.map(parseLessonLink);
   const links = [...new Set(entries.flatMap((entry) => entry.links))];
   const hasDetails = entries.some((entry) => !entry.directUrl);
   const originalText = urls.join("\n\n");
 
-  const copyDetails = async () => {
-    try {
-      await navigator.clipboard.writeText(originalText);
-      setCopyStatus("copied");
-    } catch {
-      setCopyStatus("failed");
-    }
-  };
+  const copyDetails = () =>
+    navigator.clipboard.writeText(originalText).then(
+      () => Toast.success("Скопійовано"),
+      (e) => Toast.error(e, "Не вдалося скопіювати. Виділіть текст вручну.")
+    );
 
-  useEffect(() => {
-    if (copyStatus !== "copied") return;
-    const timeout = window.setTimeout(() => setCopyStatus("idle"), 2000);
-    return () => window.clearTimeout(timeout);
-  }, [copyStatus]);
-
-  const copyMessage =
-    copyStatus === "copied"
-      ? "Copied!"
-      : copyStatus === "failed"
-        ? "Couldn't copy. Select the text to copy it manually."
-        : null;
   return (
     <>
       {entries.length === 1 && !hasDetails && links[0] ? (
@@ -49,9 +32,9 @@ const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
           {new URL(links[0]).hostname}
         </a>
       ) : entries.length > 0 ? (
-        <Popover as="nav" className={styles.links} aria-label={hasDetails ? "Lesson details" : "Lesson links"}>
-          <PopoverButton className={type} onClick={() => setCopyStatus("idle")}>
-            <span>{hasDetails ? "Details" : "Links"}</span>
+        <Popover as="nav" className={styles.links} aria-label={hasDetails ? "Деталі пари" : "Посилання пари"}>
+          <PopoverButton className={type}>
+            <span>{hasDetails ? "Деталі" : "Посилання"}</span>
             <svg className={styles.arrow} viewBox="0 0 16 16" aria-hidden="true">
               <path d="M12 6H4l4 4.5z" />
             </svg>
@@ -78,12 +61,11 @@ const TimetableLink: FC<OwnProps> = ({ urls, type }) => {
                           )}
                         </p>
                       ))
-                    : "No details provided."}
+                    : "Деталей немає."}
                 </div>
                 <div className={styles.actions}>
-                  {copyMessage && <span role="status">{copyMessage}</span>}
                   <button type="button" onClick={copyDetails}>
-                    Copy
+                    Скопіювати
                   </button>
                 </div>
               </>
