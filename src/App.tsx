@@ -6,9 +6,9 @@ import { useTheme } from "./hooks/useTheme";
 import LoadingPage from "./pages/LoadingPage";
 import NavigationSelector from "./pages/NavigationSelector";
 import { Status } from "./types/utils";
-import { RECEIVED_DONATION_NOTIFICATION, TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
+import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 import TimetableManager from "./utils/data/TimetableManager";
-import { doOnce } from "./utils/general";
+import { isFeaturesIntroDue } from "./utils/general";
 import { pathnameToType } from "./utils/timetable";
 import Toast from "./utils/toasts";
 
@@ -35,9 +35,8 @@ const App = () => {
     TimetableManager.init(pathnameToType(window.location.pathname))
       .then(() => {
         setStatus(Status.Idle);
-        doOnce(RECEIVED_DONATION_NOTIFICATION, () => {
-          Toast.donationNotification();
-        });
+        // The intro's modal would block the toast, so it waits until the intro is closed
+        if (!isFeaturesIntroDue()) Toast.donationNotification();
       })
       .catch((e) => {
         setStatus(Status.Failed);
@@ -57,6 +56,7 @@ const App = () => {
                 <Route path="selective" element={<HomePage timetableType="selective" />} />
                 <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
                 <Route path="waifu" element={WaifuPage ? <WaifuPage /> : <Navigate to="/home" replace />} />
+                <Route path="/c/:id" element={<TimetablePage />} />
                 <Route path="/:group" element={<TimetablePage />} />
                 <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
               </Routes>
@@ -67,6 +67,7 @@ const App = () => {
         <LoadingPage />
       )}
       <MessageToast
+        className="[--toastify-toast-width:23rem]"
         position="bottom-right"
         theme="colored"
         pauseOnFocusLoss={false}

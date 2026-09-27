@@ -1,4 +1,6 @@
 import type { RenderPromises } from "@/types/utils";
+import { SEEN_FEATURES_INTRO } from "./constants";
+import { getCurrentUADate } from "./date";
 
 /**
  * Renders the optimistic data first, then the real data if possible.
@@ -113,3 +115,7 @@ export function doOnce(id: string, fn: () => void) {
   fn();
   localStorage.setItem(id, "true");
 }
+
+// New users see the features intro in September
+export const isFeaturesIntroDue = () =>
+  getCurrentUADate().getMonth() === 8 && !localStorage.getItem(SEEN_FEATURES_INTRO);

@@ -47,7 +47,7 @@ export const DisableCatModeButton = () => {
       type="button"
       className="cat-mode-toggle"
       onClick={context.disable}
-      title="Вимкнути котячий режим"
+      data-tooltip="Вимкнути котячий режим"
       aria-label="Вимкнути котячий режим"
     />
   ) : null;

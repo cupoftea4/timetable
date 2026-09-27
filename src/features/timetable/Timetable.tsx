@@ -132,7 +132,7 @@ const Timetable: FC<OwnProps> = ({
               key={time.start + day}
               className={classes(
                 "h-10 w-60",
-                skeletonTimetable.lessons.has(`${j}-${i + 1}`) && "bg-neutral-500 animate-pulse"
+                skeletonTimetable.lessons.has(`${j}-${i + 1}`) && "bg-white/15 animate-pulse"
               )}
             />
           )
@@ -183,7 +183,7 @@ const Timetable: FC<OwnProps> = ({
               Array.from({ length: 3 }).map((_, index) => (
                 // biome-ignore lint/suspicious/noArrayIndexKey: This is fine
                 <div key={index} className="px-0.5">
-                  <div className="rounded-xl h-[85.7px] w-full bg-neutral-500 animate-pulse mb-2" />
+                  <div className="rounded-xl h-[85.7px] w-full bg-white/15 animate-pulse mb-2" />
                 </div>
               ))
             )}

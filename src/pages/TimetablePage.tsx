@@ -1,21 +1,38 @@
 import { type FC, lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useTimetableISCFile from "@/features/footer/hooks/useTimetableISCFile";
 import TimetableFooter from "@/features/footer/TimetableFooter";
 import TimetableHeader from "@/features/header/TimetableHeader";
 import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
+import useGroupParam from "@/hooks/useGroupParam";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
-import type { ExamsTimetableItem, HalfTerm, Semester, TimetableItem, TimetableType } from "@/types/timetable";
+import useWindowDimensions from "@/hooks/useWindowDimensions";
+import { classes } from "@/styles/utils";
+import type {
+  CustomTimetable,
+  CustomTimetableDraft,
+  ExamsTimetableItem,
+  HalfTerm,
+  Semester,
+  TimetableItem,
+  TimetableType,
+} from "@/types/timetable";
 import type { RenderPromises } from "@/types/utils";
+import { SEEN_CALENDAR_HELP, SEEN_FEATURES_INTRO, TIMETABLE_SCREEN_BREAKPOINT } from "@/utils/constants";
+import { getDefaultCustomName, toCustomLessons, toTimetableItems } from "@/utils/customTimetable";
 import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
-import { optimisticRender } from "@/utils/general";
+import { isFeaturesIntroDue, optimisticRender } from "@/utils/general";
+import { CUSTOM_PREFIX } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import styles from "./TimetablePage.module.scss";
 
 const CreateMergedModal = lazy(() => import("@/features/merged_modal/CreateMergedModal"));
+const TimetableEditor = lazy(() => import("@/features/editor/TimetableEditor"));
+const FeaturesIntro = lazy(() => import("@/features/intro/FeaturesIntro"));
+const CalendarHelp = lazy(() => import("@/features/intro/CalendarHelp"));
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => {
   // yeah, naming! :)
@@ -31,18 +48,31 @@ type OwnProps = {
   isExamsTimetable?: boolean;
 };
 
+type LocationState = { source?: string; isCustom?: boolean; editFromView?: boolean; examsFrom?: string };
+
 const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
-  const group = useParams().group?.trim() ?? "";
+  const group = useGroupParam();
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
   const [timetable, setTimetable] = useState<TimetableItem[]>();
   const [examsTimetable, setExamsTimetable] = useState<ExamsTimetableItem[]>();
+  const [customTimetable, setCustomTimetable] = useState<CustomTimetable>();
   const [isSecondSubgroup, setIsSecondSubgroup] = useState(isSecondNULPSubgroup);
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
   const [partials, setPartials] = useState<HalfTerm[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateMergedModal, setShowCreateMergedModal] = useState(false);
+  // Only in September, when new students start using the site
+  const [showIntro, setShowIntro] = useState(isFeaturesIntroDue);
+  const [showCalendarHelp, setShowCalendarHelp] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState<Date | undefined>();
   const [semester, setSemester] = useState<Semester>();
+  const { state, search }: { state: LocationState | null; search: string } = useLocation();
+  const isEditing = new URLSearchParams(search).has("edit");
+  const isDesktop = useWindowDimensions().width >= TIMETABLE_SCREEN_BREAKPOINT;
+  // Starting from the saved draft avoids flashing the timetable before the editor on reload
+  const [editor, setEditor] = useState(() =>
+    isEditing && isDesktop ? TimetableManager.getCustomDraft(group) : undefined
+  );
 
   const navigate = useNavigate();
   const timetableRef = useRef<HTMLElement>(null);
@@ -55,7 +85,15 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const isLoading = isExamsTimetable ? !examsTimetable : !timetable;
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
-  const isLecturers = timetableType === "lecturer";
+  const hasCellSubgroups = timetableType === "lecturer" || customTimetable?.subgroupToggle === false;
+  const editToken = customTimetable && TimetableManager.getCustomEditToken(customTimetable.id);
+  const isEditable = isDesktop && !isExamsTimetable && timetableType !== "parttime";
+  const canEdit = isEditable && Boolean(timetable);
+  const editTitle = editToken
+    ? "Редагувати розклад"
+    : customTimetable
+      ? "Створити копію розкладу для редагування"
+      : "Створити змінену версію розкладу";
 
   useEffect(() => {
     void getCurrentSemester().then(setSemester);
@@ -77,7 +115,6 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     return [];
   }, [timetableType, timetable, selectedWeek]);
 
-  const { state }: { state: { source: string; isCustom?: boolean } | null } = useLocation();
   const { source, isCustom } = state ?? {};
 
   useGTagTimetableEvents(group, source ?? "url", isCustom);
@@ -85,7 +122,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   function onError(e: string, userError?: string) {
     if (isExamsTimetable) {
       Toast.error(e, userError ?? Toast.NO_EXAMS);
-      navigate(`/${group}`, { state: { source: "no-exams" } });
+      navigate(`/${state?.examsFrom ?? group}`, { state: { source: "no-exams" } });
       return;
     }
     Toast.error(e, userError);
@@ -123,6 +160,14 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
       if (!optimistic && type === "timetable") TimetableManager.getPartials(group).then(setPartials);
     };
+    if (type === "custom") {
+      const renderCustomTimetable = (timetable: CustomTimetable, optimistic: boolean) => {
+        setCustomTimetable(timetable);
+        renderTimetable(toTimetableItems(timetable.lessons), optimistic);
+      };
+      const onCustomError = (e: string) => onError(e, e === Toast.NONEXISTING_TIMETABLE ? e : undefined);
+      return optimisticRender(renderCustomTimetable, onCustomError, TimetableManager.getCustomTimetable(group));
+    }
     try {
       return optimisticRender(renderTimetable, onError, TimetableManager.getTimetable(group, type, checkCache));
     } catch (_e) {
@@ -148,6 +193,68 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     });
   };
 
+  function createEditor(): CustomTimetableDraft {
+    if (customTimetable) {
+      const { id, name, subgroupToggle, lessons, sourceNames } = customTimetable;
+      const start = { name: editToken ? name : `${name.slice(0, 52)} (копія)`, subgroupToggle, lessons };
+      const saved = editToken ? { id, editToken } : undefined;
+      return { group, timetable: start, draft: start, sourceNames, saved };
+    }
+    const sourceNames =
+      timetableType === "merged" ? (TimetableManager.cachedMergedTimetable?.timetables ?? []) : [group];
+    const start = {
+      name: getDefaultCustomName(sourceNames),
+      subgroupToggle: timetableType !== "lecturer",
+      lessons: toCustomLessons(timetable ?? []),
+    };
+    return { group, timetable: start, draft: start, sourceNames };
+  }
+
+  // Edit mode lives in the url (?edit), so going back leaves it and a reload keeps it. The draft is kept
+  // until cancel, save or delete, so reopening the editor continues it.
+  useEffect(() => {
+    if (!isEditing || !isEditable) setEditor(undefined);
+    else if (!editor) setEditor(TimetableManager.getCustomDraft(group) ?? (timetable && createEditor()));
+  });
+
+  const openEditor = () => navigate({ search: "?edit" }, { state: { ...state, editFromView: true } });
+
+  function showCalendarHelpOnce() {
+    if (localStorage.getItem(SEEN_CALENDAR_HELP)) return;
+    localStorage.setItem(SEEN_CALENDAR_HELP, "true");
+    setShowCalendarHelp(true);
+  }
+
+  function closeIntro() {
+    localStorage.setItem(SEEN_FEATURES_INTRO, "true");
+    setShowIntro(false);
+    Toast.donationNotification();
+  }
+
+  function exitEditMode() {
+    // Return to the entry the editor was opened from instead of stacking another one on top
+    if (state?.editFromView) navigate(-1);
+    else navigate({ search: "" }, { replace: true, state });
+  }
+
+  function closeEditor() {
+    TimetableManager.saveCustomDraft(group, null);
+    exitEditMode();
+  }
+
+  async function onEditorSaved(saved: CustomTimetable) {
+    // A new custom timetable keeps the subgroup selected in the one it was made from
+    await TimetableManager.saveCustomLocally(CUSTOM_PREFIX + saved.id, saved, isSecondSubgroup ? 2 : 1);
+    if (group === CUSTOM_PREFIX + saved.id) {
+      closeEditor();
+      updateTimetable();
+      return;
+    }
+    TimetableManager.saveCustomDraft(group, null);
+    navigate(`/${CUSTOM_PREFIX}${saved.id}`, { replace: true });
+    Toast.customCreated(`${window.location.origin}/${CUSTOM_PREFIX}${saved.id}`);
+  }
+
   function renderTimetableFromPromises(promises: RenderPromises<TimetableItem[]>) {
     optimisticRender(
       (timetable: TimetableItem[]) => {
@@ -158,12 +265,40 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     );
   }
 
+  if (isEditing && !isDesktop) {
+    return (
+      <div className={classes(styles.wrapper, styles.editNotice)}>
+        <h2>Редагування доступне лише на широкому екрані</h2>
+        <p>Відкрийте цей розклад на комп'ютері або розширте вікно браузера.</p>
+        <button type="button" onClick={exitEditMode}>
+          Повернутися до розкладу
+        </button>
+      </div>
+    );
+  }
+
+  if (isEditing && editor) {
+    return (
+      <div className={styles.wrapper}>
+        <Suspense fallback={null}>
+          <TimetableEditor
+            {...editor}
+            subgroup={isSecondSubgroup ? 2 : 1}
+            onCancel={closeEditor}
+            onSaved={onEditorSaved}
+          />
+        </Suspense>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.wrapper}>
       <TimetableHeader
         isExamsTimetable={isExamsTimetable}
         timetableType={timetableType}
-        isLecturers={isLecturers}
+        hasCellSubgroups={hasCellSubgroups}
+        customTimetable={customTimetable}
         partials={partials}
         subgroupState={[isSecondSubgroup, setIsSecondSubgroup]}
         weekState={[isSecondWeek, setIsSecondWeek]}
@@ -181,7 +316,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
                 timetable={timetable ?? []}
                 isSecondWeek={isSecondWeek}
                 isSecondSubgroup={isSecondSubgroup}
-                hasCellSubgroups={isLecturers}
+                hasCellSubgroups={hasCellSubgroups}
                 isLoading={isLoading}
                 timetableType={timetableType}
                 selectedWeek={selectedWeek}
@@ -205,7 +340,22 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
         isSecondSubgroup={isSecondSubgroup}
         icsFILE={iscFile}
         time={time}
+        customTimetable={customTimetable}
+        onEdit={canEdit ? openEditor : undefined}
+        onCalendarExport={showCalendarHelpOnce}
+        editTitle={editTitle}
+        isOwner={Boolean(editToken)}
       />
+      {showCalendarHelp && (
+        <Suspense fallback={null}>
+          <CalendarHelp isExams={isExamsTimetable} onClose={() => setShowCalendarHelp(false)} />
+        </Suspense>
+      )}
+      {showIntro && timetable && !isExamsTimetable && (
+        <Suspense fallback={null}>
+          <FeaturesIntro onClose={closeIntro} />
+        </Suspense>
+      )}
       {showCreateMergedModal && (
         <Suspense fallback={null}>
           <CreateMergedModal
@@ -221,4 +371,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   );
 };
 
-export default TimetablePage;
+// A fresh page per timetable, so state and late responses from the previous one don't leak into it
+const TimetablePageRoute: FC<OwnProps> = (props) => <TimetablePage key={useGroupParam()} {...props} />;
+
+export default TimetablePageRoute;

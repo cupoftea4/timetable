@@ -14,7 +14,8 @@ import { findAndConvertRomanNumeral, hashCode } from "./general";
 
 const UPDATE_PERIOD = 24 * 60 * 60 * 1000; // 1 day
 
-const lessonsComparator = (a: TimetableItem, b: TimetableItem) => a.subject === b.subject && a.lecturer === b.lecturer;
+const lessonsComparator = (a: TimetableItem, b: TimetableItem) =>
+  a.subject === b.subject && a.lecturer === b.lecturer && a.type === b.type;
 
 export const lessonsTimes: ReadonlyArray<{ readonly start: string; readonly end: string }> = [
   { start: "8:30", end: "9:50" },
@@ -38,13 +39,25 @@ export function mergeTimetables(timetables: Array<{ name: string; timetable: Tim
   return mergedTimetable;
 }
 
+export const CUSTOM_PREFIX = "c/";
+
+export function isCustom(timetable: string) {
+  return timetable.startsWith(CUSTOM_PREFIX);
+}
+
+export function getCustomId(timetable: string) {
+  return timetable.slice(CUSTOM_PREFIX.length);
+}
+
 export function isMerged(timetable: string) {
-  return timetable.includes("my") || timetable.includes("Мій розклад");
+  return timetable === "my";
 }
 
 export function getTimetableName(timetable: CachedTimetable | string) {
   const name = typeof timetable === "string" ? timetable : timetable.group;
   if (isMerged(name)) return "Мій розклад";
+  if (isCustom(name))
+    return TimetableManager.cachedTimetables.find((t) => t.group === name)?.name ?? "Змінений розклад";
   return name.replace(/(\d)З$/, "$1з");
 }
 

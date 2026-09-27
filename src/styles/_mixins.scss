@@ -1,6 +1,24 @@
 @use './variables' as vars;
 @use './utils' as utils;
 
+// Modal dialogs
+@mixin dialog-surface {
+  border: 1px solid var(--border-clr);
+  border-radius: 1rem;
+  background-color: var(--surface-clr);
+  box-shadow: 2px 2px 11px 0 hsla(0, 0%, 0%, 0.7);
+  @include utils.blur(2rem);
+}
+
+// Menus and dropdowns
+@mixin popup-surface {
+  border: 1px solid var(--border-clr);
+  border-radius: .5rem;
+  background-color: var(--surface-clr);
+  box-shadow: 0 .5rem 1.5rem rgba(0, 0, 0, .3);
+  @include utils.blur(2rem);
+}
+
 @mixin small-italic-text {
   font-size: 0.75rem;
   font-style: italic;

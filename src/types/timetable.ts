@@ -26,10 +26,28 @@ export type ExamsTimetableItem = {
 export type TimetableItemType = "lection" | "practical" | "lab" | "consultation";
 export type Semester = "1" | "2";
 export type LPNUTimetableType = "timetable" | "selective" | "lecturer" | "parttime";
-export type TimetableType = LPNUTimetableType | "merged";
+export type TimetableType = LPNUTimetableType | "merged" | "custom";
 
-export type CachedTimetable = { group: string; time: number; subgroup?: 1 | 2 };
+export type CachedTimetable = { group: string; time: number; subgroup?: 1 | 2; name?: string };
 export type MergedTimetable = CachedTimetable & { timetables: string[] };
+export type CustomLesson = Pick<TimetableItem, "day" | "number" | "subject" | "lecturer" | "location" | "type"> & {
+  week: "all" | "chys" | "znam";
+  subgroup: "all" | 1 | 2;
+  details: string;
+};
+export type CustomTimetableData = { name: string; subgroupToggle: boolean; lessons: CustomLesson[] };
+export type CustomTimetable = CustomTimetableData & { id: string; sourceNames: string[]; updatedAt: string };
+export type CustomTimetableDraft = {
+  /** Page the editor was opened on */
+  group: string;
+  /** State before editing, to know if there are changes */
+  timetable: CustomTimetableData;
+  draft: CustomTimetableData;
+  sourceNames: string[];
+  /** Missing until the first save creates the custom timetable */
+  saved?: { id: string; editToken: string };
+};
+
 export type CachedGroup = string;
 export type CachedInstitute = string;
 

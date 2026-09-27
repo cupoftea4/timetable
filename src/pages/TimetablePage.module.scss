@@ -18,6 +18,32 @@
   }
 }
 
+.editNotice {
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  padding: 2rem 1.25rem;
+  text-align: center;
+  color: $extra-text-clr;
+  h2 {
+    font-size: 1.5rem;
+    font-weight: $semi-bold-font;
+    color: var(--text-clr);
+  }
+  // Same as the merge dialog's button
+  button {
+    margin-top: .75rem;
+    padding: .5em 1em;
+    border-radius: .5em;
+    background-color: hsla(0, 0%, 100%, 0.9);
+    color: hsla(0, 0%, 0%, 0.8);
+    transition: background-color .2s;
+    &:hover {
+      background-color: hsla(226, 55%, 94%, 0.9);
+    }
+  }
+}
+
 /* Timetable on mobile */
 .container {
   display: flex;

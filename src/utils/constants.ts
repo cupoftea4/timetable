@@ -22,6 +22,8 @@ if (!import.meta.env.VITE_ZNAM_WEEK_START) {
 export const ZNAM_WEEK_START = new Date(`${import.meta.env.VITE_ZNAM_WEEK_START}T00:00:00`);
 
 export const RECEIVED_DONATION_NOTIFICATION = "received-donation-notification";
+export const SEEN_FEATURES_INTRO = "seen-features-intro";
+export const SEEN_CALENDAR_HELP = "seen-calendar-help";
 
 export const DONATION_LINK = "https://send.monobank.ua/jar/AR9WWgQGpz";
 export const BUG_REPORT_LINK = "https://t.me/lpnu_timetable";

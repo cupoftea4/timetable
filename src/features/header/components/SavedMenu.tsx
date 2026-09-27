@@ -1,9 +1,9 @@
 import { CloseButton, Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { type FC, Fragment, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import CheckMarkIcon from "@/assets/CheckMarkIcon";
+import { Link } from "react-router-dom";
 import HistoryIcon from "@/assets/HistoryIcon";
 import RemoveIcon from "@/assets/RemoveIcon";
+import useGroupParam from "@/hooks/useGroupParam";
 import { classes } from "@/styles/utils";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getTimetableName, isMerged } from "@/utils/timetable";
@@ -25,7 +25,7 @@ function getCachedGroups(): string[] {
 }
 
 const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
-  const groupParam = useParams().group?.trim();
+  const groupParam = useGroupParam();
   const [savedGroups, setSavedGroups] = useState<string[]>(getCachedGroups);
   // Hover's programmatic click can trigger :focus-visible; keep the outline for keyboard focus only.
   const [pointerFocus, setPointerFocus] = useState(false);
@@ -83,14 +83,17 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged }) => {
               </span>
               <ul>
                 {savedGroups.map((group, index) => (
-                  <li key={group}>
+                  <li key={group} className={classes(groupParam === group && styles.active)}>
                     <CloseButton as={Link} to={`/${group}`} state={{ source: "saved" }} className={styles["list-item"]}>
                       <span
                         className={styles.name}
-                        title={isMerged(group) ? TimetableManager.cachedMergedTimetable?.timetables?.join("+") : group}
+                        title={
+                          isMerged(group)
+                            ? TimetableManager.cachedMergedTimetable?.timetables?.join("+")
+                            : getTimetableName(group)
+                        }
                       >
                         {getTimetableName(group)}
-                        {groupParam === group ? <CheckMarkIcon className={styles["check-mark"]} /> : null}
                       </span>
                     </CloseButton>
                     <button
