@@ -1,11 +1,8 @@
 import type React from "react";
 import type { FC } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import ArrowRightIcon from "@/assets/ArrowRightIcon";
-import ExamIcon from "@/assets/ExamIcon";
 import HomeIcon from "@/assets/HomeIcon";
 import ShareIcon from "@/assets/ShareIcon";
-import useExamsPublished from "@/hooks/useExamsPublished";
 import useGroupParam from "@/hooks/useGroupParam";
 import usePageTitle from "@/hooks/usePageTitle";
 import { useIsMobile } from "@/hooks/useWindowDimensions";
@@ -18,6 +15,7 @@ import Toast from "@/utils/toasts";
 import WeekNavigation from "../timetable/ui/WeekNavigation";
 import SavedMenu from "./components/SavedMenu";
 import TimetablePartials from "./components/TimetablePartials";
+import TimetableViewSelect from "./components/TimetableViewSelect";
 import generalStyles from "./HeaderPanel.module.scss";
 import styles from "./TimetableHeader.module.scss";
 
@@ -56,7 +54,6 @@ const TimetableHeader: FC<OwnProps> = ({
   const { state }: { state: { examsFrom?: string } | null } = useLocation();
   const group = useGroupParam();
   const isMobile = useIsMobile();
-  const examsPublished = useExamsPublished();
   const groupTitle = customTimetable?.name ?? (timetableType === "merged" ? "Мій розклад" : getTimetableName(group));
   usePageTitle(groupTitle);
 
@@ -119,10 +116,12 @@ const TimetableHeader: FC<OwnProps> = ({
             </button>
           )}
         </div>
-        <h1 className={styles.title}>
-          {groupTitle}
-          {isExamsTimetable && <span className={styles.mode}>Екзамени</span>}
-        </h1>
+        <div className={styles["title-group"]}>
+          <h1 className={styles.title}>{groupTitle}</h1>
+          {timetableType !== "selective" && timetableType !== "parttime" && (
+            <TimetableViewSelect isExams={isExamsTimetable} onChange={handleIsExamsTimetableChange} />
+          )}
+        </div>
       </nav>
       {!isExamsTimetable && (
         <span className={styles.controls}>
@@ -143,41 +142,6 @@ const TimetableHeader: FC<OwnProps> = ({
             </>
           )}
           <TimetablePartials partials={partials} handlePartialClick={updatePartialTimetable} />
-        </span>
-      )}
-      {examsGroup && timetableType !== "selective" && timetableType !== "parttime" && (
-        <span className={styles.actions}>
-          <button
-            type="button"
-            className={classes(
-              generalStyles.exams,
-              isExamsTimetable && generalStyles.back,
-              !isExamsTimetable && examsPublished && generalStyles.published
-            )}
-            title={
-              isExamsTimetable
-                ? "Повернутися до розкладу пар"
-                : examsPublished
-                  ? "Відкрити розклад екзаменів"
-                  : "Відкрити розклад екзаменів (можливо, ще не опублікований)"
-            }
-            onClick={() => {
-              handleIsExamsTimetableChange(!isExamsTimetable);
-            }}
-          >
-            {isExamsTimetable ? (
-              <>
-                <ArrowRightIcon className={generalStyles.arrow} />
-                {isMobile ? "Пари" : "Розклад пар"}
-              </>
-            ) : (
-              <>
-                <ExamIcon className={generalStyles["exam-icon"]} />
-                {isMobile ? "Екзамени" : "Розклад екзаменів"}
-                <ArrowRightIcon className={generalStyles.arrow} />
-              </>
-            )}
-          </button>
         </span>
       )}
     </header>
