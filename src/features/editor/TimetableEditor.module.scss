@@ -17,10 +17,10 @@
 %popup {
   padding: .25rem;
   @include popup-surface;
+  background-color: var(--field-clr);
   z-index: 110;
 }
 
-// Matches the site's pill toggles: transparent by default, `.primary` gets the pill background
 %action {
   padding: .25rem .875rem;
   border: 1px solid transparent;
@@ -36,10 +36,10 @@
     cursor: default;
   }
   &.primary {
-    background-color: var(--accent-clr);
+    background-color: var(--field-clr);
     border-color: var(--border-clr);
     &:hover:not(:disabled) {
-      background-color: rgba(255, 255, 255, .3);
+      background-color: color-mix(in srgb, var(--field-clr), white 12%);
     }
   }
   &.danger {
@@ -63,35 +63,46 @@
   gap: .75rem;
   margin-bottom: .5rem;
   .name {
-    // Only as wide as the text, so the underline stays under it
     field-sizing: content;
     min-width: 6ch;
-    padding: 0 0 .125rem;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
+    margin-left: -.5rem;
+    padding: .125rem .5rem;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: .5rem;
     outline: none;
     color: var(--text-clr);
     font-size: 2rem;
     font-weight: $semi-bold-font;
     line-height: 1.2;
-    transition: border-color .08s ease-out;
+    transition: background-color .12s ease-out, border-color .12s ease-out;
     &:hover {
-      border-bottom-color: var(--border-clr);
+      background-color: color-mix(in srgb, var(--field-clr), transparent 50%);
+      :global(.dark-mode) & {
+        background-color: color-mix(in srgb, var(--field-clr), transparent 25%);
+      }
     }
-    &:focus-visible {
-      border-bottom-color: rgba(255, 255, 255, .5);
+    &:focus {
+      background-color: var(--field-clr);
+      border-color: rgba(255, 255, 255, .35);
     }
   }
   .button {
     @extend %action;
   }
-  .ai {
-    margin-left: auto;
-    border-color: var(--border-clr);
-  }
   .more {
+    margin-left: auto;
     letter-spacing: .1em;
+  }
+}
+
+.sources {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-bottom: .5rem;
+  .sourcesLabel {
+    color: $extra-text-clr;
   }
 }
 

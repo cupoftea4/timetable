@@ -1,9 +1,12 @@
+import { Menu, MenuButton, MenuItem, MenuItems, MenuSeparator } from "@headlessui/react";
 import type React from "react";
 import type { FC } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import ArrowRightIcon from "@/assets/ArrowRightIcon";
 import ExamIcon from "@/assets/ExamIcon";
+import EyeIcon from "@/assets/EyeIcon";
 import HomeIcon from "@/assets/HomeIcon";
+import KeyIcon from "@/assets/KeyIcon";
 import ShareIcon from "@/assets/ShareIcon";
 import useExamsPublished from "@/hooks/useExamsPublished";
 import useGroupParam from "@/hooks/useGroupParam";
@@ -26,6 +29,7 @@ type OwnProps = {
   hasCellSubgroups: boolean;
   timetableType?: string;
   customTimetable?: CustomTimetable;
+  editToken?: string;
   isExamsTimetable: boolean;
   partials: HalfTerm[];
   subgroupState: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
@@ -41,6 +45,7 @@ const TimetableHeader: FC<OwnProps> = ({
   isExamsTimetable,
   hasCellSubgroups,
   customTimetable,
+  editToken,
   partials,
   subgroupState,
   weekState,
@@ -71,8 +76,8 @@ const TimetableHeader: FC<OwnProps> = ({
       })
     : group;
 
-  const share = () => {
-    const url = `${window.location.origin}/${group}`;
+  const share = (hash = "") => {
+    const url = `${window.location.origin}/${group}${hash}`;
     // The native share sheet is handy on phones, on desktop copying the link is more useful
     if (isMobile && navigator.share) return navigator.share({ title: groupTitle, url }).catch(() => {});
     navigator.clipboard.writeText(url).then(
@@ -107,17 +112,50 @@ const TimetableHeader: FC<OwnProps> = ({
             <HomeIcon />
           </Link>
           <SavedMenu timetableChanged={loading} />
-          {customTimetable && (
-            <button
-              type="button"
-              className={classes("icon-button", "transition duration-300")}
-              title="Поділитися розкладом"
-              aria-label="Поділитися розкладом"
-              onClick={share}
-            >
-              <ShareIcon />
-            </button>
-          )}
+          {customTimetable &&
+            (editToken ? (
+              <Menu>
+                <MenuButton
+                  className={classes("icon-button", "transition duration-300")}
+                  title="Поділитися розкладом"
+                  aria-label="Поділитися розкладом"
+                >
+                  <ShareIcon />
+                </MenuButton>
+                <MenuItems
+                  modal={false}
+                  anchor={{ to: "bottom start", gap: 8, padding: 16 }}
+                  className={styles.shareMenu}
+                >
+                  <MenuItem>
+                    <button type="button" onClick={() => share()}>
+                      <EyeIcon />
+                      <span>Посилання для перегляду</span>
+                    </button>
+                  </MenuItem>
+                  <MenuSeparator className={styles.separator} />
+                  <MenuItem>
+                    <button type="button" onClick={() => share(`#edit=${editToken}`)}>
+                      <KeyIcon />
+                      <span>
+                        Посилання для редагування
+                        <small>Дає право змінювати для всіх</small>
+                      </span>
+                    </button>
+                  </MenuItem>
+                </MenuItems>
+              </Menu>
+            ) : (
+              <button
+                type="button"
+                className={classes("icon-button", "transition duration-300")}
+                title="Поділитися розкладом"
+                aria-label="Поділитися розкладом"
+                onClick={() => share()}
+              >
+                <ShareIcon />
+              </button>
+            ))}
         </div>
         <h1 className={styles.title}>
           {groupTitle}

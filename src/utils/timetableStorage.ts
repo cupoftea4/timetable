@@ -29,6 +29,7 @@ const CACHE_KEYS = [
   "savedTimetables",
   "examsTimetables",
   "mergedTimetable",
+  "myTimetable",
   "customEditTokens",
   "customDrafts",
   "firstHalfTermGroups",
@@ -50,6 +51,7 @@ const CACHE_CONFIGS: Record<StandardCacheKey, CacheConfig> = {
   savedTimetables: { key: "cached_timetables", storage: "localStorage" },
   examsTimetables: { key: "cached_exams_timetables", storage: "localStorage" },
   mergedTimetable: { key: "my", storage: "localStorage" },
+  myTimetable: { key: "my_timetable", storage: "localStorage" },
   customEditTokens: { key: "custom_edit_tokens", storage: "localStorage" },
   customDrafts: { key: "custom_drafts", storage: "localStorage" },
   firstHalfTermGroups: { key: "first_half_term_groups", storage: "indexedDB" },
@@ -98,7 +100,7 @@ export type CacheData = {
                     { semester: Semester; expiresAt: number; examsPublished?: boolean | null }
                   : K extends "lastOpenedMode"
                     ? TimetableMode
-                    : K extends "lastOpenedInstitute" | "lastOpenedTimetable"
+                    : K extends "lastOpenedInstitute" | "lastOpenedTimetable" | "myTimetable"
                       ? string
                       : K extends TimetableCacheKey
                         ? TimetableItem[]
@@ -124,17 +126,18 @@ export default class LocalCache {
       ),
       LocalCache.get("lecturers").then(LocalCache.setRamCache),
       LocalCache.get("mergedTimetable").then(LocalCache.setRamCache),
+      LocalCache.get("myTimetable").then(LocalCache.setRamCache),
       LocalCache.get("customEditTokens").then(LocalCache.setRamCache),
       LocalCache.get("customDrafts").then(LocalCache.setRamCache),
       LocalCache.get("lastOpenedTimetable").then(LocalCache.setRamCache),
       LocalCache.get("lastOpenedInstitute").then(LocalCache.setRamCache),
+      LocalCache.get("savedTimetables").then(LocalCache.setRamCache),
     ]);
 
     LocalCache.get("selectiveGroups").then(({ data }) =>
       LocalCache.setRamCache({ key: "selectiveGroups", data: data && sortGroups(data) })
     );
     LocalCache.get("examsTimetables").then(LocalCache.setRamCache);
-    LocalCache.get("savedTimetables").then(LocalCache.setRamCache);
   }
 
   static isInited() {
@@ -158,8 +161,11 @@ export default class LocalCache {
   }
 
   static async get<K extends CacheKey>(key: K, force = false): Promise<{ key: K; data: CacheData[K] | null }> {
-    if (isStandardKey(key) && LocalCache.ramCache[key]) return { key, data: LocalCache.ramCache[key] };
     const config = LocalCache.getCacheConfig(key);
+    // localStorage holds data merged on write (history, edit tokens); read fresh so other tabs' writes aren't lost
+    if (config.storage === "indexedDB" && isStandardKey(key) && LocalCache.ramCache[key]) {
+      return { key, data: LocalCache.ramCache[key] };
+    }
     if (config.storage === "indexedDB") {
       const cached = await storage.getItem(config.key);
       const updated = await storage.getItem<number>(config.key + UPDATED);

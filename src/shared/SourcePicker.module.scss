@@ -1,0 +1,111 @@
+@use '../styles/mixins' as *;
+@use '../styles/variables' as *;
+
+.field {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25rem;
+  padding: .25rem;
+  border: 1px solid var(--border-clr);
+  border-radius: .5rem;
+  background-color: var(--field-clr);
+  &:focus-within {
+    border-color: rgba(255, 255, 255, .35);
+  }
+  &.compact {
+    display: inline-flex;
+    padding: .125rem;
+  }
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .375rem;
+  padding: .1875rem .375rem .1875rem .5rem;
+  border-radius: .3125rem;
+  background-color: rgba(255, 255, 255, .12);
+  button {
+    opacity: .65;
+    cursor: pointer;
+    &:hover:not(:disabled) {
+      opacity: 1;
+    }
+  }
+}
+
+.search {
+  flex: 1;
+  min-width: 10rem;
+  input {
+    width: 100%;
+    padding: .1875rem .375rem;
+    background: none;
+    border: none;
+    outline: none;
+    color: var(--text-clr);
+    &::placeholder {
+      color: $extra-text-clr;
+    }
+  }
+}
+
+.count {
+  position: absolute;
+  top: 50%;
+  right: .625rem;
+  transform: translateY(-50%);
+  font-size: .75rem;
+  color: $extra-text-clr;
+  pointer-events: none;
+}
+
+.field:has(.count) {
+  padding-right: 2.5rem;
+}
+
+.options {
+  min-width: 14rem;
+  padding: .25rem;
+  @include popup-surface;
+  background-color: var(--field-clr);
+  --anchor-max-height: 14rem;
+  @include auto-scroll(y, thin);
+  z-index: 120;
+  color: var(--text-clr);
+  &:empty {
+    visibility: hidden;
+  }
+  li {
+    width: 100%;
+    cursor: pointer;
+    &[data-disabled] {
+      cursor: default;
+      color: $extra-text-clr;
+    }
+    &[data-focus]:not([data-disabled]) .option {
+      background-color: rgba(255, 255, 255, .1);
+    }
+  }
+  .section {
+    display: block;
+    padding: .375rem .5rem .125rem;
+    font-size: .6875rem;
+    color: $extra-text-clr;
+  }
+  .option {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: .75rem;
+    padding: .375rem .5rem;
+    border-radius: .3125rem;
+  }
+  .caption {
+    flex-shrink: 0;
+    font-size: .75rem;
+    color: $extra-text-clr;
+  }
+}

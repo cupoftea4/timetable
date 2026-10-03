@@ -23,11 +23,7 @@
   .saved-menu {
     z-index: 101;
     animation: show-menu 0.1s ease-in-out forwards;
-    background: linear-gradient(
-      190deg,
-      var(--accent-clr) -8.75%,
-      rgba(255, 255, 255, 0.07) 83.95%
-    );
+    background-color: var(--field-clr);
     border: var(--border-clr) solid 1px;
     border-radius: $border-radius;
     box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);

@@ -55,3 +55,38 @@ header.header {
     line-height: 1.2;
   }
 }
+
+.shareMenu {
+  display: flex;
+  flex-direction: column;
+  padding: .25rem;
+  @include popup-surface;
+  z-index: 110;
+  outline: none;
+  button {
+    display: flex;
+    gap: .625rem;
+    padding: .5rem .75rem;
+    border-radius: .375rem;
+    text-align: left;
+    &[data-focus] {
+      background-color: rgba(255, 255, 255, .1);
+    }
+  }
+  svg {
+    flex-shrink: 0;
+    width: 1.125rem;
+    height: 1lh;
+    opacity: .85;
+  }
+  small {
+    display: block;
+    font-size: .8125rem;
+    color: $extra-text-clr;
+  }
+  .separator {
+    height: 1px;
+    margin: .25rem .375rem;
+    background-color: var(--border-clr);
+  }
+}

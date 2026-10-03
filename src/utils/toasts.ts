@@ -31,6 +31,8 @@ const nonexistingGroupErrors = [
   "Let me guess, you are a wizard, cause your group does not exist",
 ];
 
+export const errorMessage = (e: unknown) => (e instanceof Error ? e.message : Toast.UNKNOWN_ERROR);
+
 export default class Toast {
   static readonly FETCH_ERROR = "Failed to fetch the data";
   static readonly FETCH_PENDING = "Fetching data";

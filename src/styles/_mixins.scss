@@ -28,12 +28,12 @@
 @mixin light-pillow-button {
   padding: .25rem .75rem;
   border-radius: 1rem;
-  background-color: var(--accent-clr);
+  background-color: var(--field-clr);
   border: var(--border-clr) solid 1px;
   cursor: pointer;
   transition: background-color .3s ease-in-out;
   &:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: color-mix(in srgb, var(--field-clr), white 12%);
   }
 }
 
