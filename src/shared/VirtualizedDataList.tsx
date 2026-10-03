@@ -1,10 +1,13 @@
 import { Combobox, ComboboxButton, ComboboxInput, ComboboxOption, ComboboxOptions } from "@headlessui/react";
 import React, { type FC } from "react";
 
-type DataListOption = {
+export type DataListOption = {
   id: string;
   value: string;
   isCustom?: boolean;
+  caption?: string;
+  section?: string;
+  disabled?: boolean;
 };
 
 type OwnProps = {
@@ -21,6 +24,9 @@ type OwnProps = {
   allowCustomValue?: boolean;
   onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
   onClose?: () => void;
+  renderOption?: (option: DataListOption) => React.ReactNode;
+  emptyText?: string;
+  optionsFrame?: { offset: number; width: number };
 };
 
 const SPECIAL_CHARACTERS_REGEX = /[^\p{L}\p{N}]/gu;
@@ -44,6 +50,9 @@ const VirtualizedDataList: FC<OwnProps> = ({
   allowCustomValue = false,
   onKeyDown,
   onClose,
+  renderOption = (option) => option.value,
+  emptyText,
+  optionsFrame,
 }) => {
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const [inputKey, setInputKey] = React.useState(0);
@@ -56,12 +65,15 @@ const VirtualizedDataList: FC<OwnProps> = ({
   if (allowCustomValue && query && !filteredOptions.some((item) => item.value === query)) {
     filteredOptions.push({ id: query, value: `Відкрити «${query}»`, isCustom: true });
   }
+  if (emptyText && query && !filteredOptions.length) {
+    filteredOptions.push({ id: "", value: emptyText, disabled: true });
+  }
 
   return (
     <div ref={containerRef} className={className}>
       <Combobox
         immediate
-        virtual={{ options: filteredOptions }}
+        virtual={{ options: filteredOptions, disabled: (option) => Boolean(option.disabled) }}
         onClose={onClose}
         onChange={(item: DataListOption | null) => {
           if (!item) return;
@@ -89,12 +101,17 @@ const VirtualizedDataList: FC<OwnProps> = ({
             <ComboboxOptions
               as="ul"
               modal={false}
-              anchor={{ to: "bottom", gap: 6, padding: 8 }}
+              anchor={
+                optionsFrame
+                  ? { to: "bottom start", gap: 6, padding: 8, offset: optionsFrame.offset }
+                  : { to: "bottom", gap: 6, padding: 8 }
+              }
+              style={optionsFrame && { width: optionsFrame.width }}
               className={optionsClassName}
             >
               {({ option }) => (
                 <ComboboxOption as="li" value={option}>
-                  {option.value}
+                  {renderOption(option)}
                 </ComboboxOption>
               )}
             </ComboboxOptions>

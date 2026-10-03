@@ -52,3 +52,20 @@
     height: var(--icon-size);
   }
 }
+
+// The share button's icon in the quotes, a tooltip can't hold markup
+.ownerHint[data-tooltip] {
+  &::after {
+    content: attr(data-tooltip) " «\200A" url(../../assets/share-tooltip.svg) "\200A»";
+  }
+  @include mobile {
+    &::after {
+      left: 0;
+      translate: 0 .25rem;
+    }
+    &:hover::after,
+    &:focus-visible::after {
+      translate: 0 0;
+    }
+  }
+}

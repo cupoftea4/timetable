@@ -1,8 +1,25 @@
 @use '../../styles/utils' as *;
 @use '../../styles/mixins' as *;
+@use '../../styles/variables' as *;
 
 :global(html):has(.wrapper) {
   overflow: hidden;
+}
+
+%field {
+  width: 100%;
+  padding: .4375rem .625rem;
+  background-color: var(--field-clr);
+  border: 1px solid var(--border-clr);
+  border-radius: .5rem;
+  outline: none;
+  color: var(--text-clr);
+  &:focus {
+    border-color: rgba(255, 255, 255, .35);
+  }
+  &::placeholder {
+    color: rgba(255, 255, 255, .5);
+  }
 }
 
 .wrapper {
@@ -22,6 +39,10 @@
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
+      .title {
+        font-size: 1.25rem;
+        font-weight: $semi-bold-font;
+      }
       .close {
         flex-shrink: 0;
         width: 1.5rem;
@@ -34,77 +55,24 @@
         }
       }
     }
-    .fieldset {
+    .sources,
+    .name {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
       margin: 1.5rem 0;
-      padding: 0;
-      border-radius: .625rem;
-      .choice {
-        display: flex;
-        flex-direction: column;
-        gap: .75rem;
-        margin-top: .5rem;
-        .selected {
-          display: flex;
-          flex-wrap: wrap;
-          gap: .5rem;
-          .selectedItem {
-            background-color: var(--accent-clr);
-            border: 1px solid var(--border-clr);
-            padding: .25em .5em;
-            border-radius: .325em;
-            position: relative;
-            cursor: pointer;
-            &::before {
-              content: attr(data-content);
-              transition: color .2s ease-in-out;
-            }
-            &::after {
-              content: url(../../assets/close.svg);
-              width: .875rem;
-              height: auto;
-              position: absolute;
-              top: 50%;
-              right: 50%;
-              transform: translateX(50%) translateY(-40%);
-              transition: opacity .2s ease-in-out;
-              opacity: 0;
-            }
-            &:disabled {
-              cursor: default;
-            }
-            &:not(:disabled):hover {
-              &::before {
-                color: transparent;
-              }
-              &::after {
-                opacity: 1;
-              }
-            }
-          }
-          
-        }
-        .search-bar {
-          input {
-            width: 100%;
-            padding: .625rem .75rem;
-            background-color: rgba(255, 255, 255, .05);
-            border: 1px solid var(--border-clr);
-            border-radius: .5rem;
-            outline: none;
-            color: var(--text-clr);
-            &:focus {
-              border-color: rgba(255, 255, 255, .35);
-            }
-            &::placeholder {
-              color: rgba(255, 255, 255, .5);
-            }
-          }
-        }
-      }
+    }
+    .name input {
+      @extend %field;
+    }
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 1rem;
     }
     .button {
       display: block;
-      margin: 0 0 0 auto;
       padding: .5em 1em;
       border-radius: .5em;
       background-color: hsla(0, 0%, 100%, 0.9);
@@ -113,29 +81,6 @@
       &:hover {
         background-color: hsla(226, 55%, 94%, 0.9);
       }
-    }
-  }
-}
-
-.options {
-  width: var(--input-width);
-  margin: 0;
-  padding: .25rem 0;
-  list-style: none;
-  color: var(--text-clr);
-  @include popup-surface;
-  --anchor-max-height: 10rem;
-  z-index: 101;
-  @include auto-scroll(y, thin);
-  &:empty {
-    visibility: hidden;
-  }
-  li {
-    width: 100%;
-    padding: .5rem .75rem;
-    cursor: pointer;
-    &[data-focus] {
-      background: var(--accent-clr);
     }
   }
 }

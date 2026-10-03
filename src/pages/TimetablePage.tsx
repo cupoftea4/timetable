@@ -18,14 +18,13 @@ import type {
   TimetableItem,
   TimetableType,
 } from "@/types/timetable";
-import type { RenderPromises } from "@/types/utils";
 import { SEEN_CALENDAR_HELP, SEEN_FEATURES_INTRO, TIMETABLE_SCREEN_BREAKPOINT } from "@/utils/constants";
 import { getDefaultCustomName, toCustomLessons, toTimetableItems } from "@/utils/customTimetable";
 import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
 import { isFeaturesIntroDue, optimisticRender } from "@/utils/general";
-import { CUSTOM_PREFIX } from "@/utils/timetable";
+import { CUSTOM_PREFIX, getCustomId } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import styles from "./TimetablePage.module.scss";
 
@@ -60,13 +59,13 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const [isSecondWeek, setIsSecondWeek] = useState(isSecondNULPWeek);
   const [partials, setPartials] = useState<HalfTerm[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showCreateMergedModal, setShowCreateMergedModal] = useState(false);
+  const [mergeModal, setMergeModal] = useState<"new" | "edit">();
   // Only in September, when new students start using the site
   const [showIntro, setShowIntro] = useState(isFeaturesIntroDue);
   const [showCalendarHelp, setShowCalendarHelp] = useState(false);
   const [selectedWeek, setSelectedWeek] = useState<Date | undefined>();
   const [semester, setSemester] = useState<Semester>();
-  const { state, search }: { state: LocationState | null; search: string } = useLocation();
+  const { state, search, hash }: { state: LocationState | null; search: string; hash: string } = useLocation();
   const isEditing = new URLSearchParams(search).has("edit");
   const isDesktop = useWindowDimensions().width >= TIMETABLE_SCREEN_BREAKPOINT;
   // Starting from the saved draft avoids flashing the timetable before the editor on reload
@@ -89,6 +88,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const editToken = customTimetable && TimetableManager.getCustomEditToken(customTimetable.id);
   const isEditable = isDesktop && !isExamsTimetable && timetableType !== "parttime";
   const canEdit = isEditable && Boolean(timetable);
+  const isMergedCustom = customTimetable?.kind === "merged";
+
   const editTitle = editToken
     ? "Редагувати розклад"
     : customTimetable
@@ -135,6 +136,12 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       onError(`Group ${group} doesn't exist`, Toast.NONEXISTING_GROUP);
       return;
     }
+    const myTimetable =
+      timetableType === "merged" && !TimetableManager.cachedMergedTimetable && TimetableManager.resolveMyTimetable();
+    if (myTimetable) {
+      navigate(`/${myTimetable}`, { replace: true });
+      return;
+    }
     if (timetableType === "selective" && isExamsTimetable)
       navigate(`/${group}`, { state: { source: "no-selective-exams" } });
     setLoading(true);
@@ -145,10 +152,39 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     TimetableManager.updateLastOpenedTimetable(group, isExamsTimetable ? "exams" : "timetable");
   }, [group, isExamsTimetable, navigate, timetableType]);
 
+  // An edit link (#edit=token) grants editing rights. The hash never reaches the server and is removed right away,
+  // so copying the address bar later doesn't share them. A stored token is never replaced, so a bad link can't lock out the owner.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: only reacts to a new hash
+  useEffect(() => {
+    const token = new URLSearchParams(hash.slice(1)).get("edit");
+    if (!token || timetableType !== "custom") return;
+    const id = getCustomId(group);
+    void (async () => {
+      if (!TimetableManager.getCustomEditToken(id)) {
+        await TimetableManager.saveCustomEditToken(id, token);
+        Toast.success("Тепер ви можете редагувати цей розклад");
+      }
+      navigate({ search, hash: "" }, { replace: true, state });
+    })();
+  }, [hash]);
+
   useEffect(() => {
     if (isExamsTimetable || !timetable) return;
     if (timetableRef.current) tryToScrollToCurrentDay(timetableRef.current, timetable);
   }, [isExamsTimetable, timetable]);
+
+  // The old local-only merged timetable moves to the server once, offline it just stays local and retries next time
+  const isUploadingMerged = useRef(false);
+  useEffect(() => {
+    if (timetableType !== "merged" || !timetable || isUploadingMerged.current) return;
+    isUploadingMerged.current = true;
+    TimetableManager.uploadMergedTimetable(toCustomLessons(timetable))
+      .then((merged) => merged && navigate(`/${merged}`, { replace: true }))
+      .catch(console.error)
+      .finally(() => {
+        isUploadingMerged.current = false;
+      });
+  }, [timetableType, timetable, navigate]);
 
   function getTimetable(group: string, exams: boolean, type?: TimetableType, checkCache = true) {
     if (exams) {
@@ -195,9 +231,9 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   function createEditor(): CustomTimetableDraft {
     if (customTimetable) {
-      const { id, name, subgroupToggle, lessons, sourceNames } = customTimetable;
+      const { id, kind, name, subgroupToggle, lessons, sourceNames } = customTimetable;
       const start = { name: editToken ? name : `${name.slice(0, 52)} (копія)`, subgroupToggle, lessons };
-      const saved = editToken ? { id, editToken } : undefined;
+      const saved = editToken ? { id, editToken, merged: kind === "merged" } : undefined;
       return { group, timetable: start, draft: start, sourceNames, saved };
     }
     const sourceNames =
@@ -205,7 +241,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     const start = {
       name: getDefaultCustomName(sourceNames),
       subgroupToggle: timetableType !== "lecturer",
-      lessons: toCustomLessons(timetable ?? []),
+      lessons: toCustomLessons(timetable ?? [], timetableType === "merged" ? undefined : group),
     };
     return { group, timetable: start, draft: start, sourceNames };
   }
@@ -255,16 +291,6 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     Toast.customCreated(`${window.location.origin}/${CUSTOM_PREFIX}${saved.id}`);
   }
 
-  function renderTimetableFromPromises(promises: RenderPromises<TimetableItem[]>) {
-    optimisticRender(
-      (timetable: TimetableItem[]) => {
-        setTimetable(timetable);
-      },
-      onError,
-      promises
-    );
-  }
-
   if (isEditing && !isDesktop) {
     return (
       <div className={classes(styles.wrapper, styles.editNotice)}>
@@ -299,6 +325,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
         timetableType={timetableType}
         hasCellSubgroups={hasCellSubgroups}
         customTimetable={customTimetable}
+        editToken={editToken}
         partials={partials}
         subgroupState={[isSecondSubgroup, setIsSecondSubgroup]}
         weekState={[isSecondWeek, setIsSecondWeek]}
@@ -332,7 +359,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       </main>
       <TimetableFooter
         showCreateMergedModal={() => {
-          setShowCreateMergedModal(true);
+          setMergeModal("new");
         }}
         loading={loading}
         updateTimetable={updateTimetable}
@@ -341,7 +368,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
         icsFILE={iscFile}
         time={time}
         customTimetable={customTimetable}
-        onEdit={canEdit ? openEditor : undefined}
+        onEdit={canEdit ? openEditor : isMergedCustom && editToken ? () => setMergeModal("edit") : undefined}
         onCalendarExport={showCalendarHelpOnce}
         editTitle={editTitle}
         isOwner={Boolean(editToken)}
@@ -356,14 +383,17 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
           <FeaturesIntro onClose={closeIntro} />
         </Suspense>
       )}
-      {showCreateMergedModal && (
+      {mergeModal && (
         <Suspense fallback={null}>
           <CreateMergedModal
-            defaultTimetable={group}
+            defaultTimetables={isMergedCustom ? customTimetable.sourceNames : [group]}
+            editing={
+              mergeModal === "edit" && isMergedCustom && editToken ? { ...customTimetable, editToken } : undefined
+            }
             onClose={() => {
-              setShowCreateMergedModal(false);
+              setMergeModal(undefined);
             }}
-            showTimetable={renderTimetableFromPromises}
+            onUpdated={() => updateTimetable()}
           />
         </Suspense>
       )}

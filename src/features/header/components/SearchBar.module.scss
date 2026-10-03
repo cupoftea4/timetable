@@ -23,7 +23,7 @@ $icon-size: 1em;
   .search {
     flex: 1;
     min-width: 0;
-    background: linear-gradient(145.37deg, rgba(255, 255, 255, 0.2) 0, rgba(255, 255, 255, 0.1) 93.95%);
+    background-color: var(--field-clr);
     border: var(--border-clr) solid 2px;
     display: flex;
     align-items: center;
@@ -65,7 +65,7 @@ $icon-size: 1em;
   --anchor-max-height: 300px;
   font-size: $medium-font-size;
   color: white;
-  background: linear-gradient(45.37deg, var(--accent-clr) 0.75%, rgba(255, 255, 255, 0.07) 83.95%);
+  background-color: var(--field-clr);
   border: var(--border-clr) solid 1px;
   border-radius: 0.25rem 0.25rem $border-radius $border-radius;
   box-shadow: 2px 2px 11px 0px rgba(0, 0, 0, 0.15);
@@ -79,10 +79,10 @@ $icon-size: 1em;
     padding: 0.25em 1em;
     cursor: pointer;
     &:hover {
-      background-color: hsla(0, 0%, 100%, 0.15);
+      background-color: hsla(0, 0%, 100%, 0.08);
     }
     &[data-focus] {
-      background-color: hsla(0, 0%, 100%, 0.371);
+      background-color: hsla(0, 0%, 100%, 0.15);
     }
   }
 }

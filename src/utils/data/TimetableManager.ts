@@ -1,9 +1,11 @@
 import {
   type CachedInstitute,
+  type CustomLesson,
   type CustomTimetable,
   type CustomTimetableDraft,
   type ExamsTimetableItem,
   HalfTerm,
+  type MergedTimetableData,
   type MergedTimetableItem,
   type TimetableItem,
   type TimetableMode,
@@ -13,7 +15,7 @@ import {
 import type { ActualPromise, OptimisticPromise, RenderPromises } from "@/types/utils";
 import { sortGroups } from "@/utils/timetable";
 import { DEVELOP } from "../constants";
-import { toTimetableItems } from "../customTimetable";
+import { toCustomLessons, toTimetableItems } from "../customTimetable";
 import * as Util from "../timetable";
 import LocalCache, { type CacheData, type CacheKey } from "../timetableStorage";
 import Toast from "../toasts";
@@ -158,7 +160,7 @@ class TimetableManager {
     if (timetableType === "merged") return this.getMergedTimetable();
     if (timetableType === "custom") {
       const toItems = (timetable?: CustomTimetable | null) => (timetable ? toTimetableItems(timetable.lessons) : null);
-      const [cacheData, fetchData] = this.getCustomTimetable(groupName);
+      const [cacheData, fetchData] = this.getCustomTimetable(groupName, true);
       return [cacheData.then(toItems), fetchData.then(toItems)] as const;
     }
 
@@ -225,22 +227,29 @@ class TimetableManager {
 
   async saveTimetableLocally(group: string, timetable?: TimetableItem[] | null, subgroup?: 1 | 2) {
     if (!timetable) return;
-    const saved = LocalCache.sync.savedTimetables?.filter((el) => el.group.toLowerCase() !== group.toLowerCase()) ?? [];
+    const { data: savedTimetables } = await LocalCache.get("savedTimetables");
+    const saved = savedTimetables?.filter((el) => el.group.toLowerCase() !== group.toLowerCase()) ?? [];
     await LocalCache.set("savedTimetables", [...saved, { group, time: Date.now(), subgroup }]);
     await LocalCache.set(`timetable_${group}`, timetable);
     return timetable;
   }
 
-  getCustomTimetable(group: string): RenderPromises<CustomTimetable> {
+  /** A deleted one is still available as a source of a merge */
+  getCustomTimetable(group: string, asSource = false): RenderPromises<CustomTimetable> {
     const cacheData = LocalCache.get(`custom_${Util.getCustomId(group)}`, true).then((t) => t.data);
     const fetchData: ActualPromise<CustomTimetable> = FallbackData.getCustomTimetable(Util.getCustomId(group)).then(
-      async (timetable) => {
-        if (!timetable) {
+      async (fetched) => {
+        if (!fetched || (fetched.deletedAt && !asSource)) {
           // A merged timetable keeps the last lessons of a deleted custom one, they just stop updating
           if (!LocalCache.sync.mergedTimetable?.timetables.includes(group)) await this.deleteTimetable(group);
           throw Toast.NONEXISTING_TIMETABLE;
         }
-        await this.saveCustomLocally(group, timetable);
+        const lessons =
+          fetched.lessons ??
+          (await this.mergeSources(fetched.sourceNames)[1].then((items) => items && toCustomLessons(items)));
+        if (!lessons) return null;
+        const timetable = { ...fetched, lessons };
+        if (!fetched.deletedAt) await this.saveCustomLocally(group, timetable);
         return timetable;
       },
       () => {
@@ -252,49 +261,93 @@ class TimetableManager {
   }
 
   async saveCustomLocally(group: string, timetable: CustomTimetable, subgroup?: 1 | 2) {
-    const saved = LocalCache.sync.savedTimetables ?? [];
+    const saved = (await LocalCache.get("savedTimetables")).data ?? [];
     subgroup ??= saved.find((el) => el.group === group)?.subgroup;
     await LocalCache.set("savedTimetables", [
       ...saved.filter((el) => el.group !== group),
-      { group, time: Date.now(), subgroup, name: timetable.name },
+      { group, time: Date.now(), subgroup, name: timetable.name, kind: timetable.kind, updatedAt: timetable.updatedAt },
     ]);
     await LocalCache.set(`custom_${timetable.id}`, timetable);
+    this.resolveMyTimetable();
   }
 
   getCustomEditToken(id: string) {
     return LocalCache.sync.customEditTokens?.[id];
   }
 
-  saveCustomEditToken(id: string, token: string) {
-    return LocalCache.set("customEditTokens", { ...LocalCache.sync.customEditTokens, [id]: token });
+  async createMergedTimetable(timetable: MergedTimetableData) {
+    const { id, editToken } = await FallbackData.createMergedTimetable(timetable);
+    await this.saveCustomEditToken(id, editToken);
+    return Util.CUSTOM_PREFIX + id;
+  }
+
+  /** Moves the local-only merged timetable to the server, so it can be shared */
+  async uploadMergedTimetable(lessons: CustomLesson[]) {
+    const merged = LocalCache.sync.mergedTimetable;
+    if (!merged) return;
+    const timetable = { name: merged.group, sourceNames: merged.timetables };
+    const group = await this.createMergedTimetable(timetable);
+    const now = new Date().toISOString();
+    await this.saveCustomLocally(
+      group,
+      {
+        ...timetable,
+        id: Util.getCustomId(group),
+        kind: "merged",
+        subgroupToggle: true,
+        lessons,
+        updatedAt: now,
+        deletedAt: null,
+      },
+      merged.subgroup
+    );
+    await LocalCache.set("myTimetable", group);
+    await this.deleteTimetable(MERGED_TIMETABLE);
+    return group;
+  }
+
+  async saveCustomEditToken(id: string, token: string) {
+    const { data: tokens } = await LocalCache.get("customEditTokens");
+    return LocalCache.set("customEditTokens", { ...tokens, [id]: token });
   }
 
   getCustomDraft(group: string) {
     return LocalCache.sync.customDrafts?.[group];
   }
 
-  saveCustomDraft(group: string, draft: CustomTimetableDraft | null) {
-    const { [group]: _, ...drafts } = LocalCache.sync.customDrafts ?? {};
+  async saveCustomDraft(group: string, draft: CustomTimetableDraft | null) {
+    const { [group]: _, ...drafts } = (await LocalCache.get("customDrafts")).data ?? {};
     return LocalCache.set("customDrafts", draft ? { ...drafts, [group]: draft } : drafts);
   }
 
   async saveExamsLocally(group: string, timetable?: ExamsTimetableItem[] | null) {
     if (!timetable) return;
-    const saved = LocalCache.sync.examsTimetables?.filter((el) => el.group.toLowerCase() !== group.toLowerCase()) ?? [];
+    const { data: examsTimetables } = await LocalCache.get("examsTimetables");
+    const saved = examsTimetables?.filter((el) => el.group.toLowerCase() !== group.toLowerCase()) ?? [];
     await LocalCache.set("examsTimetables", [...saved, { group, time: Date.now() }]);
     await LocalCache.set(`exams_timetable_${group}`, timetable);
     return timetable;
   }
 
-  getMergedTimetable(timetablesToMerge?: string[]): RenderPromises<TimetableItem[]> {
-    const timetableNames = timetablesToMerge ?? LocalCache.sync.mergedTimetable?.timetables;
+  getMergedTimetable(): RenderPromises<TimetableItem[]> {
+    const timetableNames = LocalCache.sync.mergedTimetable?.timetables;
     if (!timetableNames) throw Error("Merge doesn't exist!");
+    const [cacheData, fetchData] = this.mergeSources(timetableNames);
+    // It may have moved to the server while loading
+    void Promise.all([cacheData, fetchData]).then(([cached, fetched]) => {
+      if ((fetched ?? cached) && LocalCache.sync.mergedTimetable) this.saveMergedTimetable(timetableNames);
+    });
+    return [cacheData, fetchData] as const;
+  }
+
+  private mergeSources(timetableNames: string[]): RenderPromises<TimetableItem[]> {
     const timetables = timetableNames.map((el) => ({ name: el, data: this.getTimetable(el) }));
     const cachePromises = timetables.map(({ name, data }) => data[0].then((timetable) => ({ timetable, name })));
+    // A source that failed to load keeps its cached lessons instead of disappearing from the merge
     const fetchPromises = timetables.map(({ name, data }) =>
       data[1]
-        .catch((error) => (error === Toast.NONEXISTING_TIMETABLE ? data[0] : Promise.reject(error)))
-        .then((timetable) => ({ timetable, name }))
+        .catch((error) => (error === Toast.NONEXISTING_TIMETABLE ? null : Promise.reject(error)))
+        .then(async (timetable) => ({ timetable: timetable ?? (await data[0]), name }))
     );
     const cacheData: OptimisticPromise<MergedTimetableItem[]> = Promise.all(cachePromises)
       .then((timetables) => Util.mergeTimetables(timetables))
@@ -304,17 +357,9 @@ class TimetableManager {
       });
 
     const fetchData: ActualPromise<TimetableItem[]> = Promise.all(fetchPromises)
-      .then((timetables) => {
-        const merged = Util.mergeTimetables(timetables);
-        this.saveMergedTimetable(timetableNames);
-        return merged;
-      })
+      .then((timetables) => Util.mergeTimetables(timetables))
       .catch(() => {
-        cacheData.then((merged) => {
-          if (!merged) return;
-          this.saveMergedTimetable(timetableNames);
-          Toast.warn("Data is possibly outdated!");
-        });
+        cacheData.then((merged) => merged && Toast.warn("Data is possibly outdated!"));
         return null;
       });
     return [cacheData, fetchData] as const;
@@ -337,8 +382,9 @@ class TimetableManager {
     if (!data) throw Error(`Failed to update subgroup! Group: ${group}`);
     if (data.subgroup === subgroup) return;
 
-    const savedTimetables = LocalCache.sync.savedTimetables?.filter((el) => el.group !== group) ?? []; // remove previous timetable
-    return LocalCache.set("savedTimetables", [...savedTimetables, { ...data, subgroup }]);
+    const { data: savedTimetables } = await LocalCache.get("savedTimetables");
+    const saved = savedTimetables?.filter((el) => el.group !== group) ?? []; // remove previous timetable
+    return LocalCache.set("savedTimetables", [...saved, { ...data, subgroup }]);
   }
 
   getSubgroup(groupName?: string) {
@@ -368,10 +414,8 @@ class TimetableManager {
       return;
     }
     const groupNameClean = groupName.trim();
-    await LocalCache.set(
-      "savedTimetables",
-      LocalCache.sync.savedTimetables?.filter((el) => el.group !== groupNameClean) ?? null
-    );
+    const { data: savedTimetables } = await LocalCache.get("savedTimetables");
+    await LocalCache.set("savedTimetables", savedTimetables?.filter((el) => el.group !== groupNameClean) ?? null);
     await LocalCache.set(
       Util.isCustom(groupNameClean) ? `custom_${Util.getCustomId(groupNameClean)}` : `timetable_${groupNameClean}`,
       null
@@ -446,6 +490,16 @@ class TimetableManager {
 
   get cachedMergedTimetable() {
     return LocalCache.sync.mergedTimetable;
+  }
+
+  /** /my is a shortcut to the first custom timetable you got, until it's gone, then to the latest one */
+  resolveMyTimetable() {
+    const customs = this.cachedTimetables.map(({ group }) => group).filter(Util.isCustom);
+    const current = LocalCache.sync.myTimetable;
+    if (current && customs.includes(current)) return current;
+    const next = customs.at(-1);
+    void LocalCache.set("myTimetable", next ?? null);
+    return next;
   }
 
   private async getInstitutes(): Promise<CachedInstitute[]> {

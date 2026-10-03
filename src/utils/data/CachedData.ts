@@ -1,4 +1,4 @@
-import type { CustomTimetable, CustomTimetableData, Semester } from "@/types/timetable";
+import type { CustomTimetableData, CustomTimetableResponse, MergedTimetableData, Semester } from "@/types/timetable";
 import { DEVELOP } from "../constants";
 
 const FALLBACK_URL = import.meta.env.VITE_BACKEND_URL;
@@ -61,14 +61,22 @@ export default class CachedData {
     const response = await fetch(`${FALLBACK_URL}/custom/${id}`);
     if (response.status === 404) return null;
     if (!response.ok) throw Error(`Couldn't fetch custom timetable ${id}`);
-    return (await response.json()) as CustomTimetable;
+    return (await response.json()) as CustomTimetableResponse;
   }
 
   static createCustomTimetable(timetable: CustomTimetableData & { sourceNames: string[] }) {
     return CachedData.send<{ id: string; editToken: string }>("/custom", "POST", timetable);
   }
 
-  static updateCustomTimetable(id: string, token: string, timetable: CustomTimetableData) {
+  static createMergedTimetable(timetable: MergedTimetableData) {
+    return CachedData.send<{ id: string; editToken: string }>("/custom", "POST", { kind: "merged", ...timetable });
+  }
+
+  static updateMergedTimetable(id: string, token: string, timetable: MergedTimetableData) {
+    return CachedData.send<null>(`/custom/${id}`, "PUT", { kind: "merged", ...timetable }, token);
+  }
+
+  static updateCustomTimetable(id: string, token: string, timetable: CustomTimetableData & { sourceNames: string[] }) {
     return CachedData.send<null>(`/custom/${id}`, "PUT", timetable, token);
   }
 

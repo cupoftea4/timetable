@@ -11,9 +11,12 @@
   --surface-clr: hsla(198, 40%, 22%, .9);
   // Toasts have no backdrop behind them, so they show more of the page
   --toast-clr: hsla(198, 40%, 22%, .6);
+  // Inputs and primary buttons: translucent on the light gradient, the surface on the dark page
+  --field-clr: var(--accent-clr);
   &.dark-mode {
     --surface-clr: hsla(222, 20%, 14%, .95);
     --toast-clr: var(--surface-clr);
+    --field-clr: var(--surface-clr);
   }
   @include dark-mode(":root") {
     --accent-clr: hsla(0, 0%, 100%, 0.15);
