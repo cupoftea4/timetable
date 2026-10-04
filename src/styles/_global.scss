@@ -42,8 +42,11 @@
   );
 } 
 
+// Desktop Safari tints its toolbar with the color; `fixed` keeps the gradient in place during overscroll
 html {
- background: #0e4c5a;
+ background: edge-fade(to bottom, $bg-light-top-clr), $bg-light;
+ background-color: $bg-light-top-clr;
+ background-attachment: fixed;
 }
 
 html.dark-mode {
@@ -72,7 +75,10 @@ body {
     inset: 0;
     z-index: -2;
     pointer-events: none;
-    background: $bg-light;
+    background: edge-fade(to bottom, $bg-light-top-clr), $bg-light;
+    @include mobile {
+      background-image: edge-fade(to bottom, $bg-light-top-clr), edge-fade(to top, $bg-light-bottom-clr), $bg-light;
+    }
   }
   main {
     padding: $main-padding;
