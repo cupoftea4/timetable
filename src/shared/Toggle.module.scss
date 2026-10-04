@@ -6,6 +6,7 @@
   @include flex-center;
   @include light-pillow-button;
   position: relative;
+  isolation: isolate;
   gap: 1rem;
   padding: .125em .5em .125em .625em;
   border: none;

@@ -128,6 +128,39 @@ export function getAllTimetables() {
     .concat(TimetableManager.cachedLecturers);
 }
 
+export function getSourceOptions(selected: string[]) {
+  const recent = TimetableManager.cachedTimetables
+    .filter(({ group, kind }) => !isMerged(group) && kind !== "merged" && !selected.includes(group))
+    .reverse();
+  const recentGroups = recent.map(({ group }) => group);
+  const all = getAllTimetables().filter((group) => !selected.includes(group) && !recentGroups.includes(group));
+  const names = recent.map(({ group }) => getTimetableName(group));
+
+  const getCaption = (group: string, name: string, updatedAt?: string) => {
+    if (!isCustom(group)) return undefined;
+    const owned = TimetableManager.getCustomEditToken(getCustomId(group)) ? "ваш" : undefined;
+    const date =
+      updatedAt && names.filter((n) => n === name).length > 1
+        ? new Date(updatedAt).toLocaleDateString("uk-UA", { day: "numeric", month: "short" })
+        : undefined;
+    return [owned, date].filter(Boolean).join(" · ") || undefined;
+  };
+
+  return [
+    ...recent.map(({ group, updatedAt }, i) => ({
+      id: group,
+      value: names[i] ?? group,
+      section: i === 0 ? "Нещодавні" : undefined,
+      caption: getCaption(group, names[i] ?? group, updatedAt),
+    })),
+    ...all.map((group, i) => ({
+      id: group,
+      value: getTimetableName(group),
+      section: i === 0 ? "Групи й викладачі" : undefined,
+    })),
+  ];
+}
+
 export function formatLocationForGoogleMaps(location: string | undefined) {
   const UNI_NAME = "НУ «Львівська політехніка»";
 

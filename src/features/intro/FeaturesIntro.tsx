@@ -15,8 +15,8 @@ const FeaturesIntro: FC<OwnProps> = ({ onClose }) => (
     <DialogPanel className={styles.panel}>
       <img src={catFace} alt="" className={styles.cat} />
       <div>
-      <DialogTitle className={styles.title}>Кілька корисних можливостей</DialogTitle>
-      <p className={styles.text}>Їх можна знайти внизу сторінки.</p>
+        <DialogTitle className={styles.title}>Кілька корисних можливостей</DialogTitle>
+        <p className={styles.text}>Їх можна знайти внизу сторінки.</p>
       </div>
 
       <ul className={styles.features}>

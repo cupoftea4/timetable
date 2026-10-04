@@ -112,11 +112,14 @@ const TimetableFooter: FC<OwnProps> = ({
       {customTimetable ? (
         <p>
           {isOwner && (
-            <span className="underline decoration-dotted" data-tooltip="Редагувати його можна лише в цьому браузері">
+            <span
+              className={classes("underline decoration-dotted", styles.ownerHint)}
+              data-tooltip="Посилання для редагування — у"
+            >
               Ваш
             </span>
           )}
-          {isOwner ? " змінений" : "Змінений"} розклад на основі{" "}
+          {isOwner ? " розклад з " : "Розклад з "}
           {customTimetable.sourceNames.map((source, i) => (
             <Fragment key={source}>
               {i > 0 && ", "}
@@ -125,7 +128,12 @@ const TimetableFooter: FC<OwnProps> = ({
               </Link>
             </Fragment>
           ))}{" "}
-          · оновлено {customTimetableUpdatedAtText}
+          ·{" "}
+          {customTimetable.kind === "merged" ? (
+            "оновлюється автоматично"
+          ) : (
+            <span data-tooltip={`Востаннє ${customTimetableUpdatedAtText}`}>змінено вручну</span>
+          )}
         </p>
       ) : (
         time && <p>Оновлено {new Date(time).toLocaleString()}</p>

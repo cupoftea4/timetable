@@ -1,35 +1,42 @@
-import type { CustomLesson, CustomTimetableData, TimetableItem } from "@/types/timetable";
+import type { CustomLesson, CustomTimetableData, SourceLesson, TimetableItem } from "@/types/timetable";
 import { getTimetableName, lessonsTimes } from "./timetable";
 
 const NAME_SUFFIX = " (змінений)";
 
 export function getDefaultCustomName(sourceNames: string[]) {
+  const suffix = sourceNames.length === 1 ? NAME_SUFFIX : "";
   return (
     sourceNames
       // A copy of an already changed timetable shouldn't say it twice
       .map((source) => getTimetableName(source).replace(NAME_SUFFIX, ""))
       .join(" + ")
-      .slice(0, 60 - NAME_SUFFIX.length) + NAME_SUFFIX
+      .slice(0, 60 - suffix.length) + suffix
   );
 }
 
 export function toTimetableItems(lessons: CustomLesson[]): TimetableItem[] {
-  return lessons.map(({ week, subgroup, details, ...lesson }) => ({
-    ...lesson,
-    isFirstWeek: week !== "znam",
-    isSecondWeek: week !== "chys",
-    isFirstSubgroup: subgroup !== 2,
-    isSecondSubgroup: subgroup !== 1,
-    urls: details
-      .split("\n")
-      .map((url) => url.trim())
-      .filter(Boolean),
-  }));
+  return lessons
+    .filter((lesson) => !lesson.removed)
+    .map(({ week, subgroup, details, source: _, original: __, removed: ___, ...lesson }) => ({
+      ...lesson,
+      isFirstWeek: week !== "znam",
+      isSecondWeek: week !== "chys",
+      isFirstSubgroup: subgroup !== 2,
+      isSecondSubgroup: subgroup !== 1,
+      urls: details
+        .split("\n")
+        .map((url) => url.trim())
+        .filter(Boolean),
+    }));
 }
 
-export function toCustomLessons(items: TimetableItem[]): CustomLesson[] {
+export function toCustomLessons(
+  items: (TimetableItem & { timetableName?: string })[],
+  source?: string
+): CustomLesson[] {
   const lessons = items.map(
     (item): CustomLesson => ({
+      source: item.timetableName ?? source,
       day: item.day,
       number: item.number,
       subject: item.subject,
@@ -42,7 +49,7 @@ export function toCustomLessons(items: TimetableItem[]): CustomLesson[] {
     })
   );
   // Merged timetables repeat lessons shared by several groups
-  return [...new Map(lessons.map((lesson) => [JSON.stringify(lesson), lesson])).values()];
+  return [...new Map(lessons.map((lesson) => [signature(lesson), lesson])).values()];
 }
 
 const LESSON_KEYS = [
@@ -56,6 +63,38 @@ const LESSON_KEYS = [
   "subgroup",
   "details",
 ] as const satisfies (keyof CustomLesson)[];
+
+const signature = (lesson: CustomLesson) => JSON.stringify(LESSON_KEYS.map((key) => lesson[key]));
+
+const withoutSource = ({ source: _, original: __, removed: ___, ...lesson }: CustomLesson): SourceLesson => lesson;
+
+/** Keeps how a source lesson was before its first edit */
+export function markEdited(previous: CustomLesson, next: CustomLesson): CustomLesson {
+  const lesson = withoutSource(next);
+  if (!previous.source) return lesson;
+  const original =
+    previous.original ?? (signature(lesson) === signature(previous) ? undefined : withoutSource(previous));
+  return { ...lesson, source: previous.source, original };
+}
+
+/** A deleted source lesson stays marked as it was there, so syncing its source doesn't bring it back */
+export const toRemoved = (lesson: CustomLesson): CustomLesson[] =>
+  lesson.source ? [{ ...(lesson.original ?? withoutSource(lesson)), source: lesson.source, removed: true }] : [];
+
+/** Imports and AI edits replace all lessons, unchanged ones keep their source and the rest counts as deleted */
+export function keepSources(current: CustomLesson[], imported: CustomLesson[]) {
+  const bySignature = new Map(current.filter((lesson) => lesson.source).map((lesson) => [signature(lesson), lesson]));
+  const lessons = imported.map((lesson) => {
+    const match = bySignature.get(signature(lesson));
+    bySignature.delete(signature(lesson));
+    return match ? { ...withoutSource(lesson), source: match.source, original: match.original } : withoutSource(lesson);
+  });
+  return { lessons, removed: [...bySignature.values()].flatMap(toRemoved) };
+}
+
+/** Untouched lessons of several sources can stay a merged timetable that follows them */
+export const isHandEdited = ({ lessons, subgroupToggle }: CustomTimetableData) =>
+  !subgroupToggle || lessons.some((lesson) => lesson.removed || !lesson.source || lesson.original);
 
 export function toJSON5({ name, subgroupToggle, lessons }: CustomTimetableData) {
   const lessonTimesComment = lessonsTimes.map(({ start, end }, i) => `${i + 1} = ${start}–${end}`).join(", ");
