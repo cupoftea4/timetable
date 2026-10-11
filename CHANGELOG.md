@@ -87,3 +87,13 @@
 [2.8.4] - 2026-09-14
 - Display part-time group suffixes as lowercase `з` to distinguish them from the digit `3`
 - Sort part-time groups after regular groups within each year, keeping both in numerical order
+
+[3.0.0] - 2026-10-12
+- New app icon and favicon
+- Custom timetables: edit lessons of any timetable on desktop and share it by a view or an edit link
+- Merged timetables can now be shared too
+- Phones: dialogs became drawers that can be swiped down to close
+- Phones: a bottom bar with Home, Edit, Share, More and Saved, always within reach
+- Phones: day tabs above the lessons, and custom timetables can be renamed, regrouped or deleted
+- Faster loading and no layout shift while loading
+- Fixed overscroll and address bar colors on Apple devices
