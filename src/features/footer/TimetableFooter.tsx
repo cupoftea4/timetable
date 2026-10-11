@@ -112,7 +112,6 @@ const TimetableFooter: FC<OwnProps> = ({
             data-tooltip="Змінити тему"
             className={classes(styles.theme, styles.button)}
             onClick={toggleTheme}
-            aria-label="Змінити тему"
             type="button"
           >
             <MoonIcon className={classes(styles.themeIcon, styles.moonIcon)} />
@@ -130,7 +129,6 @@ const TimetableFooter: FC<OwnProps> = ({
         {!isNarrow && (
           <button
             type="button"
-            aria-label="Об`єднати кілька розкладів в одну таблицю"
             data-tooltip="Об`єднати кілька розкладів в одну таблицю"
             onClick={showCreateMergedModal}
             className={classes(styles.merge, styles.button)}
@@ -145,7 +143,6 @@ const TimetableFooter: FC<OwnProps> = ({
             disabled={loading}
             className={classes(styles.update, styles.button, loading && styles.pending)}
             data-tooltip="Оновити дані"
-            aria-label="Оновити дані"
             onClick={() => {
               updateTimetable();
             }}
@@ -160,7 +157,6 @@ const TimetableFooter: FC<OwnProps> = ({
             data-tooltip="Експортувати розклад для Google Calendar"
             href={icsFILE}
             download={calendarFile}
-            aria-label="Експортувати розклад для Google Calendar"
             onClick={onCalendarExport}
           >
             <DownloadIcon />
@@ -168,13 +164,7 @@ const TimetableFooter: FC<OwnProps> = ({
           </a>
         )}
         {onEdit && (
-          <button
-            type="button"
-            className={styles.button}
-            data-tooltip={editTitle}
-            aria-label={editTitle}
-            onClick={onEdit}
-          >
+          <button type="button" className={styles.button} data-tooltip={editTitle} onClick={onEdit}>
             <PencilIcon />
             <span className={styles.label}>Змінити</span>
           </button>

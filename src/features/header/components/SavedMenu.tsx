@@ -91,7 +91,7 @@ const SavedMenu: FC<OwnProps> = ({ timetableChanged, sheetButton }) => {
         <button
           type="button"
           className={sheetButton?.className ?? classes("icon-button", "transition duration-300")}
-          aria-label="Saved groups menu"
+          aria-label={sheetButton ? undefined : "Saved groups menu"}
           onClick={() => setShowSheet(true)}
         >
           <HistoryIcon />

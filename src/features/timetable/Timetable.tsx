@@ -173,7 +173,7 @@ const Timetable: FC<OwnProps> = ({
           }}
           className={classes(styles.list, "relative flex flex-col min-h-64")}
         >
-          <h3 className="sr-only">{day}</h3>
+          <h2 className="sr-only">{day}</h2>
           <ol className={classes(styles.list, "h-full")}>
             {!isLoading ? (
               hasAnyLessons ? (
@@ -236,7 +236,7 @@ const Timetable: FC<OwnProps> = ({
           <button
             key={day}
             type="button"
-            aria-label={day}
+            title={day}
             aria-current={visibleDay === i}
             className={classes((currentDay || 7) === i + 1 && styles.today)}
             onClick={() =>

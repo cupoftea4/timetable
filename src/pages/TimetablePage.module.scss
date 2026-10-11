@@ -64,6 +64,13 @@
   align-items: center;
   .timetableWrapper {
     max-width: 100%;
+    // Full width like most loaded tables, so the narrower loading skeleton doesn't shift the page
+    &:has(table) {
+      width: 100%;
+      table {
+        width: 100%;
+      }
+    }
 
     .semester {
       margin: 0.5rem 0 0;
