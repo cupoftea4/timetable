@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { useIsMobile } from "@/hooks/useWindowDimensions";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 import MobileSelect from "@/shared/MobileSelect";
 import { classes } from "@/styles/utils";
 import { formatWeekRange, getCurrentUADate, getWeekStart } from "@/utils/date";
@@ -46,7 +46,7 @@ const WeekNavigation: FC<OwnProps> = ({ weeks, selectedWeek, onWeekChange }) => 
           </button>
         ))
       ) : (
-        <MobileSelect items={weekItems} selectedState={[selectedValue, handleWeekChange]} />
+        <MobileSelect label="Тиждень" items={weekItems} selectedState={[selectedValue, handleWeekChange]} />
       )}
     </nav>
   );

@@ -28,7 +28,7 @@ class TimetableManager {
   async init(type?: TimetablePageType) {
     await LocalCache.initRamCache(type);
 
-    return Promise.all([
+    const lists = Promise.all([
       this.getData("groups", FallbackData, FallbackData.getGroups).then((data) =>
         LocalCache.set("groups", sortGroups(data ?? []))
       ),
@@ -39,6 +39,8 @@ class TimetableManager {
         LocalCache.set("lecturers", data)
       ),
     ]).catch((e) => console.error(e));
+    // Yesterday's lists open the app right away instead of waiting for the network, the fresh ones replace them
+    if (!(await LocalCache.loadOutdatedLists())) await lists;
   }
 
   isInited() {
@@ -304,6 +306,19 @@ class TimetableManager {
     await LocalCache.set("myTimetable", group);
     await this.deleteTimetable(MERGED_TIMETABLE);
     return group;
+  }
+
+  async deleteCustomTimetable(id: string, editToken: string) {
+    await FallbackData.deleteCustomTimetable(id, editToken);
+    await this.deleteTimetable(Util.CUSTOM_PREFIX + id);
+    await this.saveCustomDraft(Util.CUSTOM_PREFIX + id, null);
+  }
+
+  async getSourceLessons(source: string) {
+    const [cached, fetched] = this.getTimetable(source);
+    const items = (await fetched) ?? (await cached);
+    if (!items) throw Error("Не вдалося завантажити розклад");
+    return toCustomLessons(items, source);
   }
 
   async saveCustomEditToken(id: string, token: string) {

@@ -126,8 +126,7 @@ $cell-border-radius: .625rem;
       @include dark-mode(".cell") {
         --bg-alpha: .3;
         color: var(--text-clr);
-      } 
-      backdrop-filter: blur(10px);
+      }
     }
     
     @include timetable-mobile {

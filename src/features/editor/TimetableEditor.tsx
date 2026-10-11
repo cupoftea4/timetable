@@ -11,11 +11,12 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { Dialog, DialogPanel, DialogTitle, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
+import { CloseButton, Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react";
 import { type FC, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import timetableStyles from "@/features/timetable/Timetable.module.scss";
 import usePageTitle from "@/hooks/usePageTitle";
+import Drawer from "@/shared/Drawer";
 import SourcePicker from "@/shared/SourcePicker";
 import { classes } from "@/styles/utils";
 import type { CustomLesson, CustomTimetable, CustomTimetableData, CustomTimetableDraft } from "@/types/timetable";
@@ -24,13 +25,12 @@ import {
   isHandEdited,
   keepSources,
   markEdited,
-  toCustomLessons,
   toJSON5,
   toRemoved,
 } from "@/utils/customTimetable";
 import FallbackData from "@/utils/data/CachedData";
 import TimetableManager from "@/utils/data/TimetableManager";
-import { CUSTOM_PREFIX, getCustomId, getDisplayType, isCustom, lessonsTimes } from "@/utils/timetable";
+import { getCustomId, getDisplayType, isCustom, lessonsTimes } from "@/utils/timetable";
 import Toast, { errorMessage } from "@/utils/toasts";
 import AiEditDialog from "./AiEditDialog";
 import ConfirmDialog, { type Confirmation } from "./ConfirmDialog";
@@ -231,11 +231,9 @@ const TimetableEditor: FC<OwnProps> = ({
 
   const addSource = (source: string) =>
     run(async () => {
-      const [cached, fetched] = TimetableManager.getTimetable(source);
-      const items = (await fetched) ?? (await cached);
-      if (!items) throw Error("Не вдалося завантажити розклад");
+      const sourceLessons = await TimetableManager.getSourceLessons(source);
       changeSources([...sources, source]);
-      setLessons((current) => [...current, ...withIds(toCustomLessons(items, source))]);
+      setLessons((current) => [...current, ...withIds(sourceLessons)]);
     });
 
   const removeSource = (source: string) => {
@@ -270,9 +268,7 @@ const TimetableEditor: FC<OwnProps> = ({
       danger: true,
       onConfirm: () =>
         run(async () => {
-          await FallbackData.deleteCustomTimetable(saved.id, saved.editToken);
-          await TimetableManager.deleteTimetable(CUSTOM_PREFIX + saved.id);
-          await TimetableManager.saveCustomDraft(group, null);
+          await TimetableManager.deleteCustomTimetable(saved.id, saved.editToken);
           navigate(`/${sources[0] ?? "home"}`, { replace: true });
         }),
     });
@@ -440,9 +436,8 @@ const TimetableEditor: FC<OwnProps> = ({
           onClose={() => setEditedLesson(undefined)}
         />
       )}
-      <Dialog open={importText !== undefined} onClose={() => setImportText(undefined)} className={styles.backdrop}>
-        <DialogPanel className={styles.dialog}>
-          <DialogTitle className={styles.dialogTitle}>Імпорт JSON5</DialogTitle>
+      {importText !== undefined && (
+        <Drawer title="Імпорт JSON5" onClose={() => setImportText(undefined)} className={styles.dialog}>
           <p className={styles.hint}>
             Вставте відредагований розклад у форматі JSON5 або JSON. Він замінить усі пари в редакторі, а зберегти зміни
             можна буде після перевірки.
@@ -455,9 +450,7 @@ const TimetableEditor: FC<OwnProps> = ({
             aria-label="Текст JSON5"
           />
           <div className={styles.dialogActions}>
-            <button type="button" className={styles.pushRight} onClick={() => setImportText(undefined)}>
-              Скасувати
-            </button>
+            <CloseButton className={styles.pushRight}>Скасувати</CloseButton>
             <button
               type="button"
               className={styles.primary}
@@ -467,8 +460,8 @@ const TimetableEditor: FC<OwnProps> = ({
               Імпортувати
             </button>
           </div>
-        </DialogPanel>
-      </Dialog>
+        </Drawer>
+      )}
     </div>
   );
 };

@@ -27,6 +27,7 @@
       if (prefersDark) {
         document.documentElement.classList.add('dark-mode');
       }
+      document.querySelector('meta[name="theme-color"]').content = prefersDark ? '#00000a' : '#0e4c5a';
     })();
   </script>
 </head>

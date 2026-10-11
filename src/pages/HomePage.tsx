@@ -1,15 +1,17 @@
 import { type FC, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import ArrowRightIcon from "@/assets/ArrowRightIcon";
 import BugIcon from "@/assets/BugIcon";
 import catImage from "@/assets/cat.svg";
 import HeartIcon from "@/assets/HeartIcon";
 import LoadingIcon from "@/assets/LoadingIcon";
 import { DisableCatModeButton } from "@/context/catMode";
 import { DatalistFocusProvider } from "@/context/datalistFocus";
+import SavedMenu from "@/features/header/components/SavedMenu";
 import HeaderPanel from "@/features/header/HomeHeader";
 import MissingGroupTip from "@/features/home/MissingGroupTip";
 import TimetablesSelection from "@/features/home/TimetablesSelection";
-import { useIsTablet } from "@/hooks/useWindowDimensions";
+import { useIsTablet } from "@/hooks/useMediaQuery";
 import List from "@/shared/List";
 import { classes } from "@/styles/utils";
 import type { TimetableType } from "@/types/timetable";
@@ -151,6 +153,12 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
           >
             {showFirstLayer && <List items={firstLayer} selectedState={[selectedFirst, handleFirstChange]} />}
             {showSecondLayer && <List items={secondLayer} selectedState={[selectedSecond, handleSecondChange]} />}
+            {isTablet && selectedSecond && (
+              <button type="button" className={styles.back} onClick={() => handleSecondChange(null)}>
+                <ArrowRightIcon />
+                {selectedFirst} · {selectedSecond}
+              </button>
+            )}
             {showThirdLayer ? (
               !isLoadingThirdLayer ? (
                 <TimetablesSelection timetables={thirdLayer} withYears={timetableType !== "lecturer"} />
@@ -197,6 +205,11 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
               <BugIcon />
               Bug report
             </a>
+            {isTablet && (
+              <SavedMenu
+                sheetButton={{ className: classes(styles.saved, "flex gap-1 items-center"), label: "Збережені" }}
+              />
+            )}
           </div>
         </main>
       </div>

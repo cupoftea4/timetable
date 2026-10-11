@@ -1,6 +1,6 @@
 import { type FC, useState } from "react";
 import { Link } from "react-router-dom";
-import { useIsMobile } from "@/hooks/useWindowDimensions";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 import { classes } from "@/styles/utils";
 import { getTimetableName, sortGroupsByYear } from "@/utils/timetable";
 import MissingGroupTip from "./MissingGroupTip";

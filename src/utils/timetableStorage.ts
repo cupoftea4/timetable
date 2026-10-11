@@ -140,6 +140,20 @@ export default class LocalCache {
     LocalCache.get("examsTimetables").then(LocalCache.setRamCache);
   }
 
+  /** Lists past their update time, to start with while the fresh ones load */
+  static async loadOutdatedLists() {
+    const [groups, selectiveGroups, lecturers] = await Promise.all([
+      LocalCache.get("groups", true),
+      LocalCache.get("selectiveGroups", true),
+      LocalCache.get("lecturers", true),
+    ]);
+    if (!groups.data?.length || !selectiveGroups.data?.length || !lecturers.data?.length) return false;
+    LocalCache.ramCache.groups ??= sortGroups(groups.data);
+    LocalCache.ramCache.selectiveGroups ??= sortGroups(selectiveGroups.data);
+    LocalCache.ramCache.lecturers ??= lecturers.data;
+    return true;
+  }
+
   static isInited() {
     return (
       LocalCache.ramCache.institutes &&

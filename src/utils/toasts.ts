@@ -79,7 +79,9 @@ export default class Toast {
   static donationNotification() {
     doOnce(RECEIVED_DONATION_NOTIFICATION, () =>
       toast(DonationToast, {
-        autoClose: false,
+        autoClose: 10000,
+        closeButton: false,
+        hideProgressBar: true,
         className: TOAST_CLASS,
         delay: 500,
       })

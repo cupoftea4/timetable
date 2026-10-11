@@ -15,3 +15,25 @@
 	}
 }
 
+.compact {
+	grid-column: 1 / -1;
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	width: 100%;
+	padding: 0.75rem 1rem;
+	border: 1px dashed var(--border-clr);
+	border-radius: 0.625rem;
+	font-size: 0.875rem;
+	text-align: left;
+	color: rgba(255, 255, 255, 0.85);
+	svg {
+		flex-shrink: 0;
+		width: 1.25rem;
+		height: 1.25rem;
+		opacity: 0.8;
+	}
+	&:active {
+		background-color: var(--accent-clr);
+	}
+}

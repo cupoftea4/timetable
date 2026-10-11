@@ -67,6 +67,9 @@
 				grid-template-columns: 1fr;
 				padding: 0 1rem;
 			}
+			@include mobile {
+				padding: 0;
+			}
 
 			.year {
 				animation: slideUp 0.2s ease forwards;

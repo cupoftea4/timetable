@@ -1,17 +1,13 @@
-import { Menu, MenuButton, MenuItem, MenuItems, MenuSeparator } from "@headlessui/react";
 import type React from "react";
-import type { FC } from "react";
+import { type FC, useLayoutEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import ArrowRightIcon from "@/assets/ArrowRightIcon";
 import ExamIcon from "@/assets/ExamIcon";
-import EyeIcon from "@/assets/EyeIcon";
 import HomeIcon from "@/assets/HomeIcon";
-import KeyIcon from "@/assets/KeyIcon";
-import ShareIcon from "@/assets/ShareIcon";
 import useExamsPublished from "@/hooks/useExamsPublished";
 import useGroupParam from "@/hooks/useGroupParam";
+import { useIsMobile, useIsTablet } from "@/hooks/useMediaQuery";
 import usePageTitle from "@/hooks/usePageTitle";
-import { useIsMobile } from "@/hooks/useWindowDimensions";
 import Toggle from "@/shared/Toggle";
 import { classes } from "@/styles/utils";
 import type { CustomTimetable, HalfTerm } from "@/types/timetable";
@@ -20,6 +16,8 @@ import { getTimetableName, isMerged } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import WeekNavigation from "../timetable/ui/WeekNavigation";
 import SavedMenu from "./components/SavedMenu";
+import ShareButton from "./components/ShareButton";
+import ThemeButton from "./components/ThemeButton";
 import TimetablePartials from "./components/TimetablePartials";
 import generalStyles from "./HeaderPanel.module.scss";
 import styles from "./TimetableHeader.module.scss";
@@ -61,9 +59,23 @@ const TimetableHeader: FC<OwnProps> = ({
   const { state }: { state: { examsFrom?: string } | null } = useLocation();
   const group = useGroupParam();
   const isMobile = useIsMobile();
+  const isNarrow = useIsTablet();
   const examsPublished = useExamsPublished();
   const groupTitle = customTimetable?.name ?? (timetableType === "merged" ? "Мій розклад" : getTimetableName(group));
   usePageTitle(groupTitle);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  // On phones a title too long for one line wraps in a smaller font
+  const [wrappedTitle, setWrappedTitle] = useState<string>();
+
+  useLayoutEffect(() => {
+    if (wrappedTitle === groupTitle) return;
+    const wrapIfTooLong = () => {
+      const title = titleRef.current;
+      if (title && title.scrollWidth > title.clientWidth) setWrappedTitle(groupTitle);
+    };
+    wrapIfTooLong();
+    void document.fonts.ready.then(wrapIfTooLong);
+  }, [groupTitle, wrappedTitle]);
 
   const isPartTime = timetableType === "parttime";
   const showWeekNavigation = isPartTime && availableWeeks && availableWeeks.length > 0 && selectedWeek && onWeekChange;
@@ -75,16 +87,6 @@ const TimetableHeader: FC<OwnProps> = ({
         return type === "timetable" || type === "lecturer";
       })
     : group;
-
-  const share = (hash = "") => {
-    const url = `${window.location.origin}/${group}${hash}`;
-    // The native share sheet is handy on phones, on desktop copying the link is more useful
-    if (isMobile && navigator.share) return navigator.share({ title: groupTitle, url }).catch(() => {});
-    navigator.clipboard.writeText(url).then(
-      () => Toast.success("Посилання скопійовано"),
-      (e) => Toast.error(e, "Не вдалося скопіювати посилання")
-    );
-  };
 
   const handleIsExamsTimetableChange = (isExams: boolean) => {
     if (isExams) navigate(`/${examsGroup ?? group}/exams`, { state: { examsFrom: group } });
@@ -99,65 +101,37 @@ const TimetableHeader: FC<OwnProps> = ({
   };
 
   return (
-    <header className={classes(generalStyles.header, styles.header)}>
-      <nav className={generalStyles["right-buttons"]}>
-        <div className={"flex gap-1"}>
-          <Link
-            state={{ force: true }}
-            to="/home"
-            aria-label="Home"
-            type="button"
-            className={classes("icon-button", "transition duration-300")}
-          >
-            <HomeIcon />
-          </Link>
-          <SavedMenu timetableChanged={loading} />
-          {customTimetable &&
-            (editToken ? (
-              <Menu>
-                <MenuButton
-                  className={classes("icon-button", "transition duration-300")}
-                  title="Поділитися розкладом"
-                  aria-label="Поділитися розкладом"
-                >
-                  <ShareIcon />
-                </MenuButton>
-                <MenuItems
-                  modal={false}
-                  anchor={{ to: "bottom start", gap: 8, padding: 16 }}
-                  className={styles.shareMenu}
-                >
-                  <MenuItem>
-                    <button type="button" onClick={() => share()}>
-                      <EyeIcon />
-                      <span>Посилання для перегляду</span>
-                    </button>
-                  </MenuItem>
-                  <MenuSeparator className={styles.separator} />
-                  <MenuItem>
-                    <button type="button" onClick={() => share(`#edit=${editToken}`)}>
-                      <KeyIcon />
-                      <span>
-                        Посилання для редагування
-                        <small>Дає право змінювати для всіх</small>
-                      </span>
-                    </button>
-                  </MenuItem>
-                </MenuItems>
-              </Menu>
-            ) : (
-              <button
+    <header
+      className={classes(
+        generalStyles.header,
+        styles.header,
+        wrappedTitle === groupTitle && styles.wrapped,
+        showWeekNavigation && styles.weekPicker
+      )}
+    >
+      <nav className={classes(generalStyles["right-buttons"], styles.nav)}>
+        <div className={classes("flex gap-1", styles.icons)}>
+          {isNarrow ? (
+            <ThemeButton />
+          ) : (
+            <>
+              <Link
+                state={{ force: true }}
+                to="/home"
+                aria-label="Home"
                 type="button"
                 className={classes("icon-button", "transition duration-300")}
-                title="Поділитися розкладом"
-                aria-label="Поділитися розкладом"
-                onClick={() => share()}
               >
-                <ShareIcon />
-              </button>
-            ))}
+                <HomeIcon />
+              </Link>
+              <SavedMenu timetableChanged={loading} />
+            </>
+          )}
+          {customTimetable && !isNarrow && (
+            <ShareButton editToken={editToken} className={classes("icon-button", "transition duration-300")} />
+          )}
         </div>
-        <h1 className={styles.title}>
+        <h1 ref={titleRef} className={styles.title}>
           {groupTitle}
           {isExamsTimetable && <span className={styles.mode}>Екзамени</span>}
         </h1>

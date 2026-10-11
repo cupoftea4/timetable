@@ -1,7 +1,6 @@
 @use 'mixins' as *;
 @use 'utils' as *;
 @use 'variables' as *;
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,700;1,700&display=swap');
 
 
 :root {
@@ -197,5 +196,10 @@ a, button {
   &:focus-visible::after {
     opacity: 1;
     translate: -50% 0;
+  }
+  @include touchscreen {
+    &::after {
+      display: none;
+    }
   }
 }

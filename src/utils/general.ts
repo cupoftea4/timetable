@@ -1,3 +1,4 @@
+import { type ComponentType, createElement, lazy } from "react";
 import type { RenderPromises } from "@/types/utils";
 import { SEEN_FEATURES_INTRO } from "./constants";
 import { getCurrentUADate } from "./date";
@@ -118,4 +119,20 @@ export function doOnce(id: string, fn: () => void) {
 
 // New users see the features intro in September
 export const isFeaturesIntroDue = () =>
-  getCurrentUADate().getMonth() === 8 && !localStorage.getItem(SEEN_FEATURES_INTRO);
+  getCurrentUADate().getMonth() === 9 && !localStorage.getItem(SEEN_FEATURES_INTRO);
+
+/** React.lazy that also loads in the background right after the page, so opening it doesn't wait for the network */
+export function lazyPrefetched<P extends object>(load: () => Promise<{ default: ComponentType<P> }>) {
+  let loaded: ComponentType<P> | undefined;
+  setTimeout(() => {
+    load().then(
+      (module) => {
+        loaded = module.default;
+      },
+      () => {}
+    );
+  }, 500);
+  const Lazy = lazy(load);
+  // Lazy suspends on its first render even when loaded, and React holds back what suspended for 300ms
+  return (props: P) => createElement(loaded ?? Lazy, props);
+}

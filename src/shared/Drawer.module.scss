@@ -1,0 +1,70 @@
+@use '../styles/utils' as *;
+@use '../styles/mixins' as *;
+@use '../styles/variables' as *;
+
+.backdrop {
+  position: fixed;
+  @include inset-0;
+  z-index: 100;
+  background-color: hsla(0, 0%, 0%, 0.7);
+}
+
+.container {
+  position: fixed;
+  @include inset-0;
+  z-index: 100;
+  @include flex-center;
+  padding: 1rem;
+  &.sheet {
+    align-items: flex-end;
+    padding: calc(env(safe-area-inset-top) + 2.5rem) 0 0;
+  }
+}
+
+// Callers set the width on wide screens with --drawer-width
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(var(--drawer-width, 30rem), 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.5rem;
+  @include dialog-surface;
+  outline: none;
+  .sheet & {
+    width: 100%;
+    max-height: calc(100% - var(--keyboard-inset, 0px));
+    margin-bottom: var(--keyboard-inset, 0px);
+    padding: .5rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
+    border-width: 1px 0 0;
+    border-radius: 1.25rem 1.25rem 0 0;
+    // The page behind is dimmed anyway, and blurring it makes sliding janky on phones, so it's opaque instead
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-image: linear-gradient(var(--surface-clr), var(--surface-clr));
+    background-color: hsl(215, 30%, 9%);
+  }
+}
+
+.handle {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: .3125rem;
+  margin: 0 auto -.25rem;
+  border-radius: 1rem;
+  background-color: rgba(255, 255, 255, .3);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: $semi-bold-font;
+}

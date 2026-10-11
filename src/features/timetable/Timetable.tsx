@@ -1,5 +1,5 @@
-import { type FC, useCallback, useEffect, useMemo, useState } from "react";
-import { useIsMobile } from "@/hooks/useWindowDimensions";
+import { type FC, type RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 import { classes } from "@/styles/utils";
 import type { TimetableItem, TimetableType } from "@/types/timetable";
 import { DEVELOP } from "@/utils/constants";
@@ -16,7 +16,10 @@ type OwnProps = {
   isLoading?: boolean;
   timetableType?: TimetableType;
   selectedWeek?: Date;
+  scrollerRef: RefObject<HTMLElement | null>;
 };
+
+const SHORT_DAYS = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
 
 const MINUTE = 60 * 1000;
 
@@ -31,8 +34,11 @@ const Timetable: FC<OwnProps> = ({
   isLoading,
   timetableType,
   selectedWeek,
+  scrollerRef,
 }) => {
   const isMobile = useIsMobile();
+  const dayLists = useRef<(Element | null)[]>([]);
+  const [visibleDay, setVisibleDay] = useState(0);
 
   const isPartTime = timetableType === "parttime";
 
@@ -160,8 +166,14 @@ const Timetable: FC<OwnProps> = ({
       const hasAnyLessons = dayLessons.some((lessons) => lessons !== null);
 
       return (
-        <div key={day} className={classes(styles.list, "flex flex-col min-h-64")}>
-          <h3 className={styles["day-title"]}>{day}</h3>
+        <div
+          key={day}
+          ref={(list) => {
+            dayLists.current[i] = list;
+          }}
+          className={classes(styles.list, "relative flex flex-col min-h-64")}
+        >
+          <h3 className="sr-only">{day}</h3>
           <ol className={classes(styles.list, "h-full")}>
             {!isLoading ? (
               hasAnyLessons ? (
@@ -203,8 +215,40 @@ const Timetable: FC<OwnProps> = ({
     hasCellSubgroups,
   ]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: observes the day lists again when they are rendered anew
+  useEffect(() => {
+    if (!isMobile) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((entry) => entry.isIntersecting)?.target;
+        if (visible) setVisibleDay(dayLists.current.indexOf(visible));
+      },
+      { root: scrollerRef.current, threshold: 0.6 }
+    );
+    for (const list of dayLists.current) if (list) observer.observe(list);
+    return () => observer.disconnect();
+  }, [isMobile, listsContent, scrollerRef]);
+
   return isMobile ? (
-    <div className={classes(styles.timetable, styles.lists)}>{listsContent}</div>
+    <>
+      <nav className={styles.days} aria-label="Дні тижня">
+        {tableDays.filter(Boolean).map((day, i) => (
+          <button
+            key={day}
+            type="button"
+            aria-label={day}
+            aria-current={visibleDay === i}
+            className={classes((currentDay || 7) === i + 1 && styles.today)}
+            onClick={() =>
+              dayLists.current[i]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" })
+            }
+          >
+            {SHORT_DAYS[i]}
+          </button>
+        ))}
+      </nav>
+      <div className={classes(styles.timetable, styles.lists)}>{listsContent}</div>
+    </>
   ) : (
     <table className={styles.timetable}>
       <thead>

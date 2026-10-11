@@ -27,6 +27,7 @@ type OwnProps = {
   renderOption?: (option: DataListOption) => React.ReactNode;
   emptyText?: string;
   optionsFrame?: { offset: number; width: number };
+  showOptionsOnInput?: boolean;
 };
 
 const SPECIAL_CHARACTERS_REGEX = /[^\p{L}\p{N}]/gu;
@@ -53,14 +54,16 @@ const VirtualizedDataList: FC<OwnProps> = ({
   renderOption = (option) => option.value,
   emptyText,
   optionsFrame,
+  showOptionsOnInput = false,
 }) => {
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const [inputKey, setInputKey] = React.useState(0);
   const [query, setQuery] = React.useState("");
   const normalizedQuery = normalize(query, ignoreSpecialCharacters);
-  const filteredOptions = options.filter((item) =>
-    normalize(item.value, ignoreSpecialCharacters).includes(normalizedQuery)
-  );
+  const filteredOptions =
+    showOptionsOnInput && !query
+      ? []
+      : options.filter((item) => normalize(item.value, ignoreSpecialCharacters).includes(normalizedQuery));
 
   if (allowCustomValue && query && !filteredOptions.some((item) => item.value === query)) {
     filteredOptions.push({ id: query, value: `Відкрити «${query}»`, isCustom: true });
@@ -72,7 +75,7 @@ const VirtualizedDataList: FC<OwnProps> = ({
   return (
     <div ref={containerRef} className={className}>
       <Combobox
-        immediate
+        immediate={!showOptionsOnInput}
         virtual={{ options: filteredOptions, disabled: (option) => Boolean(option.disabled) }}
         onClose={onClose}
         onChange={(item: DataListOption | null) => {
@@ -93,7 +96,7 @@ const VirtualizedDataList: FC<OwnProps> = ({
               placeholder={placeholder}
               autoFocus={autoFocus}
               onClick={() => {
-                if (!open) buttonRef.current?.click();
+                if (!open && !showOptionsOnInput) buttonRef.current?.click();
               }}
               onChange={(event) => setQuery(event.target.value)}
               onKeyDown={onKeyDown}

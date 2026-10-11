@@ -10,6 +10,31 @@
   @include utils.blur(2rem);
 }
 
+// Actions listed in a drawer
+@mixin drawer-list {
+  li + li {
+    border-top: 1px solid var(--border-clr);
+  }
+  a,
+  button {
+    display: flex;
+    align-items: center;
+    gap: .875rem;
+    width: 100%;
+    padding: .875rem .25rem;
+    font-size: 1.0625rem;
+    text-align: left;
+    &:active {
+      opacity: .7;
+    }
+  }
+  svg {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}
+
 // Menus and dropdowns
 @mixin popup-surface {
   border: 1px solid var(--border-clr);

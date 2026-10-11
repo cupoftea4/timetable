@@ -1,8 +1,22 @@
+import SearchIcon from "@/assets/SearchIcon";
 import { useDatalistFocus } from "@/context/datalistFocus";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 import styles from "./MissingGroupTip.module.scss";
 
 const MissingGroupTip = () => {
   const { focus } = useDatalistFocus();
+  const isMobile = useIsMobile();
+
+  if (isMobile) {
+    return (
+      <button type="button" className={styles.compact} onClick={() => focus()}>
+        <SearchIcon />
+        <span>
+          <span className="font-bold">Не знайшли групу?</span> Введіть її назву в пошуку
+        </span>
+      </button>
+    );
+  }
 
   return (
     <div className={styles.timetablesInfo}>

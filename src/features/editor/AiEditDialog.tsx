@@ -1,5 +1,6 @@
-import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { CloseButton } from "@headlessui/react";
 import { type FC, useState } from "react";
+import Drawer from "@/shared/Drawer";
 import type { CustomTimetableData } from "@/types/timetable";
 import { toAIPrompt } from "@/utils/customTimetable";
 import Toast from "@/utils/toasts";
@@ -23,47 +24,42 @@ const AiEditDialog: FC<OwnProps> = ({ timetable, subgroup, pending, onApply, onC
     );
 
   return (
-    <Dialog open onClose={onClose} className={styles.backdrop}>
-      <DialogPanel className={styles.dialog}>
-        <DialogTitle className={styles.dialogTitle}>Змінити розклад за допомогою ШІ</DialogTitle>
-        <ol className={styles.steps}>
-          <li>
-            <span>Скопіюйте розклад разом з інструкціями для ШІ.</span>
-            <button type="button" className={styles.outlined} onClick={copyPrompt}>
-              Скопіювати для ШІ
-            </button>
-          </li>
-          <li>
-            Вставте його в чат із ChatGPT, Gemini чи Claude і одразу після нього допишіть, що змінити. Можна додати й
-            скріншот іншого розкладу.
-          </li>
-          <li>
-            <label className={styles.field}>
-              Вставте сюди відповідь ШІ
-              <textarea
-                className={styles.importText}
-                rows={8}
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-              />
-            </label>
-          </li>
-        </ol>
-        <div className={styles.dialogActions}>
-          <button type="button" className={styles.pushRight} onClick={onClose}>
-            Скасувати
+    <Drawer title="Змінити розклад за допомогою ШІ" onClose={onClose} className={styles.dialog}>
+      <ol className={styles.steps}>
+        <li>
+          <span>Скопіюйте розклад разом з інструкціями для ШІ.</span>
+          <button type="button" className={styles.outlined} onClick={copyPrompt}>
+            Скопіювати для ШІ
           </button>
-          <button
-            type="button"
-            className={styles.primary}
-            onClick={() => onApply(answer)}
-            disabled={pending || !answer.trim()}
-          >
-            Застосувати
-          </button>
-        </div>
-      </DialogPanel>
-    </Dialog>
+        </li>
+        <li>
+          Вставте його в чат із ChatGPT, Gemini чи Claude і одразу після нього допишіть, що змінити. Можна додати й
+          скріншот іншого розкладу.
+        </li>
+        <li>
+          <label className={styles.field}>
+            Вставте сюди відповідь ШІ
+            <textarea
+              className={styles.importText}
+              rows={8}
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+            />
+          </label>
+        </li>
+      </ol>
+      <div className={styles.dialogActions}>
+        <CloseButton className={styles.pushRight}>Скасувати</CloseButton>
+        <button
+          type="button"
+          className={styles.primary}
+          onClick={() => onApply(answer)}
+          disabled={pending || !answer.trim()}
+        >
+          Застосувати
+        </button>
+      </div>
+    </Drawer>
   );
 };
 

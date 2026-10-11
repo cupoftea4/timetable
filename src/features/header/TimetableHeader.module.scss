@@ -8,10 +8,37 @@ header.header {
   @include mobile {
     padding-left: 1.25rem;
     padding-right: 1.25rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      "icons title actions"
+      "controls controls controls";
+    > .nav {
+      display: contents;
+    }
+
+    &.weekPicker {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-start;
+      align-items: center;
+      .title {
+        flex-grow: 1;
+      }
+      .controls {
+        width: auto;
+        margin: 0 auto;
+      }
+    }
   }
 }
 
+.icons {
+  grid-area: icons;
+}
+
 .controls {
+  grid-area: controls;
   @include flex-center;
   gap: .5rem;
   flex-wrap: wrap;
@@ -22,12 +49,14 @@ header.header {
 }
 
 .actions {
+  grid-area: actions;
   display: flex;
   align-items: center;
   margin-left: auto;
 }
 
 .title {
+  grid-area: title;
   display: inline-flex;
   align-items: baseline;
   gap: .375em;
@@ -40,7 +69,17 @@ header.header {
     flex-direction: column;
     align-items: flex-start;
     gap: 0;
-    line-height: 1.1;
+    font-size: 1.75rem;
+    line-height: 1.15;
+    text-align: left;
+    // Clipped, so overflowing shows that it needs to wrap
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    .wrapped & {
+      font-size: 1.375rem;
+      white-space: normal;
+    }
   }
 }
 
@@ -53,40 +92,5 @@ header.header {
     font-size: .5em;
     font-weight: $regular-font;
     line-height: 1.2;
-  }
-}
-
-.shareMenu {
-  display: flex;
-  flex-direction: column;
-  padding: .25rem;
-  @include popup-surface;
-  z-index: 110;
-  outline: none;
-  button {
-    display: flex;
-    gap: .625rem;
-    padding: .5rem .75rem;
-    border-radius: .375rem;
-    text-align: left;
-    &[data-focus] {
-      background-color: rgba(255, 255, 255, .1);
-    }
-  }
-  svg {
-    flex-shrink: 0;
-    width: 1.125rem;
-    height: 1lh;
-    opacity: .85;
-  }
-  small {
-    display: block;
-    font-size: .8125rem;
-    color: $extra-text-clr;
-  }
-  .separator {
-    height: 1px;
-    margin: .25rem .375rem;
-    background-color: var(--border-clr);
   }
 }

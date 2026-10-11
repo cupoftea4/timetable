@@ -1,0 +1,16 @@
+# Розклад НУЛП
+
+> Class and exam timetables for students and lecturers of Lviv Polytechnic National University (Національний університет «Львівська політехніка»). The interface is in Ukrainian.
+
+Each timetable has its own URL named after a student group, a lecturer or an elective course, for example `https://lpnu.pp.ua/ПЗ-22` for the group ПЗ-22. Adding `/exams` opens the exam timetable, for example `https://lpnu.pp.ua/ПЗ-22/exams`. Merged and edited timetables made by users live at `https://lpnu.pp.ua/c/{id}`. Pages are rendered in the browser with JavaScript.
+
+## Timetables
+
+- [Student groups](https://lpnu.pp.ua/home): Pick an institute, a year and a group
+- [Lecturers](https://lpnu.pp.ua/lecturer): Timetables of individual lecturers
+- [Elective courses](https://lpnu.pp.ua/selective): Timetables of elective subject groups
+
+## Optional
+
+- [Source code](https://github.com/cupoftea4/timetable)
+- [Bug reports and feedback](https://t.me/lpnu_timetable): On Telegram
