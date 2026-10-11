@@ -38,9 +38,14 @@ export const CatModeProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const DisableCatModeButton = () => {
+export const useCatMode = () => {
   const context = useContext(CatModeContext);
-  if (!context) throw new Error("DisableCatModeButton must be used within a CatModeProvider");
+  if (!context) throw new Error("useCatMode must be used within a CatModeProvider");
+  return context;
+};
+
+export const DisableCatModeButton = () => {
+  const context = useCatMode();
 
   return context.enabled ? (
     <button

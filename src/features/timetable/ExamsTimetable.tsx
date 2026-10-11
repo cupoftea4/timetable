@@ -38,7 +38,7 @@ const ExamsTimetable: FC<OwnProps> = ({ exams, isLoading }) => {
                   {exam.number} пара ({lessonsTimes[exam.number - 1]?.start})
                 </p>
               </div>
-              <h3>{exam.subject}</h3>
+              <h2>{exam.subject}</h2>
               <div className={styles.bottom}>
                 <p>{exam.lecturer.trim().replace(/,$/, "")}</p>
                 <TimetableLink urls={exam.urls} type={"lab"} />

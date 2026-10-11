@@ -1,19 +1,21 @@
-import React, { type FC } from "react";
+import { CloseButton } from "@headlessui/react";
+import React, { type FC, Suspense } from "react";
+import CheckMarkIcon from "@/assets/CheckMarkIcon";
+import ChevronDownIcon from "@/assets/ChevronDownIcon";
+import { lazyPrefetched } from "@/utils/general";
 import styles from "./MobileSelect.module.scss";
 
+const Drawer = lazyPrefetched(() => import("./Drawer"));
+
 type OwnProps = {
+  label: string;
   items: Array<{ value: string; name: string }>;
   selectedState: [string, React.Dispatch<React.SetStateAction<string>> | ((state: string) => void)];
 };
 
-const MobileSelect: FC<OwnProps> = ({ items, selectedState }) => {
+const MobileSelect: FC<OwnProps> = ({ label, items, selectedState }) => {
   const [selected, onSelect] = selectedState;
   const [showSelect, setShowSelect] = React.useState(false);
-
-  const onItemClicked = (item: string) => {
-    setShowSelect(false);
-    onSelect(item);
-  };
 
   return (
     <>
@@ -25,31 +27,29 @@ const MobileSelect: FC<OwnProps> = ({ items, selectedState }) => {
         className={styles.selected}
       >
         {items.find((item) => item.value === selected)?.name}
+        <ChevronDownIcon />
       </button>
       {showSelect && (
-        <div
-          className={styles.select}
-          role="dialog"
-          aria-modal="true"
-          onClick={() => {
-            setShowSelect(false);
-          }}
-        >
-          <ul>
-            {items.map((item) => (
-              <li key={item.value}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onItemClicked(item.value);
-                  }}
-                >
-                  {item.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Suspense fallback={null}>
+          <Drawer title={label} onClose={() => setShowSelect(false)}>
+            <ul className={styles.options}>
+              {items.map((item) => (
+                <li key={item.value}>
+                  <CloseButton
+                    className={styles.option}
+                    aria-current={item.value === selected}
+                    onClick={() => {
+                      onSelect(item.value);
+                    }}
+                  >
+                    {item.name}
+                    {item.value === selected && <CheckMarkIcon className={styles.check} />}
+                  </CloseButton>
+                </li>
+              ))}
+            </ul>
+          </Drawer>
+        </Suspense>
       )}
     </>
   );

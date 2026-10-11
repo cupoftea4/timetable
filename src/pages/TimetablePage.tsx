@@ -7,7 +7,7 @@ import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
 import useGroupParam from "@/hooks/useGroupParam";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
-import useWindowDimensions from "@/hooks/useWindowDimensions";
+import useMediaQuery from "@/hooks/useMediaQuery";
 import { classes } from "@/styles/utils";
 import type {
   CustomTimetable,
@@ -23,12 +23,12 @@ import { getDefaultCustomName, toCustomLessons, toTimetableItems } from "@/utils
 import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
-import { isFeaturesIntroDue, optimisticRender } from "@/utils/general";
+import { isFeaturesIntroDue, lazyPrefetched, optimisticRender } from "@/utils/general";
 import { CUSTOM_PREFIX, getCustomId } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import styles from "./TimetablePage.module.scss";
 
-const CreateMergedModal = lazy(() => import("@/features/merged_modal/CreateMergedModal"));
+const CreateMergedModal = lazyPrefetched(() => import("@/features/merged_modal/CreateMergedModal"));
 const TimetableEditor = lazy(() => import("@/features/editor/TimetableEditor"));
 const FeaturesIntro = lazy(() => import("@/features/intro/FeaturesIntro"));
 const CalendarHelp = lazy(() => import("@/features/intro/CalendarHelp"));
@@ -67,7 +67,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const [semester, setSemester] = useState<Semester>();
   const { state, search, hash }: { state: LocationState | null; search: string; hash: string } = useLocation();
   const isEditing = new URLSearchParams(search).has("edit");
-  const isDesktop = useWindowDimensions().width >= TIMETABLE_SCREEN_BREAKPOINT;
+  const isDesktop = useMediaQuery(`(min-width: ${TIMETABLE_SCREEN_BREAKPOINT}px)`);
   // Starting from the saved draft avoids flashing the timetable before the editor on reload
   const [editor, setEditor] = useState(() =>
     isEditing && isDesktop ? TimetableManager.getCustomDraft(group) : undefined
@@ -95,6 +95,10 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     : customTimetable
       ? "Створити копію розкладу для редагування"
       : "Створити змінену версію розкладу";
+
+  useEffect(() => {
+    if (!showIntro) Toast.donationNotification();
+  }, [showIntro]);
 
   useEffect(() => {
     void getCurrentSemester().then(setSemester);
@@ -264,7 +268,6 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   function closeIntro() {
     localStorage.setItem(SEEN_FEATURES_INTRO, "true");
     setShowIntro(false);
-    Toast.donationNotification();
   }
 
   function exitEditMode() {
@@ -347,6 +350,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
                 isLoading={isLoading}
                 timetableType={timetableType}
                 selectedWeek={selectedWeek}
+                scrollerRef={timetableRef}
               />
             ) : examsTimetable?.length === 0 ? (
               <p>Розклад екзаменів пустий</p>
@@ -368,10 +372,10 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
         icsFILE={iscFile}
         time={time}
         customTimetable={customTimetable}
-        onEdit={canEdit ? openEditor : isMergedCustom && editToken ? () => setMergeModal("edit") : undefined}
+        onEdit={canEdit ? openEditor : customTimetable && editToken ? () => setMergeModal("edit") : undefined}
         onCalendarExport={showCalendarHelpOnce}
         editTitle={editTitle}
-        isOwner={Boolean(editToken)}
+        editToken={editToken}
       />
       {showCalendarHelp && (
         <Suspense fallback={null}>
@@ -388,7 +392,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
           <CreateMergedModal
             defaultTimetables={isMergedCustom ? customTimetable.sourceNames : [group]}
             editing={
-              mergeModal === "edit" && isMergedCustom && editToken ? { ...customTimetable, editToken } : undefined
+              mergeModal === "edit" && customTimetable && editToken ? { ...customTimetable, editToken } : undefined
             }
             onClose={() => {
               setMergeModal(undefined);

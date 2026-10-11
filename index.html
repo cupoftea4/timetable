@@ -9,14 +9,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#000000" />
   <meta name="description"
-    content="Розклад занять для студентів та викладачів Національного університету 'Львівська політехніка'. Актуальні час й місце пар та екзаменів." />
+    content="Альтернативна, зручніша версія розкладу НУЛП: пари й екзамени для студентів і викладачів. Працює офлайн, розклад можна змінити, об’єднати чи додати в календар." />
   <meta name="keywords"
     content="НУЛП, ЛПНУ, розклад, ЛП, lpnu timetable, lpnu, timetable, політехніка, політех, студенти, викладачі, лабораторні, лекції">
   <meta property="og:title" content="Розклад НУЛП" />
-  <meta property="og:site_name" content="Timetable" />
+  <meta property="og:site_name" content="Розклад НУЛП" />
   <meta property="og:image" content="https://lpnu.pp.ua/images/logo-light.png" />
   <link rel="manifest" href="/manifest.json" />
   <title>Розклад НУЛП</title>
+  <!-- The name Google shows above the results instead of the domain -->
+  <script type="application/ld+json">
+    { "@context": "https://schema.org", "@type": "WebSite", "name": "Розклад НУЛП", "alternateName": ["Розклад Політехніки", "lpnu.pp.ua"], "url": "https://lpnu.pp.ua/" }
+  </script>
   <script>
     (function() {
       const theme = localStorage.getItem('color-mode');
@@ -27,6 +31,7 @@
       if (prefersDark) {
         document.documentElement.classList.add('dark-mode');
       }
+      document.querySelector('meta[name="theme-color"]').content = prefersDark ? '#00000a' : '#0e4c5a';
     })();
   </script>
 </head>

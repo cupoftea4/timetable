@@ -26,6 +26,8 @@ export function useTheme(): UseThemeReturn {
       } else {
         document.documentElement.classList.remove("dark-mode");
       }
+      // Mobile browsers tint their toolbars with it, matches the html background in _global.scss
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", dark ? "#00000a" : "#0e4c5a");
     };
 
     applyTheme(isDarkTheme);

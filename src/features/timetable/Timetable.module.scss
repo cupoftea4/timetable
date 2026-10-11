@@ -63,9 +63,38 @@
 
   &.lists {
     display: flex;
-    .day-title {
-      font-size: larger;
-      margin: 0 0 .5rem .625rem;
+    flex: 1;
+  }
+}
+
+.days {
+  position: sticky;
+  left: 0;
+  display: flex;
+  gap: .25rem;
+  margin: .5rem 0 .25rem;
+  button {
+    position: relative;
+    flex: 1;
+    padding: .375rem 0;
+    border-radius: .625rem;
+    color: $extra-text-clr;
+    transition: background-color .2s, color .2s;
+    &[aria-current="true"] {
+      background-color: var(--accent-clr);
+      color: var(--text-clr);
+      font-weight: $semi-bold-font;
+    }
+    &.today::after {
+      content: '';
+      position: absolute;
+      bottom: .125rem;
+      left: 50%;
+      width: .25rem;
+      height: .25rem;
+      border-radius: 50%;
+      background-color: currentColor;
+      translate: -50% 0;
     }
   }
 }

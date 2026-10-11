@@ -60,7 +60,7 @@ $icon-size: 1em;
   padding: 0;
   width: calc(var(--input-width) + 1rem);
   list-style: none;
-  @include fade-in-animation(0.05s);
+  animation: options-in .15s ease-out;
   z-index: 100;
   --anchor-max-height: 300px;
   font-size: $medium-font-size;
@@ -126,6 +126,13 @@ $icon-size: 1em;
     }
   }
 
+}
+
+@keyframes options-in {
+  from {
+    opacity: 0;
+    transform: translateY(-.25rem);
+  }
 }
 
 @keyframes show {

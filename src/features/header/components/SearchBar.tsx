@@ -45,6 +45,7 @@ const SearchBar: FC<OwnProps> = ({ toggleSearchBar, show }) => {
           optionsClassName={styles.options}
           ignoreSpecialCharacters
           allowCustomValue
+          showOptionsOnInput
           autoFocus
           containerRef={datalistRef}
         />

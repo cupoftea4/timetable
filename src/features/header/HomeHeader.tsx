@@ -1,12 +1,13 @@
-import { type FC, useEffect, useMemo, useState } from "react";
+import { type FC, useEffect, useState } from "react";
 import { useDatalistFocus } from "@/context/datalistFocus";
-import useWindowDimensions from "@/hooks/useWindowDimensions";
+import useMediaQuery, { useIsTablet } from "@/hooks/useMediaQuery";
 import { classes } from "@/styles/utils";
 import type { TimetableType } from "@/types/timetable";
 import { NARROW_SCREEN_BREAKPOINT, TABLET_SCREEN_BREAKPOINT } from "@/utils/constants";
 import Navigation from "./components/Navigation";
 import SavedMenu from "./components/SavedMenu";
 import SearchBar from "./components/SearchBar";
+import ThemeButton from "./components/ThemeButton";
 import styles from "./HeaderPanel.module.scss";
 
 type OwnProps = {
@@ -15,11 +16,10 @@ type OwnProps = {
 };
 
 const HeaderPanel: FC<OwnProps> = ({ timetableType, className }) => {
-  const { width } = useWindowDimensions();
-  const shouldShrinkSearchBar = useMemo(
-    () => width < TABLET_SCREEN_BREAKPOINT && width > NARROW_SCREEN_BREAKPOINT,
-    [width]
+  const shouldShrinkSearchBar = useMediaQuery(
+    `(min-width: ${NARROW_SCREEN_BREAKPOINT + 0.02}px) and (max-width: ${TABLET_SCREEN_BREAKPOINT - 0.02}px)`
   );
+  const isNarrow = useIsTablet();
   const { isFocused, blur } = useDatalistFocus();
   const [showSearchBar, setShowSearchBar] = useState(!shouldShrinkSearchBar || isFocused);
 
@@ -55,7 +55,7 @@ const HeaderPanel: FC<OwnProps> = ({ timetableType, className }) => {
       {showSearchBar && shouldShrinkSearchBar ? null : (
         <div className={styles["right-buttons"]}>
           <Navigation timetableType={timetableType} />
-          <SavedMenu />
+          {isNarrow ? <ThemeButton /> : <SavedMenu />}
           {/* <ThemesIcon /> */}
         </div>
       )}

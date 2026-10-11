@@ -1,3 +1,4 @@
+@use "../../styles/mixins" as *;
 @use "../../styles/utils" as *;
 @use "../../styles/variables" as *;
 
@@ -50,6 +51,138 @@
   .button {
     width: var(--icon-size);
     height: var(--icon-size);
+  }
+}
+
+// Hidden yet still the buttons' names for screen readers, the tooltips describe them in full
+.label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.toFooter {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 10;
+  @include flex-center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--border-clr);
+  border-radius: 50%;
+  background-color: var(--accent-clr);
+  @include blur;
+  color: $extra-text-clr;
+  animation: fade-in .3s ease-out;
+  transition: color .2s, background-color .2s;
+  &:hover {
+    color: var(--text-clr);
+    background-color: rgba(255, 255, 255, .25);
+  }
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@include tablet {
+  .bottom {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    padding: .25rem 0 calc(.25rem + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--border-clr);
+    background-color: hsla(0, 0%, 100%, .05);
+    @include blur;
+  }
+}
+
+@media (hover: none), (max-width: 768px) {
+  // Up to six buttons share the width of a phone
+  .bottom > span {
+    justify-content: center;
+    gap: 0;
+    width: 100%;
+    padding: 0 .5rem;
+  }
+  .bottom .button {
+    display: flex;
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    gap: .25rem;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    max-width: 4.5rem;
+    padding: .375rem 0;
+    border-radius: .625rem;
+    &:active {
+      background-color: var(--accent-clr);
+    }
+    > svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+  .bottom > span .theme .themeIcon {
+    width: 1.5rem;
+    height: 1.5rem;
+    &.moonIcon {
+      top: .375rem;
+      left: 50%;
+      translate: -50% 0;
+    }
+  }
+  .label {
+    position: static;
+    width: auto;
+    height: auto;
+    clip-path: none;
+    font-size: .6875rem;
+    white-space: nowrap;
+    color: $extra-text-clr;
+  }
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid var(--border-clr);
+  svg {
+    display: inline;
+    width: 1em;
+    height: 1em;
+    vertical-align: -.125em;
+  }
+}
+
+.hint {
+  font-size: $small-font-size;
+  color: $extra-text-clr;
+}
+
+.more {
+  @include drawer-list;
+  .catIcon {
+    flex-shrink: 0;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: currentColor;
+    mask: url(../../assets/cat-face.svg) center / contain no-repeat;
   }
 }
 

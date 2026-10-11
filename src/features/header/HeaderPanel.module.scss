@@ -22,7 +22,7 @@
     flex-wrap: wrap;
     justify-content: center;
 
-    svg {
+    :global(.icon-button) > svg {
       width: clamp(2rem, 8vw, 2.75rem);
       height: clamp(2rem, 8vw, 2.75rem);
       transform-origin: center;

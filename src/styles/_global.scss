@@ -1,7 +1,6 @@
 @use 'mixins' as *;
 @use 'utils' as *;
 @use 'variables' as *;
-@import url('https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,400;0,700;1,700&display=swap');
 
 
 :root {
@@ -42,8 +41,11 @@
   );
 } 
 
+// Desktop Safari tints its toolbar with the color; `fixed` keeps the gradient in place during overscroll
 html {
- background: #0e4c5a;
+ background: edge-fade(to bottom, $bg-light-top-clr), $bg-light;
+ background-color: $bg-light-top-clr;
+ background-attachment: fixed;
 }
 
 html.dark-mode {
@@ -72,7 +74,10 @@ body {
     inset: 0;
     z-index: -2;
     pointer-events: none;
-    background: $bg-light;
+    background: edge-fade(to bottom, $bg-light-top-clr), $bg-light;
+    @include mobile {
+      background-image: edge-fade(to bottom, $bg-light-top-clr), edge-fade(to top, $bg-light-bottom-clr), $bg-light;
+    }
   }
   main {
     padding: $main-padding;
@@ -191,5 +196,10 @@ a, button {
   &:focus-visible::after {
     opacity: 1;
     translate: -50% 0;
+  }
+  @include touchscreen {
+    &::after {
+      display: none;
+    }
   }
 }

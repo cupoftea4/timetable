@@ -1,15 +1,7 @@
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  Field,
-  Label,
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-} from "@headlessui/react";
+import { CloseButton, Field, Label, Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { type FC, useState } from "react";
+import ChevronDownIcon from "@/assets/ChevronDownIcon";
+import Drawer from "@/shared/Drawer";
 import type { CustomLesson } from "@/types/timetable";
 import { getDisplayType, lessonsTimes } from "@/utils/timetable";
 import { DAYS } from "./constants";
@@ -41,9 +33,7 @@ const Select = <T extends string | number>({ label, value, options, onChange }: 
     <Listbox value={value} onChange={onChange}>
       <ListboxButton className={styles.select}>
         {options.find(([optionValue]) => optionValue === value)?.[1]}
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="m6 9 6 6 6-6" />
-        </svg>
+        <ChevronDownIcon />
       </ListboxButton>
       <ListboxOptions anchor={{ to: "bottom start", gap: 4 }} className={styles.options}>
         {options.map(([optionValue, text]) => (
@@ -71,21 +61,18 @@ const LessonDialog: FC<OwnProps> = ({ lesson: initialLesson, isNew, onSave, onDu
     setLesson((current) => ({ ...current, [key]: value }));
 
   return (
-    <Dialog open onClose={onClose} className={styles.backdrop}>
-      <DialogPanel
-        as="form"
-        className={styles.dialog}
+    <Drawer title={isNew ? "Нова пара" : "Редагування пари"} onClose={onClose} className={styles.dialog}>
+      <form
         onSubmit={(event) => {
           event.preventDefault();
           onSave(lesson);
         }}
       >
-        <DialogTitle className={styles.dialogTitle}>{isNew ? "Нова пара" : "Редагування пари"}</DialogTitle>
         <label className={styles.field}>
           Предмет
           <input
             required
-            autoFocus
+            data-autofocus
             maxLength={200}
             value={lesson.subject}
             onChange={(e) => set("subject", e.target.value)}
@@ -135,15 +122,13 @@ const LessonDialog: FC<OwnProps> = ({ lesson: initialLesson, isNew, onSave, onDu
               </button>
             </>
           )}
-          <button type="button" className={styles.pushRight} onClick={onClose}>
-            Скасувати
-          </button>
+          <CloseButton className={styles.pushRight}>Скасувати</CloseButton>
           <button type="submit" className={styles.primary}>
             {isNew ? "Додати" : "Готово"}
           </button>
         </div>
-      </DialogPanel>
-    </Dialog>
+      </form>
+    </Drawer>
   );
 };
 

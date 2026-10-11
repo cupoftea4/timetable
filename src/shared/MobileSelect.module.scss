@@ -1,49 +1,38 @@
 @use '../styles/variables' as *;
 @use '../styles/mixins' as *;
-@use '../styles/utils' as *;
 
 .selected {
   @include light-pillow-button;
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  svg {
+    width: .75rem;
+    height: .75rem;
+    opacity: .7;
+  }
 }
 
-.select {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 101;
+.options li + li {
+  border-top: 1px solid var(--border-clr);
+}
+
+.option {
   display: flex;
-  align-items: flex-end;
-  > ul {
-    flex: 1;
-    background: var(--accent-clr);
-    @include blur(10px);
-    border-radius: $border-radius $border-radius 0 0;
-    padding: .5rem 0;
-    > li {
-      font-size: $medium-font-size;
-      &:not(:last-child) {
-        &:after {
-          content: '';
-          display: block;
-          width: 80%;
-          height: 1px;
-          left: 50%;
-          transform: translateX(-50%);
-          position: absolute;
-          background: var(--accent-clr);
-        }
-      }
-      > button {
-        width: 100%;
-        padding: .75rem 2rem;
-      }
-      &:hover {
-        background-color: hsla(0, 0%, 100%, 0.15);
-        cursor: pointer;
-      }
-    }
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: .875rem .25rem;
+  font-size: 1.125rem;
+  text-align: left;
+  &[aria-current="true"] {
+    font-weight: $semi-bold-font;
+  }
+  &:active {
+    opacity: .7;
+  }
+  .check {
+    width: 1rem;
+    height: auto;
   }
 }

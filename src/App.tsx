@@ -8,12 +8,13 @@ import NavigationSelector from "./pages/NavigationSelector";
 import { Status } from "./types/utils";
 import { TOAST_AUTO_CLOSE_TIME } from "./utils/constants";
 import TimetableManager from "./utils/data/TimetableManager";
-import { isFeaturesIntroDue } from "./utils/general";
+import { lazyPrefetched } from "./utils/general";
 import { pathnameToType } from "./utils/timetable";
 import Toast from "./utils/toasts";
 
-const HomePage = lazy(() => import("./pages/HomePage"));
-const TimetablePage = lazy(() => import("./pages/TimetablePage"));
+// Both load soon after start, so going from the list to a timetable doesn't wait
+const HomePage = lazyPrefetched(() => import("./pages/HomePage"));
+const TimetablePage = lazyPrefetched(() => import("./pages/TimetablePage"));
 const WaifuPage = import.meta.env.VITE_ENABLE_WAIFU === "true" ? lazy(() => import("./pages/WaifuPage")) : null;
 
 /* TODO:
@@ -35,8 +36,6 @@ const App = () => {
     TimetableManager.init(pathnameToType(window.location.pathname))
       .then(() => {
         setStatus(Status.Idle);
-        // The intro's modal would block the toast, so it waits until the intro is closed
-        if (!isFeaturesIntroDue()) Toast.donationNotification();
       })
       .catch((e) => {
         setStatus(Status.Failed);
@@ -67,7 +66,7 @@ const App = () => {
         <LoadingPage />
       )}
       <MessageToast
-        className="[--toastify-toast-width:23rem]"
+        className="[--toastify-toast-width:23rem] max-[480px]:[--toastify-toast-min-height:5rem]"
         position="bottom-right"
         theme="colored"
         pauseOnFocusLoss={false}

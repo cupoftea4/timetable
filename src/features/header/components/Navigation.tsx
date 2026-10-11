@@ -1,6 +1,6 @@
 import type { FC } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useIsMobile } from "@/hooks/useWindowDimensions";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 import MobileSelect from "@/shared/MobileSelect";
 import { classes } from "@/styles/utils";
 import type { TimetableType } from "@/types/timetable";
@@ -21,7 +21,7 @@ const Navigation: FC<OwnProps> = ({ timetableType }) => {
   const navigate = useNavigate();
 
   const onMobileSelectChange = (type: string) => {
-    navigate(`/${type === "timetable" ? "" : type}`, { state: { force: true } });
+    navigate(`/${type === "timetable" ? "home" : type}`, { state: { force: true } });
   };
 
   return (
@@ -38,7 +38,11 @@ const Navigation: FC<OwnProps> = ({ timetableType }) => {
           </Link>
         ))
       ) : (
-        <MobileSelect items={navigationItems} selectedState={[timetableType, onMobileSelectChange]} />
+        <MobileSelect
+          label="Розклад для"
+          items={navigationItems}
+          selectedState={[timetableType, onMobileSelectChange]}
+        />
       )}
     </nav>
   );
