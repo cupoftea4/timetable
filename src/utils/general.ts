@@ -119,7 +119,7 @@ export function doOnce(id: string, fn: () => void) {
 
 // New users see the features intro in September
 export const isFeaturesIntroDue = () =>
-  getCurrentUADate().getMonth() === 9 && !localStorage.getItem(SEEN_FEATURES_INTRO);
+  getCurrentUADate().getMonth() === 8 && !localStorage.getItem(SEEN_FEATURES_INTRO);
 
 /** React.lazy that also loads in the background right after the page, so opening it doesn't wait for the network */
 export function lazyPrefetched<P extends object>(load: () => Promise<{ default: ComponentType<P> }>) {
