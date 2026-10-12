@@ -39,6 +39,15 @@ $bg-light: linear-gradient(135deg, hsl(176, 77%, 26%), hsl(216, 69%, 16%));
 $bg-light-top-clr: #0e5b62;
 $bg-light-bottom-clr: #0d304c;
 
+:root {
+  // The color the page fades to at the bottom on phones, solid so Safari's toolbar tinted with it blends in
+  --bottom-bar-clr: #{$bg-light-bottom-clr};
+  --bottom-bar-height: calc(3.875rem + env(safe-area-inset-bottom));
+  &.dark-mode {
+    --bottom-bar-clr: rgb(0, 0, 10);
+  }
+}
+
 $bg-theme-dark-2: linear-gradient(45deg, hsl(231, 33%, 39%), hsl(240, 32%, 9%));
 $bg-theme-light-1: linear-gradient(45deg, hsl(230, 40%, 43%), hsl(162, 58%, 54%));
 $bg-theme-light-2: linear-gradient(45deg, hsl(292, 64%, 53%), hsl(212, 98%, 63%), hsl(54, 73%, 47%));

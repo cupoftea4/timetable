@@ -6,6 +6,8 @@ import "@fontsource/ubuntu/700.css";
 import "@fontsource/ubuntu/700-italic.css";
 import "./styles/main.scss";
 import "./index.css";
+// Listens for the browser's install offer from the start
+import "./hooks/usePwaInstall";
 
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 

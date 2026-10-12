@@ -9,9 +9,8 @@
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   display: flex;
   flex-direction: column;
-  // The footer sticks to the bottom and pads the home indicator itself
   @include tablet {
-    padding-bottom: 0;
+    padding-bottom: var(--bottom-bar-height);
   }
   .header {
     width: 100%;

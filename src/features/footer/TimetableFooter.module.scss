@@ -98,13 +98,7 @@
 
 @include tablet {
   .bottom {
-    position: sticky;
-    bottom: 0;
-    z-index: 10;
-    padding: .25rem 0 calc(.25rem + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border-clr);
-    background-color: hsla(0, 0%, 100%, .05);
-    @include blur;
+    @include bottom-bar;
   }
 }
 
@@ -177,6 +171,13 @@
 
 .more {
   @include drawer-list;
+  .installHint {
+    display: flex;
+    align-items: center;
+    gap: .875rem;
+    padding: .875rem .25rem;
+    color: $extra-text-clr;
+  }
   .catIcon {
     flex-shrink: 0;
     width: 1.5rem;

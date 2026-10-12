@@ -101,6 +101,22 @@ body {
    
   }
 }
+// The phones' bottom bar color from the first paint. Until the app renders the bar,
+// iOS Safari would tint its toolbar with the page's top color instead
+.bottom-bar-backdrop {
+  display: none;
+  @include tablet {
+    display: block;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9;
+    height: var(--bottom-bar-height);
+    background-color: var(--bottom-bar-clr);
+  }
+}
+
 @include dark-mode("body") {
   --background-start-rgb: 0, 00, 10;
   --background-end-rgb: 0, 0, 10;

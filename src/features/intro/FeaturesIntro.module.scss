@@ -59,6 +59,17 @@
   }
 }
 
+.actions {
+  display: flex;
+  align-self: stretch;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1.5rem;
+  .primary {
+    align-self: auto;
+  }
+}
+
 .help {
   --drawer-width: 36rem;
   align-items: stretch;
