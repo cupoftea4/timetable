@@ -1,7 +1,7 @@
 import type { ExamsTimetableItem, TimetableItem } from "@/types/timetable";
 import { getCurrentUADate, getNextLessonDate, isSecondNULPWeek } from "@/utils/date";
 import { removeLineBreaks } from "@/utils/general";
-import { formatLocationForGoogleMaps, getDisplayType, lessonsTimes } from "../timetable";
+import { formatLocationForGoogleMaps, getDisplayType, getWorkingSaturdays, lessonsTimes } from "../timetable";
 
 const ONE_WEEK = 1000 * 60 * 60 * 24 * 7;
 
@@ -41,45 +41,40 @@ export default class ISCFile {
 
   public static fromTimetable(timetable: TimetableItem[], subgroup: 1 | 2): string {
     const now = getCurrentUADate();
+    const today = new Date(now);
+    today.setHours(0, 0, 0, 0);
     const isCurrentWeekSecond = isSecondNULPWeek(now);
-    const text = ISCFile.createICSFile(
-      timetable
-        .map(
-          ({
-            day,
-            number,
-            subject,
-            lecturer,
-            location,
-            urls,
-            isFirstWeek,
-            isSecondWeek,
-            isFirstSubgroup,
-            isSecondSubgroup,
-            type,
-          }) => {
-            if (isSecondSubgroup !== (subgroup === 2) && !(isFirstSubgroup && isSecondSubgroup)) return null;
-            const date = getNextLessonDate(now, day, isFirstWeek, isSecondWeek, isCurrentWeekSecond);
-            const [start, end] = ISCFile.lessonNumberToICSTime(date, number);
-            const rrule = ISCFile.getRRULE(date, isFirstWeek, isSecondWeek, now);
-            const description = [cleanInfo(lecturer), cleanInfo(location), getDisplayType(type), urls[0]]
-              .filter(Boolean)
-              .join(", ");
+    const isForSubgroup = ({ isFirstSubgroup, isSecondSubgroup }: TimetableItem) =>
+      isSecondSubgroup === (subgroup === 2) || (isFirstSubgroup && isSecondSubgroup);
 
-            return ISCFile.createEvent({
-              start,
-              end,
-              summary: subject,
-              description,
-              location: formatLocationForGoogleMaps(location),
-              rrule,
-            });
-          }
-        )
-        .filter(Boolean)
-        .join("")
-    );
-    return text;
+    const weekly = timetable.filter(isForSubgroup).map((item) => {
+      const date = getNextLessonDate(now, item.day, item.isFirstWeek, item.isSecondWeek, isCurrentWeekSecond);
+      return ISCFile.lessonEvent(item, date, ISCFile.getRRULE(date, item.isFirstWeek, item.isSecondWeek, now));
+    });
+    const saturdays = getWorkingSaturdays(timetable)
+      .filter(({ date }) => date >= today)
+      .flatMap(({ date, lessons }) => lessons.filter(isForSubgroup).map((item) => ISCFile.lessonEvent(item, date)));
+
+    return ISCFile.createICSFile([...weekly, ...saturdays].join(""));
+  }
+
+  private static lessonEvent(
+    { number, subject, lecturer, location, urls, type }: TimetableItem,
+    date: Date,
+    rrule?: string
+  ) {
+    const [start, end] = ISCFile.lessonNumberToICSTime(date, number);
+    const description = [cleanInfo(lecturer), cleanInfo(location), getDisplayType(type), urls[0]]
+      .filter(Boolean)
+      .join(", ");
+    return ISCFile.createEvent({
+      start,
+      end,
+      summary: subject,
+      description,
+      location: formatLocationForGoogleMaps(location),
+      rrule,
+    });
   }
 
   private static getTermEnd(now: Date) {

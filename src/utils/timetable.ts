@@ -218,25 +218,22 @@ export function getDisplayType(type: TimetableItemType) {
   return timetableItemDisplayTypes[type];
 }
 
-export function generateSaturdayLessons(originalTimetable: TimetableItem[]) {
-  if (ENABLE_SATURDAYS) {
-    const dayCount = countDaysFrom(new Date(FIRST_CLASS_DATE));
-    const alreadyHasSaturdayLessons = originalTimetable.some((item) => item.day === 6);
-    if (dayCount < 0 || alreadyHasSaturdayLessons) return [];
+// Saturdays of the first 10 weeks repeat Monday…Friday: of the first week for weeks 1-5, of the second week for 6-10
+export function getWorkingSaturdays(timetable: TimetableItem[]) {
+  if (!ENABLE_SATURDAYS || timetable.some((item) => item.day === 6)) return [];
+  return Array.from({ length: 10 }, (_, week) => {
+    const date = new Date(FIRST_CLASS_DATE);
+    date.setDate(date.getDate() + week * 7 + 5);
+    const lessons = timetable
+      .filter((item) => item.day === (week % 5) + 1 && (week < 5 ? item.isFirstWeek : item.isSecondWeek))
+      .map((item) => ({ ...item, day: 6 }));
+    return { date, lessons };
+  });
+}
 
-    const weeksFromStart = dayCount / 7;
-    const saturdayLessonsDay = (Math.floor(weeksFromStart) % 5) + 1;
-    const shouldHaveLessonsFromEvenWeek = weeksFromStart > 5; // Second 5 weeks
-    if (weeksFromStart > 10) return []; // No Saturday lessons after 10 weeks
-
-    const saturdayLessons = originalTimetable.filter(
-      (item) =>
-        item.day === saturdayLessonsDay && (shouldHaveLessonsFromEvenWeek ? item.isSecondWeek : item.isFirstWeek)
-    );
-
-    return saturdayLessons.map((item) => ({ ...item, day: 6 }));
-  }
-  return [];
+export function generateSaturdayLessons(timetable: TimetableItem[]) {
+  const week = Math.floor(countDaysFrom(FIRST_CLASS_DATE) / 7);
+  return getWorkingSaturdays(timetable)[week]?.lessons ?? [];
 }
 
 export function sortGroups(groups: string[]) {
