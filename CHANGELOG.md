@@ -97,3 +97,6 @@
 - Phones: day tabs above the lessons, and custom timetables can be renamed, regrouped or deleted
 - Faster loading and no layout shift while loading
 - Fixed overscroll and address bar colors on Apple devices
+
+[3.0.1] - 2026-10-13
+- The calendar (.ics) export now includes the working Saturdays
