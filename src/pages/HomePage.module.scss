@@ -13,6 +13,9 @@ $lecturers-second-layer-width: 9rem;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   display: flex;
   flex-flow: column;
+  @include tablet {
+    padding-bottom: var(--bottom-bar-height);
+  }
   .header {
     min-height: 5.625rem; // to make height more consistent when search bar shrinks
     width: 100%;
@@ -31,6 +34,12 @@ $lecturers-second-layer-width: 9rem;
       color: hsl(0, 0%, 77%);
       white-space: nowrap;
       font-size: $small-font-size;
+      @include tablet {
+        @include bottom-bar;
+        width: auto;
+        justify-content: center;
+        align-items: center;
+      }
       > a,
       > .saved {
         text-decoration: underline;
@@ -112,9 +121,16 @@ $lecturers-second-layer-width: 9rem;
         cursor: pointer;
         transition: all .2s ease-in-out;
         border: transparent solid 1px;
-        &[data-state=selected], &:hover{
+        &[data-state=selected] {
           background: var(--accent-clr);
           border: var(--border-clr) solid 1px;
+        }
+        // A tapped item would keep the hover look on touch screens
+        @include can-hover {
+          &:hover {
+            background: var(--accent-clr);
+            border: var(--border-clr) solid 1px;
+          }
         }
       }
     }

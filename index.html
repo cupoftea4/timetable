@@ -39,6 +39,7 @@
 <body>
   <noscript>You need to enable JavaScript to run this app.</noscript>
   <div id="root"></div>
+  <div class="bottom-bar-backdrop" aria-hidden="true"></div>
   <script type="module" src="/src/index.tsx"></script>
   <!--
    ,-.       _,---._ __  / \
@@ -59,6 +60,10 @@
     window.dataLayer = window.dataLayer || [];
     function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
+    // Splits the stats into people using the installed app and the website
+    gtag('set', 'user_properties', {
+      display_mode: matchMedia('(display-mode: standalone)').matches || navigator.standalone ? 'standalone' : 'browser',
+    });
 
     gtag('config', 'G-4753HPJ44Q');
   </script>

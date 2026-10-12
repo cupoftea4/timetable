@@ -7,7 +7,8 @@ import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
 import useGroupParam from "@/hooks/useGroupParam";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
-import useMediaQuery from "@/hooks/useMediaQuery";
+import useMediaQuery, { useIsTablet } from "@/hooks/useMediaQuery";
+import usePwaInstall, { isReturningVisitor } from "@/hooks/usePwaInstall";
 import { classes } from "@/styles/utils";
 import type {
   CustomTimetable,
@@ -18,12 +19,17 @@ import type {
   TimetableItem,
   TimetableType,
 } from "@/types/timetable";
-import { SEEN_CALENDAR_HELP, SEEN_FEATURES_INTRO, TIMETABLE_SCREEN_BREAKPOINT } from "@/utils/constants";
+import {
+  SEEN_CALENDAR_HELP,
+  SEEN_FEATURES_INTRO,
+  SEEN_INSTALL_PROMPT,
+  TIMETABLE_SCREEN_BREAKPOINT,
+} from "@/utils/constants";
 import { getDefaultCustomName, toCustomLessons, toTimetableItems } from "@/utils/customTimetable";
 import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
-import { isFeaturesIntroDue, lazyPrefetched, optimisticRender } from "@/utils/general";
+import { doOnce, isFeaturesIntroDue, lazyPrefetched, optimisticRender } from "@/utils/general";
 import { CUSTOM_PREFIX, getCustomId } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import styles from "./TimetablePage.module.scss";
@@ -32,6 +38,7 @@ const CreateMergedModal = lazyPrefetched(() => import("@/features/merged_modal/C
 const TimetableEditor = lazy(() => import("@/features/editor/TimetableEditor"));
 const FeaturesIntro = lazy(() => import("@/features/intro/FeaturesIntro"));
 const CalendarHelp = lazy(() => import("@/features/intro/CalendarHelp"));
+const InstallPrompt = lazy(() => import("@/features/intro/InstallPrompt"));
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => {
   // yeah, naming! :)
@@ -63,6 +70,9 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   // Only in September, when new students start using the site
   const [showIntro, setShowIntro] = useState(isFeaturesIntroDue);
   const [showCalendarHelp, setShowCalendarHelp] = useState(false);
+  const install = usePwaInstall();
+  const isPhone = useIsTablet();
+  const [installPrompt, setInstallPrompt] = useState<typeof install>();
   const [selectedWeek, setSelectedWeek] = useState<Date | undefined>();
   const [semester, setSemester] = useState<Semester>();
   const { state, search, hash }: { state: LocationState | null; search: string; hash: string } = useLocation();
@@ -99,6 +109,12 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   useEffect(() => {
     if (!showIntro) Toast.donationNotification();
   }, [showIntro]);
+
+  // Once, on a phone where it isn't installed yet, to someone who keeps coming back
+  useEffect(() => {
+    if (install && isPhone && isReturningVisitor && !showIntro && timetable)
+      doOnce(SEEN_INSTALL_PROMPT, () => setInstallPrompt(install));
+  }, [install, isPhone, showIntro, timetable]);
 
   useEffect(() => {
     void getCurrentSemester().then(setSemester);
@@ -380,6 +396,11 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       {showCalendarHelp && (
         <Suspense fallback={null}>
           <CalendarHelp isExams={isExamsTimetable} onClose={() => setShowCalendarHelp(false)} />
+        </Suspense>
+      )}
+      {installPrompt && (
+        <Suspense fallback={null}>
+          <InstallPrompt kind={installPrompt} onClose={() => setInstallPrompt(undefined)} />
         </Suspense>
       )}
       {showIntro && timetable && !isExamsTimetable && (

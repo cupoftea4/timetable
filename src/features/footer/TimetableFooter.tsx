@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import ChevronDownIcon from "@/assets/ChevronDownIcon";
 import DownloadIcon from "@/assets/DownloadIcon";
 import HomeIcon from "@/assets/HomeIcon";
+import InstallIcon from "@/assets/InstallIcon";
 import MergeIcon from "@/assets/MergeIcon";
 import MoonIcon from "@/assets/MoonIcon";
 import MoreIcon from "@/assets/MoreIcon";
@@ -14,6 +15,7 @@ import SunIcon from "@/assets/SunIcon";
 import { DisableCatModeButton, useCatMode } from "@/context/catMode";
 import useGroupParam from "@/hooks/useGroupParam";
 import { useIsTablet } from "@/hooks/useMediaQuery";
+import usePwaInstall, { promptInstall } from "@/hooks/usePwaInstall";
 import { useTheme } from "@/hooks/useTheme";
 import { classes } from "@/styles/utils";
 import type { CustomTimetable } from "@/types/timetable";
@@ -61,6 +63,7 @@ const TimetableFooter: FC<OwnProps> = ({
   const isNarrow = useIsTablet();
   const isOwner = Boolean(editToken);
   const catMode = useCatMode();
+  const install = usePwaInstall();
   const [showMore, setShowMore] = useState(false);
   const footerRef = useRef<HTMLElement>(null);
   const [isOffScreen, setIsOffScreen] = useState(false);
@@ -169,6 +172,12 @@ const TimetableFooter: FC<OwnProps> = ({
             <span className={styles.label}>Змінити</span>
           </button>
         )}
+        {!isNarrow && install === "prompt" && (
+          <button type="button" className={styles.button} data-tooltip="Встановити застосунок" onClick={promptInstall}>
+            <InstallIcon />
+            <span className={styles.label}>Встановити</span>
+          </button>
+        )}
         {isNarrow && (
           <>
             <ShareButton
@@ -228,6 +237,20 @@ const TimetableFooter: FC<OwnProps> = ({
                   Додати в календар
                 </CloseButton>
               </li>
+              {install === "prompt" && (
+                <li>
+                  <CloseButton onClick={promptInstall}>
+                    <InstallIcon />
+                    Встановити застосунок
+                  </CloseButton>
+                </li>
+              )}
+              {install === "ios" && (
+                <li className={styles.installHint}>
+                  <InstallIcon />
+                  Щоб встановити застосунок, у меню «Поділитися» виберіть «На екран „Додому“»
+                </li>
+              )}
               {catMode.enabled && (
                 <li>
                   <CloseButton onClick={catMode.disable}>

@@ -10,6 +10,20 @@
   @include utils.blur(2rem);
 }
 
+// The phones' bar at the bottom of the screen. Fixed, it stays put while the page bounces, and iOS Safari
+// tints its toolbar with the solid color. Pages keep --bottom-bar-height free under their content for it
+@mixin bottom-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  height: var(--bottom-bar-height);
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  border-top: 1px solid var(--border-clr);
+  background-color: var(--bottom-bar-clr);
+}
+
 // Actions listed in a drawer
 @mixin drawer-list {
   li + li {
