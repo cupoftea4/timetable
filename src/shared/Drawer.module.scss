@@ -34,17 +34,20 @@
   @include dialog-surface;
   outline: none;
   .sheet & {
-    width: 100%;
-    max-height: calc(100% - var(--keyboard-inset, 0px));
-    margin-bottom: var(--keyboard-inset, 0px);
+    // Fixed to the bottom edge itself, so iOS Safari tints its toolbar with the sheet's color
+    position: fixed;
+    right: 0;
+    bottom: var(--keyboard-inset, 0px);
+    left: 0;
+    width: auto;
+    max-height: calc(100% - env(safe-area-inset-top) - 2.5rem - var(--keyboard-inset, 0px));
     padding: .5rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom));
     border-width: 1px 0 0;
     border-radius: 1.25rem 1.25rem 0 0;
     // The page behind is dimmed anyway, and blurring it makes sliding janky on phones, so it's opaque instead
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
-    background-image: linear-gradient(var(--surface-clr), var(--surface-clr));
-    background-color: hsl(215, 30%, 9%);
+    background: var(--sheet-clr);
   }
 }
 

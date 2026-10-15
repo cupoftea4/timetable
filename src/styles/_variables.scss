@@ -43,8 +43,10 @@ $bg-light-bottom-clr: #0d304c;
   // The color the page fades to at the bottom on phones, solid so Safari's toolbar tinted with it blends in
   --bottom-bar-clr: #{$bg-light-bottom-clr};
   --bottom-bar-height: calc(3.875rem + env(safe-area-inset-bottom));
+  --sheet-clr: #203d4a;
   &.dark-mode {
     --bottom-bar-clr: rgb(0, 0, 10);
+    --sheet-clr: #1c202a;
   }
 }
 
