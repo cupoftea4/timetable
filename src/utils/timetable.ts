@@ -61,6 +61,10 @@ export function getTimetableName(timetable: CachedTimetable | string) {
   return name.replace(/(\d)З$/, "$1з");
 }
 
+export function isPartTimeType(timetableType?: TimetableType) {
+  return timetableType === "parttime" || timetableType === "postgraduate_parttime";
+}
+
 export function getGroupName(group: string, timetableType: TimetableType) {
   const [first, second] = group.split("-");
   if (!first) return group;
@@ -125,6 +129,7 @@ export function needsUpdate(timestamp: number) {
 export function getAllTimetables() {
   return TimetableManager.cachedGroups
     .concat(TimetableManager.cachedSelectiveGroups)
+    .concat(TimetableManager.cachedPostgraduateGroups)
     .concat(TimetableManager.cachedLecturers);
 }
 

@@ -26,6 +26,7 @@ const CACHE_KEYS = [
   "lecturers",
   "departments",
   "selectiveGroups",
+  "postgraduateGroups",
   "savedTimetables",
   "examsTimetables",
   "mergedTimetable",
@@ -48,6 +49,7 @@ const CACHE_CONFIGS: Record<StandardCacheKey, CacheConfig> = {
   lecturers: { key: "lecturers", storage: "indexedDB" },
   departments: { key: "departments", storage: "indexedDB" },
   selectiveGroups: { key: "selective_groups", storage: "indexedDB" },
+  postgraduateGroups: { key: "postgraduate_groups", storage: "indexedDB" },
   savedTimetables: { key: "cached_timetables", storage: "localStorage" },
   examsTimetables: { key: "cached_exams_timetables", storage: "localStorage" },
   mergedTimetable: { key: "my", storage: "localStorage" },
@@ -83,7 +85,7 @@ export type CacheKey =
 export type CacheData = {
   [K in CacheKey]: K extends "institutes"
     ? CachedInstitute[]
-    : K extends "groups" | "selectiveGroups"
+    : K extends "groups" | "selectiveGroups" | "postgraduateGroups"
       ? CachedGroup[]
       : K extends "lecturers" | "departments" | "firstHalfTermGroups" | "secondHalfTermGroups"
         ? string[]
@@ -136,6 +138,9 @@ export default class LocalCache {
 
     LocalCache.get("selectiveGroups").then(({ data }) =>
       LocalCache.setRamCache({ key: "selectiveGroups", data: data && sortGroups(data) })
+    );
+    LocalCache.get("postgraduateGroups").then(({ data }) =>
+      LocalCache.setRamCache({ key: "postgraduateGroups", data: data && sortGroups(data) })
     );
     LocalCache.get("examsTimetables").then(LocalCache.setRamCache);
   }

@@ -35,6 +35,9 @@ class TimetableManager {
       this.getData("selectiveGroups", FallbackData, FallbackData.getSelectiveGroups).then((data) =>
         LocalCache.set("selectiveGroups", sortGroups(data ?? []))
       ),
+      this.getData("postgraduateGroups", FallbackData, FallbackData.getPostgraduateGroups).then((data) =>
+        LocalCache.set("postgraduateGroups", sortGroups(data ?? []))
+      ),
       this.getData("lecturers", FallbackData, FallbackData.getLecturers).then((data) =>
         LocalCache.set("lecturers", data)
       ),
@@ -53,6 +56,10 @@ class TimetableManager {
         const data = await this.getSelectiveGroups();
         const tempGroups = new Set<string>(data.map((group) => Util.getGroupName(group, type)));
         return Util.getFirstLetters([...tempGroups]);
+      }
+      case "postgraduate": {
+        const data = await this.getPostgraduateGroups();
+        return Util.getFirstLetters(data.map((group) => Util.getGroupName(group, type)));
       }
       case "lecturer": {
         const lecturers = await this.getLecturers();
@@ -85,6 +92,11 @@ class TimetableManager {
         const names = [...new Set(data.map((group) => Util.getGroupName(group, type)))];
         return names.filter((name) => Util.startsWithLetters(name, query));
       }
+      case "postgraduate": {
+        const data = await this.getPostgraduateGroups();
+        const names = [...new Set(data.map((group) => Util.getGroupName(group, type)))];
+        return names.filter((name) => Util.startsWithLetters(name, query));
+      }
       case "lecturer": {
         const lecturers = await this.getLecturers();
         const names = lecturers
@@ -103,6 +115,10 @@ class TimetableManager {
     switch (type) {
       case "selective": {
         const data = await this.getSelectiveGroups();
+        return data.filter((group) => Util.getGroupName(group, type) === query);
+      }
+      case "postgraduate": {
+        const data = await this.getPostgraduateGroups();
         return data.filter((group) => Util.getGroupName(group, type) === query);
       }
       case "lecturer": {
@@ -458,6 +474,10 @@ class TimetableManager {
     if (LocalCache.sync.selectiveGroups?.some(compare)) return "selective";
     if (LocalCache.sync.lecturers?.some(compare)) return "lecturer";
     if (timetable === MERGED_TIMETABLE) return "merged";
+    // Only postgraduate groups are named like КНА-11, which also covers the ones missing from the list
+    if (LocalCache.sync.postgraduateGroups?.some(compare) || /^[^-]{2}а-\d+з?$/i.test(timetable)) {
+      return timetable.toLowerCase().endsWith("з") ? "postgraduate_parttime" : "postgraduate";
+    }
 
     // try to guess the type based on the name
     const numberOfDashes = timetable.split("-").length - 1;
@@ -499,6 +519,10 @@ class TimetableManager {
     return LocalCache.sync.selectiveGroups ?? [];
   }
 
+  get cachedPostgraduateGroups() {
+    return LocalCache.sync.postgraduateGroups ?? [];
+  }
+
   get cachedLecturers() {
     return LocalCache.sync.lecturers ?? [];
   }
@@ -536,6 +560,10 @@ class TimetableManager {
 
   private getSelectiveGroups(): Promise<string[]> {
     return this.getData("selectiveGroups", FallbackData, FallbackData.getSelectiveGroups).then((g) => g ?? []);
+  }
+
+  private getPostgraduateGroups(): Promise<string[]> {
+    return this.getData("postgraduateGroups", FallbackData, FallbackData.getPostgraduateGroups).then((g) => g ?? []);
   }
 
   private getLecturers(): Promise<string[]> {
