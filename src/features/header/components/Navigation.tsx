@@ -10,6 +10,7 @@ const navigationItems: Array<{ value: TimetableType; name: string }> = [
   { value: "timetable", name: "Студент" },
   { value: "selective", name: "Вибіркові" },
   { value: "lecturer", name: "Викладач" },
+  { value: "postgraduate", name: "Аспірант" },
 ];
 
 type OwnProps = {

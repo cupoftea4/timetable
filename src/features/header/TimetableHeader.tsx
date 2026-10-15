@@ -10,9 +10,9 @@ import { useIsMobile, useIsTablet } from "@/hooks/useMediaQuery";
 import usePageTitle from "@/hooks/usePageTitle";
 import Toggle from "@/shared/Toggle";
 import { classes } from "@/styles/utils";
-import type { CustomTimetable, HalfTerm } from "@/types/timetable";
+import type { CustomTimetable, HalfTerm, TimetableType } from "@/types/timetable";
 import TimetableManager from "@/utils/data/TimetableManager";
-import { getTimetableName, isMerged } from "@/utils/timetable";
+import { getTimetableName, isMerged, isPartTimeType } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import WeekNavigation from "../timetable/ui/WeekNavigation";
 import SavedMenu from "./components/SavedMenu";
@@ -24,8 +24,8 @@ import styles from "./TimetableHeader.module.scss";
 
 type OwnProps = {
   loading: boolean;
-  hasCellSubgroups: boolean;
-  timetableType?: string;
+  showSubgroupToggle: boolean;
+  timetableType?: TimetableType;
   customTimetable?: CustomTimetable;
   editToken?: string;
   isExamsTimetable: boolean;
@@ -41,7 +41,7 @@ type OwnProps = {
 const TimetableHeader: FC<OwnProps> = ({
   timetableType,
   isExamsTimetable,
-  hasCellSubgroups,
+  showSubgroupToggle,
   customTimetable,
   editToken,
   partials,
@@ -77,7 +77,7 @@ const TimetableHeader: FC<OwnProps> = ({
     void document.fonts.ready.then(wrapIfTooLong);
   }, [groupTitle, wrappedTitle]);
 
-  const isPartTime = timetableType === "parttime";
+  const isPartTime = isPartTimeType(timetableType);
   const showWeekNavigation = isPartTime && availableWeeks && availableWeeks.length > 0 && selectedWeek && onWeekChange;
 
   const sources = isMerged(group) ? TimetableManager.cachedMergedTimetable?.timetables : customTimetable?.sourceNames;
@@ -142,7 +142,7 @@ const TimetableHeader: FC<OwnProps> = ({
             <WeekNavigation weeks={availableWeeks} selectedWeek={selectedWeek} onWeekChange={onWeekChange} />
           ) : (
             <>
-              {!hasCellSubgroups && (
+              {showSubgroupToggle && (
                 <Toggle
                   toggleState={[isSecondSubgroup, changeIsSecondSubgroup]}
                   states={isMobile ? ["I підг.", "II підг."] : ["I підгрупа", "II підгрупа"]}
@@ -157,7 +157,7 @@ const TimetableHeader: FC<OwnProps> = ({
           <TimetablePartials partials={partials} handlePartialClick={updatePartialTimetable} />
         </span>
       )}
-      {examsGroup && timetableType !== "selective" && timetableType !== "parttime" && (
+      {examsGroup && timetableType !== "selective" && timetableType !== "postgraduate" && !isPartTime && (
         <span className={styles.actions}>
           <button
             type="button"

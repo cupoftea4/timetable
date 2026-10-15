@@ -52,6 +52,25 @@ html.dark-mode {
  background: rgb(0, 0, 10);
 }
 
+// iOS Safari colors its top bar from the page's fixed background, so under a dialog it dims along with the backdrop.
+// On phones the html color and the bottom bar, which show around the keyboard, take the sheet's color so it seems to go on
+html:has([role="dialog"]):not(:has([data-closing])) {
+  background-color: color-mix(in srgb, $bg-light-top-clr 30%, black);
+  body::before {
+    background: color-mix(in srgb, $bg-light-top-clr 30%, black);
+  }
+  &.dark-mode {
+    background-color: black;
+  }
+  &,
+  &.dark-mode {
+    @include tablet {
+      --bottom-bar-clr: var(--sheet-clr);
+      background-color: var(--sheet-clr);
+    }
+  }
+}
+
 html, body, #root {
  min-height: 100vh;
  min-height: var(--app-height, 100dvh);

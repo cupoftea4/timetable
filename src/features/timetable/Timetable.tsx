@@ -4,7 +4,7 @@ import { classes } from "@/styles/utils";
 import type { TimetableItem, TimetableType } from "@/types/timetable";
 import { DEVELOP } from "@/utils/constants";
 import { getCurrentUADate, isDateInWeek, stringToDate } from "@/utils/date";
-import { generateSaturdayLessons, lessonsTimes, skeletonTimetable, unique } from "@/utils/timetable";
+import { generateSaturdayLessons, isPartTimeType, lessonsTimes, skeletonTimetable, unique } from "@/utils/timetable";
 import TimetableLesson from "./components/TimetableLesson";
 import styles from "./Timetable.module.scss";
 
@@ -40,7 +40,7 @@ const Timetable: FC<OwnProps> = ({
   const dayLists = useRef<(Element | null)[]>([]);
   const [visibleDay, setVisibleDay] = useState(0);
 
-  const isPartTime = timetableType === "parttime";
+  const isPartTime = isPartTimeType(timetableType);
 
   const timetable = useMemo(() => {
     return [...originalTimetable, ...generateSaturdayLessons(originalTimetable)];

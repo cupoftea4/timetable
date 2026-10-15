@@ -64,6 +64,8 @@ const Drawer: FC<OwnProps> = ({ title, titleActions, className, onClose, childre
     if (!panel || !backdrop) return onCloseRef.current();
     if (closing.current) return;
     closing.current = true;
+    // Lets the page's colors under it come back while it fades out
+    backdrop.dataset.closing = "";
     const options = { duration: duration(isSheet ? 300 : 140), easing: EASING, fill: "forwards" as const };
     const { transform, opacity } = getComputedStyle(panel);
     Promise.all([

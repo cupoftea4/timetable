@@ -30,7 +30,7 @@ import { getCurrentSemester } from "@/utils/data/LPNUData";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
 import { doOnce, isFeaturesIntroDue, lazyPrefetched, optimisticRender } from "@/utils/general";
-import { CUSTOM_PREFIX, getCustomId } from "@/utils/timetable";
+import { CUSTOM_PREFIX, getCustomId, isPartTimeType } from "@/utils/timetable";
 import Toast from "@/utils/toasts";
 import styles from "./TimetablePage.module.scss";
 
@@ -95,8 +95,9 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
   const hasCellSubgroups = timetableType === "lecturer" || customTimetable?.subgroupToggle === false;
+  const hasSubgroupLessons = timetable?.some((item) => !(item.isFirstSubgroup && item.isSecondSubgroup)) ?? true;
   const editToken = customTimetable && TimetableManager.getCustomEditToken(customTimetable.id);
-  const isEditable = isDesktop && !isExamsTimetable && timetableType !== "parttime";
+  const isEditable = isDesktop && !isExamsTimetable && !isPartTimeType(timetableType);
   const canEdit = isEditable && Boolean(timetable);
   const isMergedCustom = customTimetable?.kind === "merged";
 
@@ -121,7 +122,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   }, []);
 
   const availableWeeks = useMemo(() => {
-    if (timetableType === "parttime" && timetable) {
+    if (isPartTimeType(timetableType) && timetable) {
       const weeks = getAvailableWeeks(timetable);
 
       if (weeks.length > 0 && !selectedWeek) {
@@ -342,7 +343,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       <TimetableHeader
         isExamsTimetable={isExamsTimetable}
         timetableType={timetableType}
-        hasCellSubgroups={hasCellSubgroups}
+        showSubgroupToggle={!hasCellSubgroups && hasSubgroupLessons}
         customTimetable={customTimetable}
         editToken={editToken}
         partials={partials}

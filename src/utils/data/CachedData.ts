@@ -40,6 +40,10 @@ export default class CachedData {
     return CachedData.fetchData("/selective/groups");
   }
 
+  static getPostgraduateGroups(): Promise<string[]> {
+    return CachedData.fetchData("/postgraduate/groups");
+  }
+
   static async getLecturers(): Promise<string[]> {
     const data: string[] = await CachedData.fetchData("/lecturers/groups");
     return [...new Set(data)].sort((a, b) => a.localeCompare(b));
