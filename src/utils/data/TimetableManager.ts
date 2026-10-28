@@ -195,15 +195,13 @@ class TimetableManager {
       cacheData = Promise.resolve(null);
     }
 
-    const fetchData: ActualPromise<TimetableItem[]> = LPNUData.getTimetable(timetableType, groupName) // doesn't work
-      .catch(() => {
-        cacheData.then((t) => {
-          if (!t) return;
-          this.saveTimetableLocally(groupName, t, data?.subgroup);
-          Toast.warn("Data is possibly outdated!");
-        });
-        return null;
-      });
+    const fetchData: ActualPromise<TimetableItem[]> = LPNUData.getTimetable(timetableType, groupName).catch(
+      async () => {
+        const { data: cached } = await LocalCache.get(`timetable_${groupName}`, true);
+        if (cached) Toast.warn("Data is possibly outdated!");
+        return cached;
+      }
+    );
 
     fetchData.then((t) => this.saveTimetableLocally(groupName, t, data?.subgroup));
     return [cacheData, fetchData] as const;
@@ -228,14 +226,11 @@ class TimetableManager {
     }
 
     const fetchData: ActualPromise<ExamsTimetableItem[]> = LPNUData.getExamsTimetable(timetableType, groupName).catch(
-      (e) => {
+      async (e) => {
         console.warn("LPNU API is not working!", e);
-        cacheData.then((t) => {
-          if (!t) return;
-          this.saveExamsLocally(groupName, t);
-          Toast.warn("Data is possibly outdated!");
-        });
-        return null;
+        const { data: cached } = await LocalCache.get(`exams_timetable_${groupName}`, true);
+        if (cached) Toast.warn("Data is possibly outdated!");
+        return cached;
       }
     );
 
