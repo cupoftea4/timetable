@@ -19,9 +19,7 @@
     "start": "serve build -p ${PORT:-3000}",
     "build": "tsc && vite build",
     "serve": "vite preview",
-    "dev": "env-cmd -f dev.env vite --host",
-    "build:prod": "tsc && env-cmd -f .env vite build",
-    "build:hope": "tsc && env-cmd -f hope.env vite build --mode development",
+    "dev": "vite --host",
     "lint": "biome lint"
   },
   "browserslist": {
@@ -44,7 +42,6 @@
     "@types/react-dom": "^19.2.5",
     "@vitejs/plugin-react": "^6.1.1",
     "autoprefixer": "^10.4.20",
-    "env-cmd": "^11.0.0",
     "lefthook": "^2.1.12",
     "postcss": "^8.4.47",
     "sass": "^1.55.0",
