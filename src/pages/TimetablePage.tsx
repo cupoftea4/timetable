@@ -93,6 +93,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   const isLoading = isExamsTimetable ? !examsTimetable : !timetable;
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
+  // A saved copy takes a few ms to read, the page appears with it instead of a skeleton first
+  const isReadingSavedCopy = isLoading && time !== undefined;
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
   const hasCellSubgroups = timetableType === "lecturer" || customTimetable?.subgroupToggle === false;
   const hasSubgroupLessons = timetable?.some((item) => !(item.isFirstSubgroup && item.isSecondSubgroup)) ?? true;
@@ -343,7 +345,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={classes(styles.wrapper, isReadingSavedCopy && styles.readingSavedCopy)}>
       <TimetableHeader
         isExamsTimetable={isExamsTimetable}
         timetableType={timetableType}

@@ -124,15 +124,16 @@ export const isFeaturesIntroDue = () =>
 /** React.lazy that also loads in the background right after the page, so opening it doesn't wait for the network */
 export function lazyPrefetched<P extends object>(load: () => Promise<{ default: ComponentType<P> }>) {
   let loaded: ComponentType<P> | undefined;
-  setTimeout(() => {
+  const preload = () =>
     load().then(
       (module) => {
         loaded = module.default;
       },
       () => {}
     );
-  }, 500);
+  setTimeout(preload, 500);
   const Lazy = lazy(load);
   // Lazy suspends on its first render even when loaded, and React holds back what suspended for 300ms
-  return (props: P) => createElement(loaded ?? Lazy, props);
+  const Component = (props: P) => createElement(loaded ?? Lazy, props);
+  return Object.assign(Component, { preload });
 }

@@ -186,14 +186,11 @@ class TimetableManager {
       return [cacheData.then(toItems), fetchData.then(toItems)] as const;
     }
 
-    let cacheData: OptimisticPromise<TimetableItem[]>;
     const data = LocalCache.sync.savedTimetables?.find((el) => el.group.toLowerCase() === groupName.toLowerCase());
-
-    if (checkCache && data && !Util.needsUpdate(data.time)) {
-      cacheData = LocalCache.get(`timetable_${groupName}`).then((t) => t?.data);
-    } else {
-      cacheData = Promise.resolve(null);
-    }
+    // A saved copy of any age shows right away, the fresh one replaces it
+    const cacheData: OptimisticPromise<TimetableItem[]> = checkCache
+      ? LocalCache.get(`timetable_${groupName}`, true).then((t) => t?.data)
+      : Promise.resolve(null);
 
     const fetchData: ActualPromise<TimetableItem[]> = FallbackData.getTimetable(
       timetableType,
@@ -222,14 +219,9 @@ class TimetableManager {
       throw Error(`Couldn't define a type! Group: ${groupName}`);
     }
 
-    let cacheData: OptimisticPromise<ExamsTimetableItem[]>;
-    const data = LocalCache.sync.examsTimetables?.find((el) => el.group.toLowerCase() === groupName.toLowerCase());
-
-    if (checkCache && data && !Util.needsUpdate(data.time)) {
-      cacheData = LocalCache.get(`exams_timetable_${groupName}`).then((t) => t?.data);
-    } else {
-      cacheData = Promise.resolve(null);
-    }
+    const cacheData: OptimisticPromise<ExamsTimetableItem[]> = checkCache
+      ? LocalCache.get(`exams_timetable_${groupName}`, true).then((t) => t?.data)
+      : Promise.resolve(null);
 
     const fetchData: ActualPromise<ExamsTimetableItem[]> = FallbackData.getExamsTimetable(
       timetableType,

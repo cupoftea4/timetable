@@ -2,6 +2,17 @@
 @use '../styles/utils' as *;
 @use '../styles/variables' as *;
 
+// A saved copy shows up within a few ms, the skeleton only if it's missing
+@keyframes hidden {
+  from,
+  to {
+    opacity: 0;
+  }
+}
+
+.readingSavedCopy {
+  animation: hidden 0s 300ms backwards;
+}
 
 .wrapper {
   min-height: 100vh;
