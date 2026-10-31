@@ -62,7 +62,12 @@ const TimetableHeader: FC<OwnProps> = ({
   const isNarrow = useIsTablet();
   const examsPublished = useExamsPublished();
   const groupTitle = customTimetable?.name ?? (timetableType === "merged" ? "Мій розклад" : getTimetableName(group));
-  usePageTitle(groupTitle);
+  // Worded like the searches that lead here, e.g. "розклад пз-21"
+  usePageTitle(
+    customTimetable || timetableType === "merged"
+      ? `${groupTitle} · Розклад НУЛП`
+      : `${isExamsTimetable ? "Екзамени" : "Розклад"} ${groupTitle} · НУЛП`
+  );
   const titleRef = useRef<HTMLHeadingElement>(null);
   // On phones a title too long for one line wraps in a smaller font
   const [wrappedTitle, setWrappedTitle] = useState<string>();

@@ -11,6 +11,7 @@ import SavedMenu from "@/features/header/components/SavedMenu";
 import HeaderPanel from "@/features/header/HomeHeader";
 import MissingGroupTip from "@/features/home/MissingGroupTip";
 import TimetablesSelection from "@/features/home/TimetablesSelection";
+import useCanonicalUrl from "@/hooks/useCanonicalUrl";
 import { useIsTablet } from "@/hooks/useMediaQuery";
 import List from "@/shared/List";
 import { classes } from "@/styles/utils";
@@ -25,6 +26,7 @@ type OwnProps = {
 };
 
 const HomePage: FC<OwnProps> = ({ timetableType }) => {
+  useCanonicalUrl();
   const [firstLayer, setFirstLayer] = useState<string[]>([]); // institutes/alphabet
   const [secondLayer, setSecondLayer] = useState<string[]>([]); // majors/departments/selective
   const [thirdLayer, setThirdLayer] = useState<string[]>([]); // groups/lecturers

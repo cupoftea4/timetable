@@ -5,6 +5,7 @@ import TimetableFooter from "@/features/footer/TimetableFooter";
 import TimetableHeader from "@/features/header/TimetableHeader";
 import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
+import useCanonicalUrl from "@/hooks/useCanonicalUrl";
 import useGroupParam from "@/hooks/useGroupParam";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
 import useMediaQuery, { useIsTablet } from "@/hooks/useMediaQuery";
@@ -57,6 +58,7 @@ type OwnProps = {
 type LocationState = { source?: string; isCustom?: boolean; editFromView?: boolean; examsFrom?: string };
 
 const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
+  useCanonicalUrl();
   const group = useGroupParam();
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
   const [timetable, setTimetable] = useState<TimetableItem[]>();
