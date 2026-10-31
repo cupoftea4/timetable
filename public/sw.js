@@ -1,8 +1,6 @@
 const CACHE_PREFIX = "d-app-v";
 const CACHE_NAME = CACHE_PREFIX + new URLSearchParams(location.search).get("v");
 const HOME = "/home";
-// Same-origin proxy to lpnu.ua, must never be cached
-const PROXY_PATH = "/get.php";
 
 const isHtml = (response) => (response.headers.get("content-type") ?? "").includes("text/html");
 // Navigations must get HTML, anything else must not (the SPA fallback answers missing files with HTML)
@@ -25,7 +23,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
-  if (request.method !== "GET" || url.origin !== location.origin || url.pathname.startsWith(PROXY_PATH)) return;
+  if (request.method !== "GET" || url.origin !== location.origin) return;
   event.respondWith(url.pathname.startsWith("/assets/") ? cacheFirst(request) : networkFirst(request));
 });
 

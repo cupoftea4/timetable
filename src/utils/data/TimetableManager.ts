@@ -20,9 +20,13 @@ import * as Util from "../timetable";
 import LocalCache, { type CacheData, type CacheKey } from "../timetableStorage";
 import Toast from "../toasts";
 import FallbackData from "./CachedData";
-import LPNUData from "./LPNUData";
 
 const MERGED_TIMETABLE = "my";
+
+const warnIfStale = <T>({ items, stale }: { items: T; stale: boolean }) => {
+  if (stale) Toast.warn("Data is possibly outdated!");
+  return items;
+};
 
 class TimetableManager {
   async init(type?: TimetablePageType) {
@@ -188,14 +192,19 @@ class TimetableManager {
     if (checkCache && data && !Util.needsUpdate(data.time)) {
       cacheData = LocalCache.get(`timetable_${groupName}`).then((t) => t?.data);
     } else {
-      // TODO: implement server cache
-      // cacheData = FallbackData.getTimetable(timetableType, groupName).catch(() =>
-      //   storage.getItem(TIMETABLE + groupName)
-      // );
       cacheData = Promise.resolve(null);
     }
 
-    const fetchData: ActualPromise<TimetableItem[]> = LPNUData.getTimetable(timetableType, groupName).catch(
+    const fetchData: ActualPromise<TimetableItem[]> = FallbackData.getTimetable(
+      timetableType,
+      groupName,
+      !checkCache
+    ).then(
+      (timetable) => {
+        if (!timetable) throw Toast.NONEXISTING_TIMETABLE;
+        void this.saveTimetableLocally(groupName, timetable.items, timetable.fetchedAt, data?.subgroup);
+        return warnIfStale(timetable);
+      },
       async () => {
         const { data: cached } = await LocalCache.get(`timetable_${groupName}`, true);
         if (cached) Toast.warn("Data is possibly outdated!");
@@ -203,14 +212,15 @@ class TimetableManager {
       }
     );
 
-    fetchData.then((t) => this.saveTimetableLocally(groupName, t, data?.subgroup));
     return [cacheData, fetchData] as const;
   }
 
   getExamsTimetable(group: string, type?: TimetableType, checkCache = true): RenderPromises<ExamsTimetableItem[]> {
     const groupName = group.trim();
     const timetableType = type ?? this.tryToGetType(groupName);
-    if (!timetableType) throw Error(`Couldn't define a type! Group: ${groupName}`);
+    if (!timetableType || timetableType === "merged" || timetableType === "custom") {
+      throw Error(`Couldn't define a type! Group: ${groupName}`);
+    }
 
     let cacheData: OptimisticPromise<ExamsTimetableItem[]>;
     const data = LocalCache.sync.examsTimetables?.find((el) => el.group.toLowerCase() === groupName.toLowerCase());
@@ -218,31 +228,33 @@ class TimetableManager {
     if (checkCache && data && !Util.needsUpdate(data.time)) {
       cacheData = LocalCache.get(`exams_timetable_${groupName}`).then((t) => t?.data);
     } else {
-      // TODO: implement server cache
-      // cacheData = FallbackData.getExamsTimetable(timetableType, groupName).catch(() =>
-      //   LocalCache.get(`exams_timetable_${groupName}`).then((t) => t?.data)
-      // );
       cacheData = Promise.resolve(null);
     }
 
-    const fetchData: ActualPromise<ExamsTimetableItem[]> = LPNUData.getExamsTimetable(timetableType, groupName).catch(
-      async (e) => {
-        console.warn("LPNU API is not working!", e);
+    const fetchData: ActualPromise<ExamsTimetableItem[]> = FallbackData.getExamsTimetable(
+      timetableType,
+      groupName,
+      !checkCache
+    ).then(
+      (timetable) => {
+        if (!timetable) throw Toast.NO_EXAMS;
+        void this.saveExamsLocally(groupName, timetable.items, timetable.fetchedAt);
+        return warnIfStale(timetable);
+      },
+      async () => {
         const { data: cached } = await LocalCache.get(`exams_timetable_${groupName}`, true);
         if (cached) Toast.warn("Data is possibly outdated!");
         return cached;
       }
     );
 
-    fetchData.then((t) => this.saveExamsLocally(groupName, t));
     return [cacheData, fetchData] as const;
   }
 
-  async saveTimetableLocally(group: string, timetable?: TimetableItem[] | null, subgroup?: 1 | 2) {
-    if (!timetable) return;
+  async saveTimetableLocally(group: string, timetable: TimetableItem[], time: number, subgroup?: 1 | 2) {
     const { data: savedTimetables } = await LocalCache.get("savedTimetables");
     const saved = savedTimetables?.filter((el) => el.group.toLowerCase() !== group.toLowerCase()) ?? [];
-    await LocalCache.set("savedTimetables", [...saved, { group, time: Date.now(), subgroup }]);
+    await LocalCache.set("savedTimetables", [...saved, { group, time, subgroup }]);
     await LocalCache.set(`timetable_${group}`, timetable);
     return timetable;
   }
@@ -346,11 +358,10 @@ class TimetableManager {
     return LocalCache.set("customDrafts", draft ? { ...drafts, [group]: draft } : drafts);
   }
 
-  async saveExamsLocally(group: string, timetable?: ExamsTimetableItem[] | null) {
-    if (!timetable) return;
+  async saveExamsLocally(group: string, timetable: ExamsTimetableItem[], time: number) {
     const { data: examsTimetables } = await LocalCache.get("examsTimetables");
     const saved = examsTimetables?.filter((el) => el.group.toLowerCase() !== group.toLowerCase()) ?? [];
-    await LocalCache.set("examsTimetables", [...saved, { group, time: Date.now() }]);
+    await LocalCache.set("examsTimetables", [...saved, { group, time }]);
     await LocalCache.set(`exams_timetable_${group}`, timetable);
     return timetable;
   }
@@ -571,7 +582,7 @@ class TimetableManager {
 
   private async getData<K extends CacheKey, P extends unknown[]>(
     key: K,
-    binding: typeof LPNUData | typeof FallbackData,
+    binding: typeof FallbackData,
     fn: (...params: P) => Promise<CacheData[K]>,
     ...args: P
   ): Promise<CacheData[K] | null> {

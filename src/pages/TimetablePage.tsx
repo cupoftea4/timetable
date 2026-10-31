@@ -217,16 +217,20 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
       if (!optimistic && type === "regular") TimetableManager.getPartials(group).then(setPartials);
     };
+    const onTimetableError = (e: string) => onError(e, e === Toast.NONEXISTING_TIMETABLE ? e : undefined);
     if (type === "custom") {
       const renderCustomTimetable = (timetable: CustomTimetable, optimistic: boolean) => {
         setCustomTimetable(timetable);
         renderTimetable(toTimetableItems(timetable.lessons), optimistic);
       };
-      const onCustomError = (e: string) => onError(e, e === Toast.NONEXISTING_TIMETABLE ? e : undefined);
-      return optimisticRender(renderCustomTimetable, onCustomError, TimetableManager.getCustomTimetable(group));
+      return optimisticRender(renderCustomTimetable, onTimetableError, TimetableManager.getCustomTimetable(group));
     }
     try {
-      return optimisticRender(renderTimetable, onError, TimetableManager.getTimetable(group, type, checkCache));
+      return optimisticRender(
+        renderTimetable,
+        onTimetableError,
+        TimetableManager.getTimetable(group, type, checkCache)
+      );
     } catch (_e) {
       console.error(_e);
       onError(Toast.NONEXISTING_TIMETABLE);

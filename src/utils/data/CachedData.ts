@@ -1,7 +1,29 @@
-import type { CustomTimetableData, CustomTimetableResponse, MergedTimetableData, Semester } from "@/types/timetable";
+import type {
+  CustomTimetableData,
+  CustomTimetableResponse,
+  ExamsTimetableItem,
+  LPNUTimetableType,
+  MergedTimetableData,
+  Semester,
+  TimetableItem,
+} from "@/types/timetable";
 import { DEVELOP } from "../constants";
 
 const FALLBACK_URL = import.meta.env.VITE_BACKEND_URL;
+
+// The backend stores part-time groups as regular and postgraduate ones and tells them apart by the name
+const BACKEND_TYPES: Record<LPNUTimetableType, string> = {
+  regular: "regular",
+  parttime: "regular",
+  selective: "selective",
+  lecturer: "lecturer",
+  postgraduate: "postgraduate",
+  postgraduate_parttime: "postgraduate",
+};
+
+type StoredTimetable<T> = { items: T[]; stale: boolean; fetchedAt: string };
+type StoredLesson = Omit<TimetableItem, "date"> & { date?: string };
+type StoredExam = Omit<ExamsTimetableItem, "date"> & { date: string };
 
 export default class CachedData {
   private static async fetchData<T>(path: string) {
@@ -25,6 +47,45 @@ export default class CachedData {
       throw Error(message ?? `Request failed with status ${response.status}`);
     }
     return data as T;
+  }
+
+  /** Null when there's no such timetable */
+  private static async getStoredTimetable<T>(
+    path: "timetables" | "exams",
+    type: LPNUTimetableType,
+    name: string,
+    refresh: boolean
+  ) {
+    const query = refresh ? "?refresh=1" : "";
+    const response = await fetch(`${FALLBACK_URL}/${path}/${BACKEND_TYPES[type]}/${encodeURIComponent(name)}${query}`, {
+      signal: AbortSignal.timeout(35_000),
+    });
+    if (response.status === 404) return null;
+    if (!response.ok) throw Error(`Couldn't fetch timetable ${name}`);
+    const { fetchedAt, ...timetable } = (await response.json()) as StoredTimetable<T>;
+    return { ...timetable, fetchedAt: Date.parse(fetchedAt) };
+  }
+
+  static async getTimetable(type: LPNUTimetableType, name: string, refresh: boolean) {
+    const timetable = await CachedData.getStoredTimetable<StoredLesson>("timetables", type, name, refresh);
+    return (
+      timetable && {
+        ...timetable,
+        items: timetable.items.map(
+          ({ date, ...lesson }): TimetableItem => (date ? { ...lesson, date: new Date(date) } : lesson)
+        ),
+      }
+    );
+  }
+
+  static async getExamsTimetable(type: LPNUTimetableType, name: string, refresh: boolean) {
+    const timetable = await CachedData.getStoredTimetable<StoredExam>("exams", type, name, refresh);
+    return (
+      timetable && {
+        ...timetable,
+        items: timetable.items.map((exam): ExamsTimetableItem => ({ ...exam, date: new Date(exam.date) })),
+      }
+    );
   }
 
   static getInstitutes(): Promise<string[]> {
