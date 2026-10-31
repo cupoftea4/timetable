@@ -78,7 +78,7 @@ class TimetableManager {
         return !isInstitute && LocalCache.sync.selectiveGroups?.some((g) => Util.startsWithLetters(g, query));
       case "lecturer":
         return !isInstitute && LocalCache.sync.departments?.some((d) => Util.startsWithLetters(d, query));
-      case "timetable":
+      case "regular":
         return isInstitute;
       default:
         return false;
@@ -464,7 +464,7 @@ class TimetableManager {
     const compare = (el: string) => el.toLowerCase() === timetable.toLowerCase();
     if (LocalCache.sync.groups?.some(compare)) {
       if (timetable.toLowerCase().endsWith("з")) return "parttime";
-      return "timetable";
+      return "regular";
     }
     if (LocalCache.sync.selectiveGroups?.some(compare)) return "selective";
     if (LocalCache.sync.lecturers?.some(compare)) return "lecturer";
@@ -481,11 +481,11 @@ class TimetableManager {
     if (!containsNumbers) return "lecturer";
     if (numberOfDashes === 1) {
       if (timetable.toLowerCase().endsWith("з")) return "parttime";
-      return "timetable";
+      return "regular";
     }
     if (numberOfDashes >= 2) return "selective";
 
-    return "timetable"; // FIXME temporary allow to fetch unknown groups
+    return "regular"; // FIXME temporary allow to fetch unknown groups
   }
 
   get cachedTimetables() {

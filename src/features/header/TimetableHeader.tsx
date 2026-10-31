@@ -84,7 +84,7 @@ const TimetableHeader: FC<OwnProps> = ({
   const examsGroup = sources
     ? sources.find((t) => {
         const type = TimetableManager.tryToGetType(t);
-        return type === "timetable" || type === "lecturer";
+        return type === "regular" || type === "lecturer";
       })
     : group;
 

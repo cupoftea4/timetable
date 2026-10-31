@@ -51,7 +51,7 @@ const App = () => {
             <Suspense fallback={<LoadingPage />}>
               <Routes>
                 <Route path="/" element={<NavigationSelector />} />
-                <Route path="home" element={<HomePage timetableType="timetable" />} />
+                <Route path="home" element={<HomePage timetableType="regular" />} />
                 <Route path="selective" element={<HomePage timetableType="selective" />} />
                 <Route path="lecturer" element={<HomePage timetableType="lecturer" />} />
                 <Route path="postgraduate" element={<HomePage timetableType="postgraduate" />} />

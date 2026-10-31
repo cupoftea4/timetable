@@ -215,7 +215,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     const renderTimetable = (timetable: TimetableItem[], optimistic: boolean) => {
       setTimetable((t) => (JSON.stringify(t) !== JSON.stringify(timetable) ? timetable : t));
       setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
-      if (!optimistic && type === "timetable") TimetableManager.getPartials(group).then(setPartials);
+      if (!optimistic && type === "regular") TimetableManager.getPartials(group).then(setPartials);
     };
     if (type === "custom") {
       const renderCustomTimetable = (timetable: CustomTimetable, optimistic: boolean) => {

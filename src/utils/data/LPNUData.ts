@@ -73,7 +73,7 @@ type LPNURequestSuffix =
   | typeof LECTURER_EXAMS_SUFFIX;
 
 const timetableSuffixes: Record<LPNUTimetableType, LPNURequestSuffix> = {
-  timetable: "students_schedule",
+  regular: "students_schedule",
   selective: "schedule_selective",
   lecturer: "lecturer_schedule",
   parttime: "parttime_schedule",
