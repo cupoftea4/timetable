@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://timetable-proxy-production.up.railway.app/sitemap.xml
+Sitemap: https://lpnu.pp.ua/sitemap.xml
