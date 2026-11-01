@@ -6,6 +6,7 @@ import ConfirmDialog from "@/features/editor/ConfirmDialog";
 import { useIsTablet } from "@/hooks/useMediaQuery";
 import Drawer from "@/shared/Drawer";
 import SourcePicker from "@/shared/SourcePicker";
+import { classes } from "@/styles/utils";
 import type { CustomTimetable } from "@/types/timetable";
 import FallbackData from "@/utils/data/CachedData";
 import TimetableManager from "@/utils/data/TimetableManager";
@@ -122,9 +123,10 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetables, editing, onClose, 
           onAdd={addTimetableToMerge}
           onRemove={onRemoveItem}
         />
-        {timetablesToMerge.length < minTimetables && (
-          <span className={styles.hint}>Додайте ще хоча б одну групу або викладача</span>
-        )}
+        {/* Stays in place once enough are picked, so the dialog doesn't jump */}
+        <span className={classes(styles.hint, timetablesToMerge.length >= minTimetables && "invisible")}>
+          Додайте ще хоча б одну групу або викладача
+        </span>
         {isEdited && <span className={styles.hint}>Пари цього розкладу можна змінити на комп'ютері</span>}
       </div>
       {!editing && nameField}

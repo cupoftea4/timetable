@@ -177,7 +177,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
             ) : (
               <div className={styles["no-selection"]}>
                 <img className={styles.cat} src={catImage} draggable="false" alt="cat" width="800" height="800" />
-                <p className={styles["cat-text"]}>Оберіть спецільність, щоб продовжити</p>
+                <p className={styles["cat-text"]}>Оберіть спеціальність, щоб продовжити</p>
                 <div className="pt-6">
                   <MissingGroupTip />
                 </div>
