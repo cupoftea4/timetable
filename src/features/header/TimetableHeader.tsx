@@ -162,7 +162,7 @@ const TimetableHeader: FC<OwnProps> = ({
           <TimetablePartials partials={partials} handlePartialClick={updatePartialTimetable} />
         </span>
       )}
-      {examsGroup && timetableType !== "selective" && timetableType !== "postgraduate" && !isPartTime && (
+      {examsGroup && !["selective", "postgraduate", "room"].includes(timetableType ?? "") && !isPartTime && (
         <span className={styles.actions}>
           <button
             type="button"

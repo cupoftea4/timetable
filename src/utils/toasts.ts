@@ -42,6 +42,7 @@ export default class Toast {
   static readonly INIT_ERROR = getRandomValue(initErrors);
   static readonly NONEXISTING_GROUP = getRandomValue(nonexistingGroupErrors);
   static readonly NONEXISTING_TIMETABLE = "This timetable does not exist";
+  static readonly NO_ROOM_LESSONS = "Немає даних про пари в цій аудиторії";
   static readonly NO_EXAMS = "Exams timetable is not published yet";
 
   static readonly PENDING_MERGED = "Merging your timetables. Wait a bit, please";

@@ -48,6 +48,7 @@ const App = () => {
                 <Route path="postgraduate" element={<HomePage timetableType="postgraduate" />} />
                 <Route path="waifu" element={WaifuPage ? <WaifuPage /> : <Navigate to="/home" replace />} />
                 <Route path="/c/:id" element={<TimetablePage />} />
+                <Route path="/room/:room" element={<TimetablePage />} />
                 <Route path="/:group" element={<TimetablePage />} />
                 <Route path="/:group/exams" element={<TimetablePage isExamsTimetable />} />
               </Routes>

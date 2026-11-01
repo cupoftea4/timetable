@@ -49,6 +49,12 @@ export function getCustomId(timetable: string) {
   return timetable.slice(CUSTOM_PREFIX.length);
 }
 
+export const ROOM_PREFIX = "room/";
+
+export function isRoom(timetable: string) {
+  return timetable.startsWith(ROOM_PREFIX);
+}
+
 export function isMerged(timetable: string) {
   return timetable === "my";
 }
@@ -56,6 +62,7 @@ export function isMerged(timetable: string) {
 export function getTimetableName(timetable: CachedTimetable | string) {
   const name = typeof timetable === "string" ? timetable : timetable.group;
   if (isMerged(name)) return "Мій розклад";
+  if (isRoom(name)) return name.slice(ROOM_PREFIX.length);
   if (isCustom(name))
     return TimetableManager.cachedTimetables.find((t) => t.group === name)?.name ?? "Змінений розклад";
   return name.replace(/(\d)З$/, "$1з");

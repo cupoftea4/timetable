@@ -31,6 +31,7 @@ const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) =
 
   const lecturer = cleanupInfoString(lesson.lecturer);
   const location = cleanupInfoString(lesson.location);
+  const rooms = lesson.rooms?.map(({ room, building }) => `${room} ${building}`);
   const linkTo = (name: string) =>
     lesson.groups?.includes(name)
       ? name
@@ -47,7 +48,7 @@ const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) =
           <span className={styles.subgroup}>{lesson.isSecondSubgroup ? "II" : "I"} підгрупа</span>
         )}
         <span className={styles.title}>
-          <h2 className={styles.name}>{lesson.subject.replace("`", "’")}</h2>
+          <h2 className={styles.name}>{lesson.subject.replaceAll("`", "’")}</h2>
           {lecturer.split(", ").map((name, index) => {
             const to = linkTo(name);
             return (
@@ -67,7 +68,16 @@ const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) =
               </Fragment>
             );
           })}
-          {location && `${lecturer ? ", " : ""}${location}`}
+          {rooms?.length
+            ? rooms.map((room, index) => (
+                <Fragment key={room}>
+                  {(lecturer || index > 0) && ", "}
+                  <Link to={`/room/${room}`} className={styles.person}>
+                    {room}
+                  </Link>
+                </Fragment>
+              ))
+            : location && `${lecturer ? ", " : ""}${location}`}
         </span>
         <span className={styles.extra}>
           {getDisplayType(lesson.type)}

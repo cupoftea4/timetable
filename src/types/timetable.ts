@@ -10,11 +10,14 @@ export type TimetableItem = {
   // Parsed by the backend, missing in older stored timetables and custom lessons
   lecturers?: string[];
   groups?: string[];
+  rooms?: Room[];
   number: number;
   subject: string;
   type: TimetableItemType;
   urls: string[];
 };
+
+export type Room = { room: string; building: string };
 
 export type MergedTimetableItem = TimetableItem & { timetableName: string };
 
@@ -35,7 +38,7 @@ export type LPNUTimetableType =
   | "parttime"
   | "postgraduate"
   | "postgraduate_parttime";
-export type TimetableType = LPNUTimetableType | "merged" | "custom";
+export type TimetableType = LPNUTimetableType | "merged" | "custom" | "room";
 
 export type CachedTimetable = {
   group: string;
