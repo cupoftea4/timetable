@@ -5,7 +5,11 @@
 .timetable {
   border-collapse: collapse;
   color: hsla(0, 0%, 100%, 0.9);
-  
+  // Equal day columns, otherwise the ones with longer lessons get wider
+  @include min-timetable-mobile {
+    table-layout: fixed;
+  }
+
   td, th {
     border: 1px solid hsla(0, 0%, 100%, 0.4);
     @include timetable-mobile {

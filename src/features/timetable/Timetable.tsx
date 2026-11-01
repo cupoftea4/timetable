@@ -75,6 +75,7 @@ const Timetable: FC<OwnProps> = ({
   const [currentLessonNumber, setCurrentLessonNumber] = useState(getCurrentLessonNumber());
 
   useEffect(() => {
+    setCurrentLessonNumber(getCurrentLessonNumber());
     const id = setInterval(() => {
       setCurrentLessonNumber(getCurrentLessonNumber());
     }, MINUTE);
