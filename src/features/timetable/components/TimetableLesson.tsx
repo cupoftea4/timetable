@@ -20,7 +20,7 @@ const colors: Record<TimetableItem["type"], string> = {
   lection: "var(--lect-clr)",
   practical: "var(--pract-clr)",
   lab: "var(--lab-clr)",
-  consultation: "var(--consult-clr)",
+  consultation: "var(--consultation-clr)",
 };
 
 function createStyleAttrFromLessons(lessons: TimetableItem[]) {

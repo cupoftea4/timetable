@@ -54,7 +54,13 @@ type OwnProps = {
   isExamsTimetable?: boolean;
 };
 
-type LocationState = { source?: string; isCustom?: boolean; editFromView?: boolean; examsFrom?: string };
+type LocationState = {
+  source?: string;
+  isCustom?: boolean;
+  editFromView?: boolean;
+  examsFrom?: string;
+  subgroup?: 1 | 2;
+};
 
 const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   useCanonicalUrl();
@@ -112,6 +118,18 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   useEffect(() => {
     if (!showIntro) Toast.donationNotification();
   }, [showIntro]);
+
+  useEffect(() => {
+    setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
+  }, [group]);
+
+  // A group link from a lesson of one subgroup opens that subgroup without saving it.
+  // It's dropped from the history entry right away, so a reload shows the saved one again.
+  useEffect(() => {
+    if (!state?.subgroup) return;
+    setIsSecondSubgroup(state.subgroup === 2);
+    navigate({ search, hash }, { replace: true, state: { ...state, subgroup: undefined } });
+  }, [state, search, hash, navigate]);
 
   // Once, on a phone where it isn't installed yet, to someone who keeps coming back
   useEffect(() => {
@@ -216,7 +234,6 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
     const renderTimetable = (timetable: TimetableItem[], optimistic: boolean) => {
       setTimetable((t) => (JSON.stringify(t) !== JSON.stringify(timetable) ? timetable : t));
-      setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
       if (!optimistic && type === "regular") TimetableManager.getPartials(group).then(setPartials);
     };
     const onTimetableError = (e: string) => onError(e, e === Toast.NONEXISTING_TIMETABLE ? e : undefined);

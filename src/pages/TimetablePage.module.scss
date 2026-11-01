@@ -96,6 +96,7 @@
       overflow-y: hidden;
       scroll-snap-type: x mandatory;
       max-width: 90vw;
+      margin-inline: auto;
       padding-bottom: 0.5rem;
       td, th, ol {
         $external-padding: calc(env(safe-area-inset-right) + env(safe-area-inset-left) + $main-padding * 2);
