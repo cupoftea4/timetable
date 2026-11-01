@@ -184,7 +184,6 @@ class TimetableManager {
       return [cacheData.then(toItems), fetchData.then(toItems)] as const;
     }
 
-    const data = LocalCache.sync.savedTimetables?.find((el) => el.group.toLowerCase() === groupName.toLowerCase());
     // A saved copy of any age shows right away, the fresh one replaces it
     const cacheData: OptimisticPromise<TimetableItem[]> = checkCache
       ? LocalCache.get(`timetable_${groupName}`, true).then((t) => t?.data)
@@ -197,7 +196,7 @@ class TimetableManager {
     ).then(
       (timetable) => {
         if (!timetable) throw Toast.NONEXISTING_TIMETABLE;
-        void this.saveTimetableLocally(groupName, timetable.items, timetable.fetchedAt, data?.subgroup);
+        void this.saveTimetableLocally(groupName, timetable.items, timetable.fetchedAt);
         return warnIfStale(timetable);
       },
       async () => {
@@ -241,9 +240,12 @@ class TimetableManager {
     return [cacheData, fetchData] as const;
   }
 
-  async saveTimetableLocally(group: string, timetable: TimetableItem[], time: number, subgroup?: 1 | 2) {
+  async saveTimetableLocally(group: string, timetable: TimetableItem[], time: number) {
     const { data: savedTimetables } = await LocalCache.get("savedTimetables");
-    const saved = savedTimetables?.filter((el) => el.group.toLowerCase() !== group.toLowerCase()) ?? [];
+    const isGroup = (el: { group: string }) => el.group.toLowerCase() === group.toLowerCase();
+    // Read now, not when loading started, so a subgroup picked meanwhile isn't overwritten
+    const subgroup = savedTimetables?.find(isGroup)?.subgroup;
+    const saved = savedTimetables?.filter((el) => !isGroup(el)) ?? [];
     await LocalCache.set("savedTimetables", [...saved, { group, time, subgroup }]);
     await LocalCache.set(`timetable_${group}`, timetable);
     return timetable;

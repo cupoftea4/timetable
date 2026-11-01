@@ -119,10 +119,17 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     if (!showIntro) Toast.donationNotification();
   }, [showIntro]);
 
-  // A group link from a lesson of one subgroup opens that subgroup, without changing the saved one
   useEffect(() => {
-    setIsSecondSubgroup((state?.subgroup ?? TimetableManager.getSubgroup(group)) === 2);
-  }, [group, state]);
+    setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
+  }, [group]);
+
+  // A group link from a lesson of one subgroup opens that subgroup without saving it.
+  // It's dropped from the history entry right away, so a reload shows the saved one again.
+  useEffect(() => {
+    if (!state?.subgroup) return;
+    setIsSecondSubgroup(state.subgroup === 2);
+    navigate({ search, hash }, { replace: true, state: { ...state, subgroup: undefined } });
+  }, [state, search, hash, navigate]);
 
   // Once, on a phone where it isn't installed yet, to someone who keeps coming back
   useEffect(() => {
