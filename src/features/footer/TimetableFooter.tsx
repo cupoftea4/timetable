@@ -20,7 +20,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { classes } from "@/styles/utils";
 import type { CustomTimetable } from "@/types/timetable";
 import { lazyPrefetched } from "@/utils/general";
-import { getTimetableName } from "@/utils/timetable";
+import { getTimetableName, isRoom } from "@/utils/timetable";
 import SavedMenu from "../header/components/SavedMenu";
 import ShareButton from "../header/components/ShareButton";
 import styles from "./TimetableFooter.module.scss";
@@ -74,6 +74,10 @@ const TimetableFooter: FC<OwnProps> = ({
   const { toggleTheme } = useTheme();
   const isNarrow = useIsTablet();
   const isOwner = Boolean(editToken);
+  // Collected from group timetables, so there's nothing to refresh, merge or export
+  const isRoomPage = isRoom(group);
+  const roomNote = "Зібрано з розкладів груп, тому може бути неповним";
+
   const catMode = useCatMode();
   const install = usePwaInstall();
   const [showMore, setShowMore] = useState(false);
@@ -147,7 +151,7 @@ const TimetableFooter: FC<OwnProps> = ({
           </Link>
         )}
         {!isNarrow && <DisableCatModeButton />}
-        {!isNarrow && (
+        {!isNarrow && !isRoomPage && (
           <button
             type="button"
             data-tooltip="Об`єднати кілька розкладів в одну таблицю"
@@ -158,7 +162,7 @@ const TimetableFooter: FC<OwnProps> = ({
             <span className={styles.label}>Об'єднати</span>
           </button>
         )}
-        {!isNarrow && (
+        {!isNarrow && !isRoomPage && (
           <button
             type="button"
             disabled={loading}
@@ -172,7 +176,7 @@ const TimetableFooter: FC<OwnProps> = ({
             <span className={styles.label}>Оновити</span>
           </button>
         )}
-        {!isNarrow && (
+        {!isNarrow && !isRoomPage && (
           <a
             className={classes(styles.download, styles.button)}
             data-tooltip="Експортувати розклад для Google Calendar"
@@ -234,27 +238,33 @@ const TimetableFooter: FC<OwnProps> = ({
                 )}
               </div>
             ) : (
-              updatedText && <p className={classes(styles.about, styles.hint)}>{updatedText}</p>
+              (isRoomPage || updatedText) && (
+                <p className={classes(styles.about, styles.hint)}>{isRoomPage ? roomNote : updatedText}</p>
+              )
             )}
             <ul className={styles.more}>
-              <li>
-                <button type="button" disabled={loading} onClick={() => updateTimetable()}>
-                  <RefreshIcon isPending={loading} />
-                  Оновити розклад
-                </button>
-              </li>
-              <li>
-                <CloseButton onClick={showCreateMergedModal}>
-                  <MergeIcon />
-                  Об'єднати з іншим розкладом
-                </CloseButton>
-              </li>
-              <li>
-                <CloseButton as="a" href={icsFILE} download={calendarFile} onClick={onCalendarExport}>
-                  <DownloadIcon />
-                  Додати в календар
-                </CloseButton>
-              </li>
+              {!isRoomPage && (
+                <>
+                  <li>
+                    <button type="button" disabled={loading} onClick={() => updateTimetable()}>
+                      <RefreshIcon isPending={loading} />
+                      Оновити розклад
+                    </button>
+                  </li>
+                  <li>
+                    <CloseButton onClick={showCreateMergedModal}>
+                      <MergeIcon />
+                      Об'єднати з іншим розкладом
+                    </CloseButton>
+                  </li>
+                  <li>
+                    <CloseButton as="a" href={icsFILE} download={calendarFile} onClick={onCalendarExport}>
+                      <DownloadIcon />
+                      Додати в календар
+                    </CloseButton>
+                  </li>
+                </>
+              )}
               {install === "prompt" && (
                 <li>
                   <CloseButton onClick={promptInstall}>
@@ -299,6 +309,8 @@ const TimetableFooter: FC<OwnProps> = ({
             <span data-tooltip={`Востаннє ${customTimetableUpdatedAtText}`}>Змінено вручну</span>
           )}
         </p>
+      ) : isRoomPage ? (
+        <p>{roomNote}</p>
       ) : (
         updatedText && <p>{updatedText}</p>
       )}

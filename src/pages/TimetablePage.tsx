@@ -82,7 +82,9 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const [installPrompt, setInstallPrompt] = useState<typeof install>();
   const [selectedWeek, setSelectedWeek] = useState<Date | undefined>();
   const [semester, setSemester] = useState<Semester>();
-  const { state, search, hash }: { state: LocationState | null; search: string; hash: string } = useLocation();
+  const { state, search, hash, key }: { state: LocationState | null; search: string; hash: string; key: string } =
+    useLocation();
+  const leftRoomKey = useRef<string>(undefined);
   const isEditing = new URLSearchParams(search).has("edit");
   const isDesktop = useMediaQuery(`(min-width: ${TIMETABLE_SCREEN_BREAKPOINT}px)`);
   // Starting from the saved draft avoids flashing the timetable before the editor on reload
@@ -102,10 +104,11 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
   const isReadingSavedCopy = isLoading && time !== undefined;
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
-  const hasCellSubgroups = timetableType === "lecturer" || customTimetable?.subgroupToggle === false;
+  const hasCellSubgroups =
+    timetableType === "lecturer" || timetableType === "room" || customTimetable?.subgroupToggle === false;
   const hasSubgroupLessons = timetable?.some((item) => !(item.isFirstSubgroup && item.isSecondSubgroup)) ?? true;
   const editToken = customTimetable && TimetableManager.getCustomEditToken(customTimetable.id);
-  const isEditable = isDesktop && !isExamsTimetable && !isPartTimeType(timetableType);
+  const isEditable = isDesktop && !isExamsTimetable && !isPartTimeType(timetableType) && timetableType !== "room";
   const canEdit = isEditable && Boolean(timetable);
   const isMergedCustom = customTimetable?.kind === "merged";
 
@@ -168,7 +171,12 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       return;
     }
     Toast.error(e, userError);
-    navigate("/home");
+
+    // Back to the page with the room link. StrictMode loads the room twice in dev, so go back only once
+    if (timetableType === "room" && key !== "default") {
+      if (leftRoomKey.current !== key) navigate(-1);
+      leftRoomKey.current = key;
+    } else navigate("/home");
   }
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: I don't actually remember why but I don't want to break it
@@ -190,7 +198,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     getTimetable(group, isExamsTimetable, timetableType)?.finally(() => {
       setLoading(false);
     });
-    TimetableManager.updateLastOpenedTimetable(group, isExamsTimetable ? "exams" : "timetable");
+    if (timetableType !== "room")
+      TimetableManager.updateLastOpenedTimetable(group, isExamsTimetable ? "exams" : "timetable");
   }, [group, isExamsTimetable, navigate, timetableType]);
 
   // An edit link (#edit=token) grants editing rights. The hash never reaches the server and is removed right away,
@@ -236,7 +245,8 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       setTimetable((t) => (JSON.stringify(t) !== JSON.stringify(timetable) ? timetable : t));
       if (!optimistic && type === "regular") TimetableManager.getPartials(group).then(setPartials);
     };
-    const onTimetableError = (e: string) => onError(e, e === Toast.NONEXISTING_TIMETABLE ? e : undefined);
+    const onTimetableError = (e: string) =>
+      onError(e, e === Toast.NONEXISTING_TIMETABLE || e === Toast.NO_ROOM_LESSONS ? e : undefined);
     if (type === "custom") {
       const renderCustomTimetable = (timetable: CustomTimetable, optimistic: boolean) => {
         setCustomTimetable(timetable);

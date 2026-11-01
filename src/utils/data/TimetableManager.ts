@@ -178,6 +178,16 @@ class TimetableManager {
     if (!timetableType) throw Error(`Couldn't define a type! Group: ${groupName}`);
 
     if (timetableType === "merged") return this.getMergedTimetable();
+
+    // Rooms aren't cached, they are rebuilt from group timetables on every request
+    if (timetableType === "room") {
+      const fetchData = BackendApi.getRoomTimetable(Util.getTimetableName(groupName)).then((items) => {
+        if (!items) throw Toast.NO_ROOM_LESSONS;
+        return items;
+      });
+      return [Promise.resolve(null), fetchData] as const;
+    }
+
     if (timetableType === "custom") {
       const toItems = (timetable?: CustomTimetable | null) => (timetable ? toTimetableItems(timetable.lessons) : null);
       const [cacheData, fetchData] = this.getCustomTimetable(groupName, true);
@@ -212,7 +222,7 @@ class TimetableManager {
   getExamsTimetable(group: string, type?: TimetableType, checkCache = true): RenderPromises<ExamsTimetableItem[]> {
     const groupName = group.trim();
     const timetableType = type ?? this.tryToGetType(groupName);
-    if (!timetableType || timetableType === "merged" || timetableType === "custom") {
+    if (!timetableType || timetableType === "merged" || timetableType === "custom" || timetableType === "room") {
       throw Error(`Couldn't define a type! Group: ${groupName}`);
     }
 
@@ -464,6 +474,7 @@ class TimetableManager {
   tryToGetType(timetableName: string): TimetableType | undefined {
     const timetable = timetableName.trim();
     if (Util.isCustom(timetable)) return "custom";
+    if (Util.isRoom(timetable)) return "room";
     const compare = (el: string) => el.toLowerCase() === timetable.toLowerCase();
     if (LocalCache.sync.groups?.some(compare)) {
       if (timetable.toLowerCase().endsWith("з")) return "parttime";

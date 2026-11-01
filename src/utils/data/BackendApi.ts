@@ -59,6 +59,7 @@ export default class BackendApi {
     const response = await fetch(`${BACKEND_URL}/${path}/${BACKEND_TYPES[type]}/${encodeURIComponent(name)}${query}`, {
       signal: AbortSignal.timeout(35_000),
     });
+
     if (response.status === 404) return null;
     if (!response.ok) throw Error(`Couldn't fetch timetable ${name}`);
     const { fetchedAt, ...timetable } = (await response.json()) as StoredTimetable<T>;
@@ -75,6 +76,16 @@ export default class BackendApi {
         ),
       }
     );
+  }
+
+  static async getRoomTimetable(room: string) {
+    const response = await fetch(`${BACKEND_URL}/rooms/${encodeURIComponent(room)}`, {
+      signal: AbortSignal.timeout(35_000),
+    });
+
+    if (response.status === 404) return null;
+    if (!response.ok) throw Error(`Couldn't fetch room ${room}`);
+    return ((await response.json()) as StoredTimetable<TimetableItem>).items;
   }
 
   static async getExamsTimetable(type: LPNUTimetableType, name: string, refresh: boolean) {
