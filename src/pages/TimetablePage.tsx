@@ -27,7 +27,7 @@ import {
   TIMETABLE_SCREEN_BREAKPOINT,
 } from "@/utils/constants";
 import { getDefaultCustomName, toCustomLessons, toTimetableItems } from "@/utils/customTimetable";
-import { getCurrentSemester } from "@/utils/data/LPNUData";
+import { getCurrentSemester } from "@/utils/data/SemesterState";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
 import { doOnce, isFeaturesIntroDue, lazyPrefetched, optimisticRender } from "@/utils/general";

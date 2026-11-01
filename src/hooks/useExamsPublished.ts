@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { isExamsPublished } from "@/utils/data/LPNUData";
+import { isExamsPublished } from "@/utils/data/SemesterState";
 
 export default function useExamsPublished() {
   const [published, setPublished] = useState(false);
