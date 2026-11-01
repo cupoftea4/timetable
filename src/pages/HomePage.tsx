@@ -73,7 +73,6 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
     setSecondLayer([]);
   }, []);
 
-  // Initial fetch
   useEffect(() => {
     reset();
 
@@ -82,7 +81,6 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
       .catch(Toast.error);
   }, [timetableType, reset]);
 
-  // On first layer change
   useEffect(() => {
     if (!selectedFirst) {
       return;
@@ -90,7 +88,6 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
     updateSecondLayer(selectedFirst);
   }, [selectedFirst, updateSecondLayer]);
 
-  // On second layer change
   useEffect(() => {
     if (!selectedSecond) {
       setThirdLayer([]);

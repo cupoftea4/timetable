@@ -1,20 +1,13 @@
+@use '../styles/mixins' as *;
 @use '../styles/utils' as *;
 @use '../styles/variables' as *;
 
-// Startup usually takes a few ms, so the loader only shows up when it's slow
-@keyframes hidden {
-  from,
-  to {
-    opacity: 0;
-  }
-}
-
 .container {
   @include flex-center;
-  animation: hidden 0s 300ms backwards;
   height: 100vh;
   height: var(--app-height, 100dvh);
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  @include appear-after(300ms);
   div {
     @include flex-center;
     gap: 1rem;

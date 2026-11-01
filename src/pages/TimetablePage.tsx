@@ -42,7 +42,6 @@ const CalendarHelp = lazy(() => import("@/features/intro/CalendarHelp"));
 const InstallPrompt = lazy(() => import("@/features/intro/InstallPrompt"));
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => {
-  // yeah, naming! :)
   const width = el.getBoundingClientRect().width;
   const currentDay = getCurrentUADate().getDay() || 7; // 0 - Sunday
   const inTimetable = timetable?.some(({ day }) => Math.max(day, 5) >= currentDay);
@@ -95,7 +94,6 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   const isLoading = isExamsTimetable ? !examsTimetable : !timetable;
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
-  // A saved copy takes a few ms to read, the page appears with it instead of a skeleton first
   const isReadingSavedCopy = isLoading && time !== undefined;
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
   const hasCellSubgroups = timetableType === "lecturer" || customTimetable?.subgroupToggle === false;
@@ -247,7 +245,6 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       return;
     }
     // TODO: remove partial timetables or fix them
-    // Toast.promise(TimetableManager.getPartialTimetable(group, partial).then(setTimetable));
   };
 
   const updateTimetable = (checkCache = false) => {

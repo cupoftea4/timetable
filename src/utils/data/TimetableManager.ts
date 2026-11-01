@@ -412,7 +412,7 @@ class TimetableManager {
     if (data.subgroup === subgroup) return;
 
     const { data: savedTimetables } = await LocalCache.get("savedTimetables");
-    const saved = savedTimetables?.filter((el) => el.group !== group) ?? []; // remove previous timetable
+    const saved = savedTimetables?.filter((el) => el.group !== group) ?? [];
     return LocalCache.set("savedTimetables", [...saved, { ...data, subgroup }]);
   }
 
@@ -477,7 +477,6 @@ class TimetableManager {
       return timetable.toLowerCase().endsWith("з") ? "postgraduate_parttime" : "postgraduate";
     }
 
-    // try to guess the type based on the name
     const numberOfDashes = timetable.split("-").length - 1;
     const containsNumbers = /\d/.test(timetable);
 

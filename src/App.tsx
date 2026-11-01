@@ -17,17 +17,7 @@ import Toast from "./utils/toasts";
 const HomePage = lazyPrefetched(() => import("./pages/HomePage"));
 const WaifuPage = import.meta.env.VITE_ENABLE_WAIFU === "true" ? lazy(() => import("./pages/WaifuPage")) : null;
 
-/* TODO:
-  - add tests
-  - update partials
-  - add partial timetables to timetable-data
-  - fix light theme
-  - fix timetable-data to work even if something goes wrong (like institutes fetching)
-  - github actions to commit only diff
- */
-
 const App = () => {
-  // Initialize theme at the app level
   useTheme();
 
   const [status, setStatus] = useState<Status>(Status.Loading);

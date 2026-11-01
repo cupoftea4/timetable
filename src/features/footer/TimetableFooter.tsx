@@ -31,7 +31,8 @@ const DAY = 24 * HOUR;
 
 const relativeTime = new Intl.RelativeTimeFormat("uk", { numeric: "auto" });
 
-const formatUpdatedAgo = (ago: number, time: number) => {
+const formatUpdatedAgo = (time: number, now: number) => {
+  const ago = now - time;
   if (ago < MINUTE) return "щойно";
   if (ago < HOUR) return relativeTime.format(-Math.floor(ago / MINUTE), "minute");
   if (ago < DAY) return relativeTime.format(-Math.floor(ago / HOUR), "hour");
@@ -104,7 +105,7 @@ const TimetableFooter: FC<OwnProps> = ({
     : "";
 
   // On phones only worth the space when the data couldn't be refreshed for a while
-  const updatedText = time && (!isNarrow || now - time > DAY) && `Оновлено ${formatUpdatedAgo(now - time, time)}`;
+  const updatedText = time && (!isNarrow || now - time > DAY) && `Оновлено ${formatUpdatedAgo(time, now)}`;
   const sources = customTimetable?.sourceNames.map((source, i) => (
     <Fragment key={source}>
       {i > 0 && ", "}

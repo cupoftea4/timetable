@@ -49,7 +49,6 @@ export default class CachedData {
     return data as T;
   }
 
-  /** Null when there's no such timetable */
   private static async getStoredTimetable<T>(
     path: "timetables" | "exams",
     type: LPNUTimetableType,
