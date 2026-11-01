@@ -54,7 +54,11 @@ const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) =
               <Fragment key={name}>
                 {index > 0 && ", "}
                 {to ? (
-                  <Link to={`/${to}`} className={styles.person}>
+                  <Link
+                    to={`/${to}`}
+                    state={isForBothSubgroups ? undefined : { subgroup: lesson.isSecondSubgroup ? 2 : 1 }}
+                    className={styles.person}
+                  >
                     {name}
                   </Link>
                 ) : (
