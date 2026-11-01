@@ -19,7 +19,7 @@ import { toCustomLessons, toTimetableItems } from "../customTimetable";
 import * as Util from "../timetable";
 import LocalCache, { type CacheData, type CacheKey } from "../timetableStorage";
 import Toast from "../toasts";
-import FallbackData from "./CachedData";
+import BackendApi from "./BackendApi";
 
 const MERGED_TIMETABLE = "my";
 
@@ -33,18 +33,16 @@ class TimetableManager {
     await LocalCache.initRamCache(type);
 
     const lists = Promise.all([
-      this.getData("groups", FallbackData, FallbackData.getGroups).then((data) =>
+      this.getData("groups", BackendApi, BackendApi.getGroups).then((data) =>
         LocalCache.set("groups", sortGroups(data ?? []))
       ),
-      this.getData("selectiveGroups", FallbackData, FallbackData.getSelectiveGroups).then((data) =>
+      this.getData("selectiveGroups", BackendApi, BackendApi.getSelectiveGroups).then((data) =>
         LocalCache.set("selectiveGroups", sortGroups(data ?? []))
       ),
-      this.getData("postgraduateGroups", FallbackData, FallbackData.getPostgraduateGroups).then((data) =>
+      this.getData("postgraduateGroups", BackendApi, BackendApi.getPostgraduateGroups).then((data) =>
         LocalCache.set("postgraduateGroups", sortGroups(data ?? []))
       ),
-      this.getData("lecturers", FallbackData, FallbackData.getLecturers).then((data) =>
-        LocalCache.set("lecturers", data)
-      ),
+      this.getData("lecturers", BackendApi, BackendApi.getLecturers).then((data) => LocalCache.set("lecturers", data)),
     ]).catch((e) => console.error(e));
     // Yesterday's lists open the app right away instead of waiting for the network, the fresh ones replace them
     if (!(await LocalCache.loadOutdatedLists())) await lists;
@@ -192,7 +190,7 @@ class TimetableManager {
       ? LocalCache.get(`timetable_${groupName}`, true).then((t) => t?.data)
       : Promise.resolve(null);
 
-    const fetchData: ActualPromise<TimetableItem[]> = FallbackData.getTimetable(
+    const fetchData: ActualPromise<TimetableItem[]> = BackendApi.getTimetable(
       timetableType,
       groupName,
       !checkCache
@@ -223,7 +221,7 @@ class TimetableManager {
       ? LocalCache.get(`exams_timetable_${groupName}`, true).then((t) => t?.data)
       : Promise.resolve(null);
 
-    const fetchData: ActualPromise<ExamsTimetableItem[]> = FallbackData.getExamsTimetable(
+    const fetchData: ActualPromise<ExamsTimetableItem[]> = BackendApi.getExamsTimetable(
       timetableType,
       groupName,
       !checkCache
@@ -254,7 +252,7 @@ class TimetableManager {
   /** A deleted one is still available as a source of a merge */
   getCustomTimetable(group: string, asSource = false): RenderPromises<CustomTimetable> {
     const cacheData = LocalCache.get(`custom_${Util.getCustomId(group)}`, true).then((t) => t.data);
-    const fetchData: ActualPromise<CustomTimetable> = FallbackData.getCustomTimetable(Util.getCustomId(group)).then(
+    const fetchData: ActualPromise<CustomTimetable> = BackendApi.getCustomTimetable(Util.getCustomId(group)).then(
       async (fetched) => {
         if (!fetched || (fetched.deletedAt && !asSource)) {
           // A merged timetable keeps the last lessons of a deleted custom one, they just stop updating
@@ -293,7 +291,7 @@ class TimetableManager {
   }
 
   async createMergedTimetable(timetable: MergedTimetableData) {
-    const { id, editToken } = await FallbackData.createMergedTimetable(timetable);
+    const { id, editToken } = await BackendApi.createMergedTimetable(timetable);
     await this.saveCustomEditToken(id, editToken);
     return Util.CUSTOM_PREFIX + id;
   }
@@ -324,7 +322,7 @@ class TimetableManager {
   }
 
   async deleteCustomTimetable(id: string, editToken: string) {
-    await FallbackData.deleteCustomTimetable(id, editToken);
+    await BackendApi.deleteCustomTimetable(id, editToken);
     await this.deleteTimetable(Util.CUSTOM_PREFIX + id);
     await this.saveCustomDraft(Util.CUSTOM_PREFIX + id, null);
   }
@@ -539,7 +537,7 @@ class TimetableManager {
   }
 
   private async getInstitutes(): Promise<CachedInstitute[]> {
-    return this.getData("institutes", FallbackData, FallbackData.getInstitutes).then((i) => i ?? []);
+    return this.getData("institutes", BackendApi, BackendApi.getInstitutes).then((i) => i ?? []);
   }
 
   private async ifPartialTimetableExists(_group: string, _halfTerm: 1 | 2) {
@@ -549,31 +547,31 @@ class TimetableManager {
   private async getTimetableGroups(institute?: string): Promise<string[]> {
     return await this.getData(
       `${institute ? (`groups_${institute}` as const) : ("groups" as const)}`,
-      FallbackData,
-      FallbackData.getGroups,
+      BackendApi,
+      BackendApi.getGroups,
       institute
     ).then((g) => g ?? []);
   }
 
   private getSelectiveGroups(): Promise<string[]> {
-    return this.getData("selectiveGroups", FallbackData, FallbackData.getSelectiveGroups).then((g) => g ?? []);
+    return this.getData("selectiveGroups", BackendApi, BackendApi.getSelectiveGroups).then((g) => g ?? []);
   }
 
   private getPostgraduateGroups(): Promise<string[]> {
-    return this.getData("postgraduateGroups", FallbackData, FallbackData.getPostgraduateGroups).then((g) => g ?? []);
+    return this.getData("postgraduateGroups", BackendApi, BackendApi.getPostgraduateGroups).then((g) => g ?? []);
   }
 
   private getLecturers(): Promise<string[]> {
-    return this.getData("lecturers", FallbackData, FallbackData.getLecturers).then((l) => l ?? []);
+    return this.getData("lecturers", BackendApi, BackendApi.getLecturers).then((l) => l ?? []);
   }
 
   private getLecturerDepartments(): Promise<string[]> {
-    return this.getData("departments", FallbackData, FallbackData.getLecturerDepartments).then((d) => d ?? []);
+    return this.getData("departments", BackendApi, BackendApi.getLecturerDepartments).then((d) => d ?? []);
   }
 
   private async getData<K extends CacheKey, P extends unknown[]>(
     key: K,
-    binding: typeof FallbackData,
+    binding: typeof BackendApi,
     fn: (...params: P) => Promise<CacheData[K]>,
     ...args: P
   ): Promise<CacheData[K] | null> {

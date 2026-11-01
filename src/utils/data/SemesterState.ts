@@ -1,12 +1,12 @@
 import type { Semester } from "@/types/timetable";
 import LocalCache, { type CacheData } from "@/utils/timetableStorage";
 import { getCurrentSemester as getCurrentSemesterByDate } from "../date";
-import CachedData from "./CachedData";
+import BackendApi from "./BackendApi";
 
 type SemesterState = CacheData["currentSemester"];
 
 const fetchSemesterState = async (): Promise<SemesterState> => {
-  const { semester, expiresAt, exams } = await CachedData.getCurrentSemester();
+  const { semester, expiresAt, exams } = await BackendApi.getCurrentSemester();
   const state: SemesterState = {
     semester,
     expiresAt: Date.parse(expiresAt),

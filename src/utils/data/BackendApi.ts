@@ -9,7 +9,7 @@ import type {
 } from "@/types/timetable";
 import { DEVELOP } from "../constants";
 
-const FALLBACK_URL = import.meta.env.VITE_BACKEND_URL;
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 // The backend stores part-time groups as regular and postgraduate ones and tells them apart by the name
 const BACKEND_TYPES: Record<LPNUTimetableType, string> = {
@@ -25,10 +25,10 @@ type StoredTimetable<T> = { items: T[]; stale: boolean; fetchedAt: string };
 type StoredLesson = Omit<TimetableItem, "date"> & { date?: string };
 type StoredExam = Omit<ExamsTimetableItem, "date"> & { date: string };
 
-export default class CachedData {
+export default class BackendApi {
   private static async fetchData<T>(path: string) {
-    if (DEVELOP) console.warn("Timetable fallback url", FALLBACK_URL + path);
-    const response = await fetch(FALLBACK_URL + path);
+    if (DEVELOP) console.warn("Backend url", BACKEND_URL + path);
+    const response = await fetch(BACKEND_URL + path);
     if (!response.ok) throw Error("Couldn't fetch or parse timetable");
     return (await response.json()) as T;
   }
@@ -36,7 +36,7 @@ export default class CachedData {
   private static async send<T>(path: string, method: string, body?: object | string, token?: string) {
     const headers = new Headers(token ? { Authorization: `Bearer ${token}` } : {});
     if (body) headers.set("Content-Type", typeof body === "string" ? "text/plain" : "application/json");
-    const response = await fetch(FALLBACK_URL + path, {
+    const response = await fetch(BACKEND_URL + path, {
       method,
       headers,
       body: typeof body === "object" ? JSON.stringify(body) : body,
@@ -56,7 +56,7 @@ export default class CachedData {
     refresh: boolean
   ) {
     const query = refresh ? "?refresh=1" : "";
-    const response = await fetch(`${FALLBACK_URL}/${path}/${BACKEND_TYPES[type]}/${encodeURIComponent(name)}${query}`, {
+    const response = await fetch(`${BACKEND_URL}/${path}/${BACKEND_TYPES[type]}/${encodeURIComponent(name)}${query}`, {
       signal: AbortSignal.timeout(35_000),
     });
     if (response.status === 404) return null;
@@ -66,7 +66,7 @@ export default class CachedData {
   }
 
   static async getTimetable(type: LPNUTimetableType, name: string, refresh: boolean) {
-    const timetable = await CachedData.getStoredTimetable<StoredLesson>("timetables", type, name, refresh);
+    const timetable = await BackendApi.getStoredTimetable<StoredLesson>("timetables", type, name, refresh);
     return (
       timetable && {
         ...timetable,
@@ -78,7 +78,7 @@ export default class CachedData {
   }
 
   static async getExamsTimetable(type: LPNUTimetableType, name: string, refresh: boolean) {
-    const timetable = await CachedData.getStoredTimetable<StoredExam>("exams", type, name, refresh);
+    const timetable = await BackendApi.getStoredTimetable<StoredExam>("exams", type, name, refresh);
     return (
       timetable && {
         ...timetable,
@@ -88,29 +88,29 @@ export default class CachedData {
   }
 
   static getInstitutes(): Promise<string[]> {
-    return CachedData.fetchData("/institutes");
+    return BackendApi.fetchData("/institutes");
   }
 
   static getGroups(institute?: string): Promise<string[]> {
     const fallbackPath = institute ? `/institutes/${institute}/groups` : "/regular/groups";
-    return CachedData.fetchData(fallbackPath);
+    return BackendApi.fetchData(fallbackPath);
   }
 
   static getSelectiveGroups(): Promise<string[]> {
-    return CachedData.fetchData("/selective/groups");
+    return BackendApi.fetchData("/selective/groups");
   }
 
   static getPostgraduateGroups(): Promise<string[]> {
-    return CachedData.fetchData("/postgraduate/groups");
+    return BackendApi.fetchData("/postgraduate/groups");
   }
 
   static async getLecturers(): Promise<string[]> {
-    const data: string[] = await CachedData.fetchData("/lecturers/groups");
+    const data: string[] = await BackendApi.fetchData("/lecturers/groups");
     return [...new Set(data)].sort((a, b) => a.localeCompare(b));
   }
 
   static getLecturerDepartments(): Promise<string[]> {
-    return CachedData.fetchData("/lecturers/departments.json");
+    return BackendApi.fetchData("/lecturers/departments.json");
   }
 
   static getCurrentSemester(): Promise<{
@@ -118,37 +118,37 @@ export default class CachedData {
     expiresAt: string;
     exams?: { published: boolean | null; checkedAt: string | null };
   }> {
-    return CachedData.fetchData("/semester");
+    return BackendApi.fetchData("/semester");
   }
 
   static async getCustomTimetable(id: string) {
-    const response = await fetch(`${FALLBACK_URL}/custom/${id}`);
+    const response = await fetch(`${BACKEND_URL}/custom/${id}`);
     if (response.status === 404) return null;
     if (!response.ok) throw Error(`Couldn't fetch custom timetable ${id}`);
     return (await response.json()) as CustomTimetableResponse;
   }
 
   static createCustomTimetable(timetable: CustomTimetableData & { sourceNames: string[] }) {
-    return CachedData.send<{ id: string; editToken: string }>("/custom", "POST", timetable);
+    return BackendApi.send<{ id: string; editToken: string }>("/custom", "POST", timetable);
   }
 
   static createMergedTimetable(timetable: MergedTimetableData) {
-    return CachedData.send<{ id: string; editToken: string }>("/custom", "POST", { kind: "merged", ...timetable });
+    return BackendApi.send<{ id: string; editToken: string }>("/custom", "POST", { kind: "merged", ...timetable });
   }
 
   static updateMergedTimetable(id: string, token: string, timetable: MergedTimetableData) {
-    return CachedData.send<null>(`/custom/${id}`, "PUT", { kind: "merged", ...timetable }, token);
+    return BackendApi.send<null>(`/custom/${id}`, "PUT", { kind: "merged", ...timetable }, token);
   }
 
   static updateCustomTimetable(id: string, token: string, timetable: CustomTimetableData & { sourceNames: string[] }) {
-    return CachedData.send<null>(`/custom/${id}`, "PUT", timetable, token);
+    return BackendApi.send<null>(`/custom/${id}`, "PUT", timetable, token);
   }
 
   static deleteCustomTimetable(id: string, token: string) {
-    return CachedData.send<null>(`/custom/${id}`, "DELETE", undefined, token);
+    return BackendApi.send<null>(`/custom/${id}`, "DELETE", undefined, token);
   }
 
   static parseCustomTimetable(json5: string) {
-    return CachedData.send<CustomTimetableData>("/custom/parse", "POST", json5);
+    return BackendApi.send<CustomTimetableData>("/custom/parse", "POST", json5);
   }
 }

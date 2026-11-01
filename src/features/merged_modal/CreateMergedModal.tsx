@@ -8,7 +8,7 @@ import Drawer from "@/shared/Drawer";
 import SourcePicker from "@/shared/SourcePicker";
 import { classes } from "@/styles/utils";
 import type { CustomTimetable } from "@/types/timetable";
-import FallbackData from "@/utils/data/CachedData";
+import BackendApi from "@/utils/data/BackendApi";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getTimetableName, isMerged } from "@/utils/timetable";
 import Toast, { errorMessage } from "@/utils/toasts";
@@ -22,7 +22,7 @@ async function updateEdited(editing: Editing, timetable: { name: string; sourceN
   const addedLessons = await Promise.all(added.map((source) => TimetableManager.getSourceLessons(source)));
   const lessons = editing.lessons.filter((lesson) => !lesson.source || timetable.sourceNames.includes(lesson.source));
   const data = { ...timetable, subgroupToggle: editing.subgroupToggle, lessons: [...lessons, ...addedLessons.flat()] };
-  return FallbackData.updateCustomTimetable(editing.id, editing.editToken, data);
+  return BackendApi.updateCustomTimetable(editing.id, editing.editToken, data);
 }
 
 type OwnProps = {
@@ -65,7 +65,7 @@ const CreateMergedModal: FC<OwnProps> = ({ defaultTimetables, editing, onClose, 
       ? TimetableManager.createMergedTimetable(timetable).then((group) => navigate(`/${group}`))
       : (isEdited
           ? updateEdited(editing, timetable)
-          : FallbackData.updateMergedTimetable(editing.id, editing.editToken, timetable)
+          : BackendApi.updateMergedTimetable(editing.id, editing.editToken, timetable)
         ).then(onUpdated);
     Toast.promise(request, editing ? "Зберігаємо зміни" : Toast.PENDING_MERGED).catch((e) =>
       Toast.error(e, errorMessage(e))

@@ -28,7 +28,7 @@ import {
   toJSON5,
   toRemoved,
 } from "@/utils/customTimetable";
-import FallbackData from "@/utils/data/CachedData";
+import BackendApi from "@/utils/data/BackendApi";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getCustomId, getDisplayType, isCustom, lessonsTimes } from "@/utils/timetable";
 import Toast, { errorMessage } from "@/utils/toasts";
@@ -210,12 +210,12 @@ const TimetableEditor: FC<OwnProps> = ({
       let id: string;
       if (saved) {
         id = saved.id;
-        if (merged) await FallbackData.updateMergedTimetable(id, saved.editToken, mergedData);
-        else await FallbackData.updateCustomTimetable(id, saved.editToken, data);
+        if (merged) await BackendApi.updateMergedTimetable(id, saved.editToken, mergedData);
+        else await BackendApi.updateCustomTimetable(id, saved.editToken, data);
       } else if (merged) {
         id = getCustomId(await TimetableManager.createMergedTimetable(mergedData));
       } else {
-        const created = await FallbackData.createCustomTimetable(data);
+        const created = await BackendApi.createCustomTimetable(data);
         await TimetableManager.saveCustomEditToken(created.id, created.editToken);
         id = created.id;
       }
@@ -251,7 +251,7 @@ const TimetableEditor: FC<OwnProps> = ({
   const importDraft = (text: string, closeDialog: () => void) =>
     run(async () => {
       // AI answers put the timetable in a markdown code block, often with explanations around it
-      const imported = await FallbackData.parseCustomTimetable(text.match(/```\w*\n([\s\S]*?)```/)?.[1] ?? text);
+      const imported = await BackendApi.parseCustomTimetable(text.match(/```\w*\n([\s\S]*?)```/)?.[1] ?? text);
       const kept = keepSources(visibleLessons, imported.lessons);
       setName(imported.name);
       setSubgroupToggle(imported.subgroupToggle);
