@@ -11,6 +11,7 @@ import SavedMenu from "@/features/header/components/SavedMenu";
 import HeaderPanel from "@/features/header/HomeHeader";
 import MissingGroupTip from "@/features/home/MissingGroupTip";
 import TimetablesSelection from "@/features/home/TimetablesSelection";
+import useCanonicalUrl from "@/hooks/useCanonicalUrl";
 import { useIsTablet } from "@/hooks/useMediaQuery";
 import List from "@/shared/List";
 import { classes } from "@/styles/utils";
@@ -25,6 +26,7 @@ type OwnProps = {
 };
 
 const HomePage: FC<OwnProps> = ({ timetableType }) => {
+  useCanonicalUrl();
   const [firstLayer, setFirstLayer] = useState<string[]>([]); // institutes/alphabet
   const [secondLayer, setSecondLayer] = useState<string[]>([]); // majors/departments/selective
   const [thirdLayer, setThirdLayer] = useState<string[]>([]); // groups/lecturers
@@ -71,7 +73,6 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
     setSecondLayer([]);
   }, []);
 
-  // Initial fetch
   useEffect(() => {
     reset();
 
@@ -80,7 +81,6 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
       .catch(Toast.error);
   }, [timetableType, reset]);
 
-  // On first layer change
   useEffect(() => {
     if (!selectedFirst) {
       return;
@@ -88,7 +88,6 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
     updateSecondLayer(selectedFirst);
   }, [selectedFirst, updateSecondLayer]);
 
-  // On second layer change
   useEffect(() => {
     if (!selectedSecond) {
       setThirdLayer([]);
@@ -156,7 +155,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
             {isTablet && selectedSecond && (
               <button type="button" className={styles.back} onClick={() => handleSecondChange(null)}>
                 <ArrowRightIcon />
-                {selectedFirst} · {selectedSecond}
+                {selectedFirst} / {selectedSecond}
               </button>
             )}
             {showThirdLayer ? (
@@ -175,7 +174,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
             ) : (
               <div className={styles["no-selection"]}>
                 <img className={styles.cat} src={catImage} draggable="false" alt="cat" width="800" height="800" />
-                <p className={styles["cat-text"]}>Оберіть спецільність, щоб продовжити</p>
+                <p className={styles["cat-text"]}>Оберіть спеціальність, щоб продовжити</p>
                 <div className="pt-6">
                   <MissingGroupTip />
                 </div>

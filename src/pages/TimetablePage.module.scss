@@ -2,6 +2,9 @@
 @use '../styles/utils' as *;
 @use '../styles/variables' as *;
 
+.readingSavedCopy {
+  @include appear-after(300ms);
+}
 
 .wrapper {
   min-height: 100vh;

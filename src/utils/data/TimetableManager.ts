@@ -19,28 +19,30 @@ import { toCustomLessons, toTimetableItems } from "../customTimetable";
 import * as Util from "../timetable";
 import LocalCache, { type CacheData, type CacheKey } from "../timetableStorage";
 import Toast from "../toasts";
-import FallbackData from "./CachedData";
-import LPNUData from "./LPNUData";
+import BackendApi from "./BackendApi";
 
 const MERGED_TIMETABLE = "my";
+
+const warnIfStale = <T>({ items, stale }: { items: T; stale: boolean }) => {
+  if (stale) Toast.warn("Data is possibly outdated!");
+  return items;
+};
 
 class TimetableManager {
   async init(type?: TimetablePageType) {
     await LocalCache.initRamCache(type);
 
     const lists = Promise.all([
-      this.getData("groups", FallbackData, FallbackData.getGroups).then((data) =>
+      this.getData("groups", BackendApi, BackendApi.getGroups).then((data) =>
         LocalCache.set("groups", sortGroups(data ?? []))
       ),
-      this.getData("selectiveGroups", FallbackData, FallbackData.getSelectiveGroups).then((data) =>
+      this.getData("selectiveGroups", BackendApi, BackendApi.getSelectiveGroups).then((data) =>
         LocalCache.set("selectiveGroups", sortGroups(data ?? []))
       ),
-      this.getData("postgraduateGroups", FallbackData, FallbackData.getPostgraduateGroups).then((data) =>
+      this.getData("postgraduateGroups", BackendApi, BackendApi.getPostgraduateGroups).then((data) =>
         LocalCache.set("postgraduateGroups", sortGroups(data ?? []))
       ),
-      this.getData("lecturers", FallbackData, FallbackData.getLecturers).then((data) =>
-        LocalCache.set("lecturers", data)
-      ),
+      this.getData("lecturers", BackendApi, BackendApi.getLecturers).then((data) => LocalCache.set("lecturers", data)),
     ]).catch((e) => console.error(e));
     // Yesterday's lists open the app right away instead of waiting for the network, the fresh ones replace them
     if (!(await LocalCache.loadOutdatedLists())) await lists;
@@ -78,7 +80,7 @@ class TimetableManager {
         return !isInstitute && LocalCache.sync.selectiveGroups?.some((g) => Util.startsWithLetters(g, query));
       case "lecturer":
         return !isInstitute && LocalCache.sync.departments?.some((d) => Util.startsWithLetters(d, query));
-      case "timetable":
+      case "regular":
         return isInstitute;
       default:
         return false;
@@ -182,20 +184,22 @@ class TimetableManager {
       return [cacheData.then(toItems), fetchData.then(toItems)] as const;
     }
 
-    let cacheData: OptimisticPromise<TimetableItem[]>;
     const data = LocalCache.sync.savedTimetables?.find((el) => el.group.toLowerCase() === groupName.toLowerCase());
+    // A saved copy of any age shows right away, the fresh one replaces it
+    const cacheData: OptimisticPromise<TimetableItem[]> = checkCache
+      ? LocalCache.get(`timetable_${groupName}`, true).then((t) => t?.data)
+      : Promise.resolve(null);
 
-    if (checkCache && data && !Util.needsUpdate(data.time)) {
-      cacheData = LocalCache.get(`timetable_${groupName}`).then((t) => t?.data);
-    } else {
-      // TODO: implement server cache
-      // cacheData = FallbackData.getTimetable(timetableType, groupName).catch(() =>
-      //   storage.getItem(TIMETABLE + groupName)
-      // );
-      cacheData = Promise.resolve(null);
-    }
-
-    const fetchData: ActualPromise<TimetableItem[]> = LPNUData.getTimetable(timetableType, groupName).catch(
+    const fetchData: ActualPromise<TimetableItem[]> = BackendApi.getTimetable(
+      timetableType,
+      groupName,
+      !checkCache
+    ).then(
+      (timetable) => {
+        if (!timetable) throw Toast.NONEXISTING_TIMETABLE;
+        void this.saveTimetableLocally(groupName, timetable.items, timetable.fetchedAt, data?.subgroup);
+        return warnIfStale(timetable);
+      },
       async () => {
         const { data: cached } = await LocalCache.get(`timetable_${groupName}`, true);
         if (cached) Toast.warn("Data is possibly outdated!");
@@ -203,46 +207,44 @@ class TimetableManager {
       }
     );
 
-    fetchData.then((t) => this.saveTimetableLocally(groupName, t, data?.subgroup));
     return [cacheData, fetchData] as const;
   }
 
   getExamsTimetable(group: string, type?: TimetableType, checkCache = true): RenderPromises<ExamsTimetableItem[]> {
     const groupName = group.trim();
     const timetableType = type ?? this.tryToGetType(groupName);
-    if (!timetableType) throw Error(`Couldn't define a type! Group: ${groupName}`);
-
-    let cacheData: OptimisticPromise<ExamsTimetableItem[]>;
-    const data = LocalCache.sync.examsTimetables?.find((el) => el.group.toLowerCase() === groupName.toLowerCase());
-
-    if (checkCache && data && !Util.needsUpdate(data.time)) {
-      cacheData = LocalCache.get(`exams_timetable_${groupName}`).then((t) => t?.data);
-    } else {
-      // TODO: implement server cache
-      // cacheData = FallbackData.getExamsTimetable(timetableType, groupName).catch(() =>
-      //   LocalCache.get(`exams_timetable_${groupName}`).then((t) => t?.data)
-      // );
-      cacheData = Promise.resolve(null);
+    if (!timetableType || timetableType === "merged" || timetableType === "custom") {
+      throw Error(`Couldn't define a type! Group: ${groupName}`);
     }
 
-    const fetchData: ActualPromise<ExamsTimetableItem[]> = LPNUData.getExamsTimetable(timetableType, groupName).catch(
-      async (e) => {
-        console.warn("LPNU API is not working!", e);
+    const cacheData: OptimisticPromise<ExamsTimetableItem[]> = checkCache
+      ? LocalCache.get(`exams_timetable_${groupName}`, true).then((t) => t?.data)
+      : Promise.resolve(null);
+
+    const fetchData: ActualPromise<ExamsTimetableItem[]> = BackendApi.getExamsTimetable(
+      timetableType,
+      groupName,
+      !checkCache
+    ).then(
+      (timetable) => {
+        if (!timetable) throw Toast.NO_EXAMS;
+        void this.saveExamsLocally(groupName, timetable.items, timetable.fetchedAt);
+        return warnIfStale(timetable);
+      },
+      async () => {
         const { data: cached } = await LocalCache.get(`exams_timetable_${groupName}`, true);
         if (cached) Toast.warn("Data is possibly outdated!");
         return cached;
       }
     );
 
-    fetchData.then((t) => this.saveExamsLocally(groupName, t));
     return [cacheData, fetchData] as const;
   }
 
-  async saveTimetableLocally(group: string, timetable?: TimetableItem[] | null, subgroup?: 1 | 2) {
-    if (!timetable) return;
+  async saveTimetableLocally(group: string, timetable: TimetableItem[], time: number, subgroup?: 1 | 2) {
     const { data: savedTimetables } = await LocalCache.get("savedTimetables");
     const saved = savedTimetables?.filter((el) => el.group.toLowerCase() !== group.toLowerCase()) ?? [];
-    await LocalCache.set("savedTimetables", [...saved, { group, time: Date.now(), subgroup }]);
+    await LocalCache.set("savedTimetables", [...saved, { group, time, subgroup }]);
     await LocalCache.set(`timetable_${group}`, timetable);
     return timetable;
   }
@@ -250,7 +252,7 @@ class TimetableManager {
   /** A deleted one is still available as a source of a merge */
   getCustomTimetable(group: string, asSource = false): RenderPromises<CustomTimetable> {
     const cacheData = LocalCache.get(`custom_${Util.getCustomId(group)}`, true).then((t) => t.data);
-    const fetchData: ActualPromise<CustomTimetable> = FallbackData.getCustomTimetable(Util.getCustomId(group)).then(
+    const fetchData: ActualPromise<CustomTimetable> = BackendApi.getCustomTimetable(Util.getCustomId(group)).then(
       async (fetched) => {
         if (!fetched || (fetched.deletedAt && !asSource)) {
           // A merged timetable keeps the last lessons of a deleted custom one, they just stop updating
@@ -289,7 +291,7 @@ class TimetableManager {
   }
 
   async createMergedTimetable(timetable: MergedTimetableData) {
-    const { id, editToken } = await FallbackData.createMergedTimetable(timetable);
+    const { id, editToken } = await BackendApi.createMergedTimetable(timetable);
     await this.saveCustomEditToken(id, editToken);
     return Util.CUSTOM_PREFIX + id;
   }
@@ -320,7 +322,7 @@ class TimetableManager {
   }
 
   async deleteCustomTimetable(id: string, editToken: string) {
-    await FallbackData.deleteCustomTimetable(id, editToken);
+    await BackendApi.deleteCustomTimetable(id, editToken);
     await this.deleteTimetable(Util.CUSTOM_PREFIX + id);
     await this.saveCustomDraft(Util.CUSTOM_PREFIX + id, null);
   }
@@ -346,11 +348,10 @@ class TimetableManager {
     return LocalCache.set("customDrafts", draft ? { ...drafts, [group]: draft } : drafts);
   }
 
-  async saveExamsLocally(group: string, timetable?: ExamsTimetableItem[] | null) {
-    if (!timetable) return;
+  async saveExamsLocally(group: string, timetable: ExamsTimetableItem[], time: number) {
     const { data: examsTimetables } = await LocalCache.get("examsTimetables");
     const saved = examsTimetables?.filter((el) => el.group.toLowerCase() !== group.toLowerCase()) ?? [];
-    await LocalCache.set("examsTimetables", [...saved, { group, time: Date.now() }]);
+    await LocalCache.set("examsTimetables", [...saved, { group, time }]);
     await LocalCache.set(`exams_timetable_${group}`, timetable);
     return timetable;
   }
@@ -409,7 +410,7 @@ class TimetableManager {
     if (data.subgroup === subgroup) return;
 
     const { data: savedTimetables } = await LocalCache.get("savedTimetables");
-    const saved = savedTimetables?.filter((el) => el.group !== group) ?? []; // remove previous timetable
+    const saved = savedTimetables?.filter((el) => el.group !== group) ?? [];
     return LocalCache.set("savedTimetables", [...saved, { ...data, subgroup }]);
   }
 
@@ -464,7 +465,7 @@ class TimetableManager {
     const compare = (el: string) => el.toLowerCase() === timetable.toLowerCase();
     if (LocalCache.sync.groups?.some(compare)) {
       if (timetable.toLowerCase().endsWith("з")) return "parttime";
-      return "timetable";
+      return "regular";
     }
     if (LocalCache.sync.selectiveGroups?.some(compare)) return "selective";
     if (LocalCache.sync.lecturers?.some(compare)) return "lecturer";
@@ -474,18 +475,17 @@ class TimetableManager {
       return timetable.toLowerCase().endsWith("з") ? "postgraduate_parttime" : "postgraduate";
     }
 
-    // try to guess the type based on the name
     const numberOfDashes = timetable.split("-").length - 1;
     const containsNumbers = /\d/.test(timetable);
 
     if (!containsNumbers) return "lecturer";
     if (numberOfDashes === 1) {
       if (timetable.toLowerCase().endsWith("з")) return "parttime";
-      return "timetable";
+      return "regular";
     }
     if (numberOfDashes >= 2) return "selective";
 
-    return "timetable"; // FIXME temporary allow to fetch unknown groups
+    return "regular";
   }
 
   get cachedTimetables() {
@@ -537,7 +537,7 @@ class TimetableManager {
   }
 
   private async getInstitutes(): Promise<CachedInstitute[]> {
-    return this.getData("institutes", FallbackData, FallbackData.getInstitutes).then((i) => i ?? []);
+    return this.getData("institutes", BackendApi, BackendApi.getInstitutes).then((i) => i ?? []);
   }
 
   private async ifPartialTimetableExists(_group: string, _halfTerm: 1 | 2) {
@@ -547,31 +547,31 @@ class TimetableManager {
   private async getTimetableGroups(institute?: string): Promise<string[]> {
     return await this.getData(
       `${institute ? (`groups_${institute}` as const) : ("groups" as const)}`,
-      FallbackData,
-      FallbackData.getGroups,
+      BackendApi,
+      BackendApi.getGroups,
       institute
     ).then((g) => g ?? []);
   }
 
   private getSelectiveGroups(): Promise<string[]> {
-    return this.getData("selectiveGroups", FallbackData, FallbackData.getSelectiveGroups).then((g) => g ?? []);
+    return this.getData("selectiveGroups", BackendApi, BackendApi.getSelectiveGroups).then((g) => g ?? []);
   }
 
   private getPostgraduateGroups(): Promise<string[]> {
-    return this.getData("postgraduateGroups", FallbackData, FallbackData.getPostgraduateGroups).then((g) => g ?? []);
+    return this.getData("postgraduateGroups", BackendApi, BackendApi.getPostgraduateGroups).then((g) => g ?? []);
   }
 
   private getLecturers(): Promise<string[]> {
-    return this.getData("lecturers", FallbackData, FallbackData.getLecturers).then((l) => l ?? []);
+    return this.getData("lecturers", BackendApi, BackendApi.getLecturers).then((l) => l ?? []);
   }
 
   private getLecturerDepartments(): Promise<string[]> {
-    return this.getData("departments", FallbackData, FallbackData.getLecturerDepartments).then((d) => d ?? []);
+    return this.getData("departments", BackendApi, BackendApi.getLecturerDepartments).then((d) => d ?? []);
   }
 
   private async getData<K extends CacheKey, P extends unknown[]>(
     key: K,
-    binding: typeof LPNUData | typeof FallbackData,
+    binding: typeof BackendApi,
     fn: (...params: P) => Promise<CacheData[K]>,
     ...args: P
   ): Promise<CacheData[K] | null> {

@@ -7,7 +7,7 @@ import type { TimetableType } from "@/types/timetable";
 import styles from "./Navigation.module.scss";
 
 const navigationItems: Array<{ value: TimetableType; name: string }> = [
-  { value: "timetable", name: "Студент" },
+  { value: "regular", name: "Студент" },
   { value: "selective", name: "Вибіркові" },
   { value: "lecturer", name: "Викладач" },
   { value: "postgraduate", name: "Аспірант" },
@@ -22,7 +22,7 @@ const Navigation: FC<OwnProps> = ({ timetableType }) => {
   const navigate = useNavigate();
 
   const onMobileSelectChange = (type: string) => {
-    navigate(`/${type === "timetable" ? "home" : type}`, { state: { force: true } });
+    navigate(`/${type === "regular" ? "home" : type}`, { state: { force: true } });
   };
 
   return (
@@ -31,7 +31,7 @@ const Navigation: FC<OwnProps> = ({ timetableType }) => {
         navigationItems.map((type) => (
           <Link
             state={{ force: true }}
-            to={`/${type.value === "timetable" ? "home" : type.value}`}
+            to={`/${type.value === "regular" ? "home" : type.value}`}
             key={type.value}
             className={classes(styles["nav-link"], timetableType === type.value && styles.active)}
           >

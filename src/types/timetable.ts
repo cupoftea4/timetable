@@ -26,7 +26,7 @@ export type ExamsTimetableItem = {
 export type TimetableItemType = "lection" | "practical" | "lab" | "consultation";
 export type Semester = "1" | "2";
 export type LPNUTimetableType =
-  | "timetable"
+  | "regular"
   | "selective"
   | "lecturer"
   | "parttime"

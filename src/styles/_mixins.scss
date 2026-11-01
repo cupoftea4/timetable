@@ -162,6 +162,18 @@
   }
 }
 
+// Stays invisible for $delay, so something that's usually ready within a few ms doesn't flash
+@mixin appear-after($delay) {
+  animation: hidden 0s $delay backwards;
+
+  @keyframes hidden {
+    from,
+    to {
+      opacity: 0;
+    }
+  }
+}
+
 @mixin timetable-mobile {
   @media only screen and (max-width: 1000px) {
       @content;

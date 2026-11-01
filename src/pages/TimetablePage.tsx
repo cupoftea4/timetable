@@ -5,6 +5,7 @@ import TimetableFooter from "@/features/footer/TimetableFooter";
 import TimetableHeader from "@/features/header/TimetableHeader";
 import ExamsTimetable from "@/features/timetable/ExamsTimetable";
 import Timetable from "@/features/timetable/Timetable";
+import useCanonicalUrl from "@/hooks/useCanonicalUrl";
 import useGroupParam from "@/hooks/useGroupParam";
 import useGTagTimetableEvents from "@/hooks/useGTagTimetableEvents";
 import useMediaQuery, { useIsTablet } from "@/hooks/useMediaQuery";
@@ -26,7 +27,7 @@ import {
   TIMETABLE_SCREEN_BREAKPOINT,
 } from "@/utils/constants";
 import { getDefaultCustomName, toCustomLessons, toTimetableItems } from "@/utils/customTimetable";
-import { getCurrentSemester } from "@/utils/data/LPNUData";
+import { getCurrentSemester } from "@/utils/data/SemesterState";
 import TimetableManager from "@/utils/data/TimetableManager";
 import { getAvailableWeeks, getCurrentUADate, getCurrentWeek, isSecondNULPWeek } from "@/utils/date";
 import { doOnce, isFeaturesIntroDue, lazyPrefetched, optimisticRender } from "@/utils/general";
@@ -41,7 +42,6 @@ const CalendarHelp = lazy(() => import("@/features/intro/CalendarHelp"));
 const InstallPrompt = lazy(() => import("@/features/intro/InstallPrompt"));
 
 const tryToScrollToCurrentDay = (el: HTMLElement, timetable: TimetableItem[]) => {
-  // yeah, naming! :)
   const width = el.getBoundingClientRect().width;
   const currentDay = getCurrentUADate().getDay() || 7; // 0 - Sunday
   const inTimetable = timetable?.some(({ day }) => Math.max(day, 5) >= currentDay);
@@ -57,6 +57,7 @@ type OwnProps = {
 type LocationState = { source?: string; isCustom?: boolean; editFromView?: boolean; examsFrom?: string };
 
 const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
+  useCanonicalUrl();
   const group = useGroupParam();
   const isSecondNULPSubgroup = () => TimetableManager.getSubgroup(group) === 2;
   const [timetable, setTimetable] = useState<TimetableItem[]>();
@@ -93,6 +94,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
 
   const isLoading = isExamsTimetable ? !examsTimetable : !timetable;
   const time = TimetableManager.getCachedTime(group, isExamsTimetable);
+  const isReadingSavedCopy = isLoading && time !== undefined;
   const timetableType = useMemo(() => TimetableManager.tryToGetType(group), [group]);
   const hasCellSubgroups = timetableType === "lecturer" || customTimetable?.subgroupToggle === false;
   const hasSubgroupLessons = timetable?.some((item) => !(item.isFirstSubgroup && item.isSecondSubgroup)) ?? true;
@@ -215,18 +217,22 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
     const renderTimetable = (timetable: TimetableItem[], optimistic: boolean) => {
       setTimetable((t) => (JSON.stringify(t) !== JSON.stringify(timetable) ? timetable : t));
       setIsSecondSubgroup(TimetableManager.getSubgroup(group) === 2);
-      if (!optimistic && type === "timetable") TimetableManager.getPartials(group).then(setPartials);
+      if (!optimistic && type === "regular") TimetableManager.getPartials(group).then(setPartials);
     };
+    const onTimetableError = (e: string) => onError(e, e === Toast.NONEXISTING_TIMETABLE ? e : undefined);
     if (type === "custom") {
       const renderCustomTimetable = (timetable: CustomTimetable, optimistic: boolean) => {
         setCustomTimetable(timetable);
         renderTimetable(toTimetableItems(timetable.lessons), optimistic);
       };
-      const onCustomError = (e: string) => onError(e, e === Toast.NONEXISTING_TIMETABLE ? e : undefined);
-      return optimisticRender(renderCustomTimetable, onCustomError, TimetableManager.getCustomTimetable(group));
+      return optimisticRender(renderCustomTimetable, onTimetableError, TimetableManager.getCustomTimetable(group));
     }
     try {
-      return optimisticRender(renderTimetable, onError, TimetableManager.getTimetable(group, type, checkCache));
+      return optimisticRender(
+        renderTimetable,
+        onTimetableError,
+        TimetableManager.getTimetable(group, type, checkCache)
+      );
     } catch (_e) {
       console.error(_e);
       onError(Toast.NONEXISTING_TIMETABLE);
@@ -239,13 +245,14 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
       return;
     }
     // TODO: remove partial timetables or fix them
-    // Toast.promise(TimetableManager.getPartialTimetable(group, partial).then(setTimetable));
   };
 
   const updateTimetable = (checkCache = false) => {
     if (loading) return;
     setLoading(true);
-    getTimetable(group, isExamsTimetable, timetableType, checkCache)?.finally(() => {
+    // A refresh that takes a few ms would look like the button did nothing, so it spins at least one full turn
+    const minSpin = !checkCache && new Promise((resolve) => setTimeout(resolve, 1000));
+    void Promise.all([getTimetable(group, isExamsTimetable, timetableType, checkCache), minSpin]).finally(() => {
       setLoading(false);
     });
   };
@@ -339,7 +346,7 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={classes(styles.wrapper, isReadingSavedCopy && styles.readingSavedCopy)}>
       <TimetableHeader
         isExamsTimetable={isExamsTimetable}
         timetableType={timetableType}

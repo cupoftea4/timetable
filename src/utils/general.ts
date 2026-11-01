@@ -3,14 +3,7 @@ import type { RenderPromises } from "@/types/utils";
 import { SEEN_FEATURES_INTRO } from "./constants";
 import { getCurrentUADate } from "./date";
 
-/**
- * Renders the optimistic data first, then the real data if possible.
- * It takes in two promises, that return data to be rendered.
- * For rendering it uses the `render` callback and for errors it uses the `error` callback.
- * @param render - A function that renders the data
- * @param error - A function that handles errors
- * @param promises - An array of two promises that return data to be rendered
- */
+/** Renders the optimistic data first, then the real data if possible. */
 export async function optimisticRender<T>(
   render: (data: T, optimistic: boolean) => void,
   error: ((error: string) => void) | (() => void),
@@ -73,11 +66,6 @@ export function findAndConvertRomanNumeral(input: string): number | null {
   return null;
 }
 
-/**
- * Basic hash function.
- * @param str - The string to hash
- * @returns The hash of the string as a number
- */
 export function hashCode(str: string) {
   let hash = 0;
   if (str.length === 0) {
@@ -101,12 +89,6 @@ export function isDarkMode() {
   return theme === null ? window.matchMedia("(prefers-color-scheme: dark)").matches : theme === "dark";
 }
 
-/**
- * Removes all line breaks from a string and replaces them with spaces.
- *
- * @param str - The string to format
- * @returns Formatted string
- */
 export function removeLineBreaks(str: string) {
   return str.replace(/[\r\n]+/g, " ").trim();
 }
@@ -124,15 +106,16 @@ export const isFeaturesIntroDue = () =>
 /** React.lazy that also loads in the background right after the page, so opening it doesn't wait for the network */
 export function lazyPrefetched<P extends object>(load: () => Promise<{ default: ComponentType<P> }>) {
   let loaded: ComponentType<P> | undefined;
-  setTimeout(() => {
+  const preload = () =>
     load().then(
       (module) => {
         loaded = module.default;
       },
       () => {}
     );
-  }, 500);
+  setTimeout(preload, 500);
   const Lazy = lazy(load);
   // Lazy suspends on its first render even when loaded, and React holds back what suspended for 300ms
-  return (props: P) => createElement(loaded ?? Lazy, props);
+  const Component = (props: P) => createElement(loaded ?? Lazy, props);
+  return Object.assign(Component, { preload });
 }
