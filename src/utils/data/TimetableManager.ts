@@ -485,7 +485,7 @@ class TimetableManager {
     }
     if (numberOfDashes >= 2) return "selective";
 
-    return "regular"; // FIXME temporary allow to fetch unknown groups
+    return "regular";
   }
 
   get cachedTimetables() {

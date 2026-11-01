@@ -148,7 +148,7 @@ export function getSourceOptions(selected: string[]) {
       updatedAt && names.filter((n) => n === name).length > 1
         ? new Date(updatedAt).toLocaleDateString("uk-UA", { day: "numeric", month: "short" })
         : undefined;
-    return [owned, date].filter(Boolean).join(" · ") || undefined;
+    return [owned, date].filter(Boolean).join(", ") || undefined;
   };
 
   return [

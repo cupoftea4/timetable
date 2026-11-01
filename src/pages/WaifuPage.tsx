@@ -5,7 +5,7 @@ import usePageTitle from "@/hooks/usePageTitle";
 import styles from "./WaifuPage.module.scss";
 
 const WaifuPage = () => {
-  usePageTitle("Waifu · Розклад НУЛП");
+  usePageTitle("Waifu | Розклад НУЛП");
 
   return (
     <main className={styles.page}>

@@ -292,11 +292,11 @@ const TimetableFooter: FC<OwnProps> = ({
             </span>
           )}
           {isOwner ? " розклад з " : "Розклад з "}
-          {sources} ·{" "}
+          {sources}.{" "}
           {customTimetable.kind === "merged" ? (
-            "оновлюється автоматично"
+            "Оновлюється автоматично"
           ) : (
-            <span data-tooltip={`Востаннє ${customTimetableUpdatedAtText}`}>змінено вручну</span>
+            <span data-tooltip={`Востаннє ${customTimetableUpdatedAtText}`}>Змінено вручну</span>
           )}
         </p>
       ) : (

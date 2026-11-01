@@ -155,7 +155,7 @@ const HomePage: FC<OwnProps> = ({ timetableType }) => {
             {isTablet && selectedSecond && (
               <button type="button" className={styles.back} onClick={() => handleSecondChange(null)}>
                 <ArrowRightIcon />
-                {selectedFirst} · {selectedSecond}
+                {selectedFirst} / {selectedSecond}
               </button>
             )}
             {showThirdLayer ? (

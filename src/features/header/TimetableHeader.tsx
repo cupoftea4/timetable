@@ -65,8 +65,8 @@ const TimetableHeader: FC<OwnProps> = ({
   // Worded like the searches that lead here, e.g. "розклад пз-21"
   usePageTitle(
     customTimetable || timetableType === "merged"
-      ? `${groupTitle} · Розклад НУЛП`
-      : `${isExamsTimetable ? "Екзамени" : "Розклад"} ${groupTitle} · НУЛП`
+      ? `${groupTitle} | Розклад НУЛП`
+      : `${isExamsTimetable ? "Екзамени" : "Розклад"} ${groupTitle} | НУЛП`
   );
   const titleRef = useRef<HTMLHeadingElement>(null);
   // On phones a title too long for one line wraps in a smaller font
