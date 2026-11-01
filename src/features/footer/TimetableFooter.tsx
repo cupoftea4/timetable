@@ -25,7 +25,18 @@ import SavedMenu from "../header/components/SavedMenu";
 import ShareButton from "../header/components/ShareButton";
 import styles from "./TimetableFooter.module.scss";
 
-const DAY = 24 * 60 * 60 * 1000;
+const MINUTE = 60 * 1000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+
+const relativeTime = new Intl.RelativeTimeFormat("uk", { numeric: "auto" });
+
+const formatUpdatedAgo = (ago: number, time: number) => {
+  if (ago < MINUTE) return "щойно";
+  if (ago < HOUR) return relativeTime.format(-Math.floor(ago / MINUTE), "minute");
+  if (ago < DAY) return relativeTime.format(-Math.floor(ago / HOUR), "hour");
+  return new Date(time).toLocaleDateString("uk", { day: "numeric", month: "long" });
+};
 
 const Drawer = lazyPrefetched(() => import("@/shared/Drawer"));
 
@@ -67,6 +78,12 @@ const TimetableFooter: FC<OwnProps> = ({
   const [showMore, setShowMore] = useState(false);
   const footerRef = useRef<HTMLElement>(null);
   const [isOffScreen, setIsOffScreen] = useState(false);
+  const [now, setNow] = useState(Date.now);
+
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), MINUTE);
+    return () => clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const footer = footerRef.current;
@@ -87,7 +104,7 @@ const TimetableFooter: FC<OwnProps> = ({
     : "";
 
   // On phones only worth the space when the data couldn't be refreshed for a while
-  const updatedText = time && (!isNarrow || Date.now() - time > DAY) && `Оновлено ${new Date(time).toLocaleString()}`;
+  const updatedText = time && (!isNarrow || now - time > DAY) && `Оновлено ${formatUpdatedAgo(now - time, time)}`;
   const sources = customTimetable?.sourceNames.map((source, i) => (
     <Fragment key={source}>
       {i > 0 && ", "}

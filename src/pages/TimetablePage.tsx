@@ -253,7 +253,9 @@ const TimetablePage: FC<OwnProps> = ({ isExamsTimetable = false }) => {
   const updateTimetable = (checkCache = false) => {
     if (loading) return;
     setLoading(true);
-    getTimetable(group, isExamsTimetable, timetableType, checkCache)?.finally(() => {
+    // A refresh that takes a few ms would look like the button did nothing, so it spins at least one full turn
+    const minSpin = !checkCache && new Promise((resolve) => setTimeout(resolve, 1000));
+    void Promise.all([getTimetable(group, isExamsTimetable, timetableType, checkCache), minSpin]).finally(() => {
       setLoading(false);
     });
   };
