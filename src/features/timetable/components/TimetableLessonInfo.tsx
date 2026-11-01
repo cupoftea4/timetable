@@ -1,9 +1,11 @@
-import { type FC, memo } from "react";
+import { type FC, Fragment, memo } from "react";
+import { Link } from "react-router-dom";
 import useGroupParam from "@/hooks/useGroupParam";
 import { classes } from "@/styles/utils";
 import type { TimetableItem } from "@/types/timetable";
+import TimetableManager from "@/utils/data/TimetableManager";
 import { hashCode } from "@/utils/general";
-import { generateId, getDisplayType } from "@/utils/timetable";
+import { findLecturer, generateId, getDisplayType } from "@/utils/timetable";
 import TimetableLink from "../ui/TimetableLink";
 import styles from "./TimetableLesson.module.scss";
 
@@ -29,6 +31,10 @@ const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) =
 
   const lecturer = cleanupInfoString(lesson.lecturer);
   const location = cleanupInfoString(lesson.location);
+  const linkTo = (name: string) =>
+    lesson.groups?.includes(name)
+      ? name
+      : lesson.lecturers?.includes(name) && findLecturer(name, TimetableManager.cachedLecturers);
 
   return (
     <div
@@ -42,7 +48,22 @@ const TimetableLessonInfo: FC<OwnProps> = ({ lesson, cellSubgroup, isMerged }) =
         )}
         <span className={styles.title}>
           <h2 className={styles.name}>{lesson.subject.replace("`", "’")}</h2>
-          {lecturer + (location && `, ${location}`)}
+          {lecturer.split(", ").map((name, index) => {
+            const to = linkTo(name);
+            return (
+              <Fragment key={name}>
+                {index > 0 && ", "}
+                {to ? (
+                  <Link to={`/${to}`} className={styles.person}>
+                    {name}
+                  </Link>
+                ) : (
+                  name
+                )}
+              </Fragment>
+            );
+          })}
+          {location && `${lecturer ? ", " : ""}${location}`}
         </span>
         <span className={styles.extra}>
           {getDisplayType(lesson.type)}

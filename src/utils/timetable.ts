@@ -121,6 +121,23 @@ export function extractLecturerUniquePrefixes(names: string[], prefixLength = 2)
   return [...prefixes].sort((a, b) => a.localeCompare(b));
 }
 
+const lecturersByShortName = new WeakMap<readonly string[], Map<string, string | null>>();
+
+/** Full name of a lecturer written as "Шаран В.Л.", when exactly one lecturer has it */
+export function findLecturer(shortName: string, lecturers: readonly string[]) {
+  let byShortName = lecturersByShortName.get(lecturers);
+  if (!byShortName) {
+    byShortName = new Map();
+    for (const lecturer of lecturers) {
+      const [surname, ...names] = lecturer.split(" ");
+      const key = `${surname} ${names.map((name) => `${name[0]}.`).join("")}`;
+      byShortName.set(key, byShortName.has(key) ? null : lecturer);
+    }
+    lecturersByShortName.set(lecturers, byShortName);
+  }
+  return byShortName.get(shortName.replace(/\.\s+/g, ".")) ?? undefined;
+}
+
 export function needsUpdate(timestamp: number) {
   if (!timestamp) return true;
   return navigator.onLine && Date.now() - UPDATE_PERIOD > timestamp;

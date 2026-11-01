@@ -471,7 +471,7 @@ class TimetableManager {
     if (LocalCache.sync.lecturers?.some(compare)) return "lecturer";
     if (timetable === MERGED_TIMETABLE) return "merged";
     // Only postgraduate groups are named like КНА-11, which also covers the ones missing from the list
-    if (LocalCache.sync.postgraduateGroups?.some(compare) || /^[^-]{2}а-\d+з?$/i.test(timetable)) {
+    if (LocalCache.sync.postgraduateGroups?.some(compare) || /^[^-]{2}а-\d+[зf]?$/i.test(timetable)) {
       return timetable.toLowerCase().endsWith("з") ? "postgraduate_parttime" : "postgraduate";
     }
 

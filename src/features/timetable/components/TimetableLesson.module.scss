@@ -145,7 +145,18 @@ $cell-border-radius: .625rem;
         .name {
           font-size:  inherit;
           font-weight: $semi-bold-font;
-        }      
+        }
+        .person {
+          text-decoration: underline dotted;
+          text-decoration-color: color-mix(in srgb, currentColor 25%, transparent);
+          text-underline-offset: 3px;
+          // Cyrillic descenders (Д, р, ц) would cut gaps into it
+          text-decoration-skip-ink: none;
+          transition: text-decoration-color .15s;
+          &:hover {
+            text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+          }
+        }
       }
       /* Type and link */
       > .extra {

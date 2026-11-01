@@ -7,6 +7,9 @@ export type TimetableItem = {
   isSecondWeek: boolean;
   lecturer: string;
   location: string;
+  // Parsed by the backend, missing in older stored timetables and custom lessons
+  lecturers?: string[];
+  groups?: string[];
   number: number;
   subject: string;
   type: TimetableItemType;
