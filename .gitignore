@@ -22,4 +22,4 @@ yarn-error.log*
 .vscode/settings.json
 .idea/
 yarn.lock
-.gitignore
+/.claude/

@@ -100,3 +100,17 @@
 
 [3.0.1] - 2026-10-13
 - The calendar (.ics) export now includes the working Saturdays
+
+[3.1.0] - 2026-11-08
+- Timetables now load from our own server, so they open faster and stay available while lpnu.ua is down
+- Postgraduate timetables
+- Lecturers, groups and rooms in lessons are links; a room opens a timetable of everything held there
+- Opening a group from a lesson picks that lesson's subgroup, and a subgroup picked by hand stays picked
+- The subgroup toggle is hidden for timetables without subgroups
+- Clearer refresh feedback with the time of the last update
+- Saved timetables show instantly, without a loading placeholder
+- Better link previews and search results
+- Fixed a blank page after an app update, and the app now picks up updates reliably
+- Fixed room links shared in messengers that lost their trailing dot
+- Fixed uneven desktop columns, the current lesson being out of view, and lesson colors
+- Fixed Safari bar colors around drawers and the keyboard, and the Android app background

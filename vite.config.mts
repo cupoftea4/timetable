@@ -12,7 +12,8 @@ export default defineConfig({
     tsconfigPaths: true
   },
   define: {
-    APP_VERSION: JSON.stringify(process.env.npm_package_version),
+    // Changes with every build, so each deploy installs a new service worker
+    BUILD_ID: JSON.stringify(Date.now().toString(36)),
   },
   server: {
     port: 5174
