@@ -19,8 +19,13 @@
 		file_server
 	}
 
+	# route keeps this order, so the header sees the path after the SPA fallback
 	handle {
-		try_files {path} /index.html
-		file_server
+		route {
+			try_files {path} /index.html
+			# The page names its build's assets, so the browser has to check for a newer one
+			header /index.html Cache-Control "no-cache"
+			file_server
+		}
 	}
 }
