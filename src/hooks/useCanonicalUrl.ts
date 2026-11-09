@@ -11,7 +11,7 @@ const useCanonicalUrl = (): void => {
       link.rel = "canonical";
       document.head.append(link);
     }
-    link.href = `https://lpnu.pp.ua${pathname}`;
+    link.href = `https://lpnu.pp.ua${pathname === "/home" ? "/" : pathname}`;
   }, [pathname]);
 };
 
