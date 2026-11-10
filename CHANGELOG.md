@@ -114,3 +114,6 @@
 - Fixed room links shared in messengers that lost their trailing dot
 - Fixed uneven desktop columns, the current lesson being out of view, and lesson colors
 - Fixed Safari bar colors around drawers and the keyboard, and the Android app background
+
+[3.1.1] - 2026-11-09
+- Search engines show the main address instead of /home
