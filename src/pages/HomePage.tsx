@@ -13,6 +13,7 @@ import MissingGroupTip from "@/features/home/MissingGroupTip";
 import TimetablesSelection from "@/features/home/TimetablesSelection";
 import useCanonicalUrl from "@/hooks/useCanonicalUrl";
 import { useIsTablet } from "@/hooks/useMediaQuery";
+import usePageTitle from "@/hooks/usePageTitle";
 import List from "@/shared/List";
 import { classes } from "@/styles/utils";
 import type { TimetableType } from "@/types/timetable";
@@ -21,12 +22,22 @@ import TimetableManager from "@/utils/data/TimetableManager";
 import Toast from "@/utils/toasts";
 import styles from "./HomePage.module.scss";
 
+type HomeTimetableType = Extract<TimetableType, "regular" | "selective" | "lecturer" | "postgraduate">;
+
+const TITLES: Record<HomeTimetableType, string> = {
+  regular: "Розклад НУЛП — пари й екзамени Львівської політехніки",
+  selective: "Розклад вибіркових дисциплін | НУЛП",
+  lecturer: "Розклад викладачів | НУЛП",
+  postgraduate: "Розклад аспірантів | НУЛП",
+};
+
 type OwnProps = {
-  timetableType: TimetableType;
+  timetableType: HomeTimetableType;
 };
 
 const HomePage: FC<OwnProps> = ({ timetableType }) => {
   useCanonicalUrl();
+  usePageTitle(TITLES[timetableType]);
   const [firstLayer, setFirstLayer] = useState<string[]>([]); // institutes/alphabet
   const [secondLayer, setSecondLayer] = useState<string[]>([]); // majors/departments/selective
   const [thirdLayer, setThirdLayer] = useState<string[]>([]); // groups/lecturers
