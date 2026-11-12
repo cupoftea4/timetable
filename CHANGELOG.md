@@ -117,3 +117,6 @@
 
 [3.1.1] - 2026-11-09
 - Search engines show the main address instead of /home
+
+[3.1.2] - 2026-11-12
+- The lecturer, selective and postgraduate pages have their own titles in search results
